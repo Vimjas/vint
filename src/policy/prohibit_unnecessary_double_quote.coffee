@@ -3,7 +3,8 @@ Policy = require('../policy')
 NodeType = require('../ast/nodetype').NodeType
 SeverityLevel = require('../level').SeverityLevel
 Sections = require('../reference/google_vim_script_style_guide').Sections
-getReferenceSource = require('../reference/google_vim_script_style_guide').getReferenceSource
+getReferenceSource = require('../reference/google_vim_script_style_guide')
+  .getReferenceSource
 
 
 # A class for validation policy of double quoted string.

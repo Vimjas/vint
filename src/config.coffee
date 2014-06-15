@@ -7,13 +7,9 @@ policyPaths = fs.readdirSync('./lib/policy')
 # @type {Array.<Policies>}
 Policies = []
 
-policyPaths.forEach((policyPath) ->
-  if path.extname(policyPath) != '.js'
-    return
-
+for policyPath in policyPaths when path.extname(policyPath) == '.js'
   Policy = require(path.join(__dirname, 'policy', policyPath))
-  Policies.push(new Policy()))
-
+  Policies.push(new Policy())
 
 # Returns an enabled policy.
 # @param {SeverityLevel} level Severity level.

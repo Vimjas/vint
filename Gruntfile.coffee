@@ -1,16 +1,22 @@
-module.exports = (grunt) ->  
-  grunt.loadNpmTasks('grunt-contrib-jshint')
-  grunt.loadNpmTasks('grunt-este-watch')
+module.exports = (grunt) ->
+  grunt.loadNpmTasks('grunt-contrib-coffee')
+  grunt.loadNpmTasks('grunt-contrib-watch')
   grunt.loadNpmTasks('grunt-jsonlint')
+  grunt.loadNpmTasks('grunt-coffeelint')
   grunt.loadNpmTasks('grunt-mocha-test')
 
   grunt.initConfig(
     pkg: grunt.file.readJSON('package.json')
 
-    jshint:
-      files: ['*.js', 'lib/**/*.js', 'bin/**/*.js', 'test/**/*.js']
+    coffee:
+      compile:
+        files:
+          'lib/**/*.js': ['src/**/*.coffee']
+
+    coffeelint:
+      files: ['src/**/*.coffee', 'test/**/*.coffee']
       options:
-        globals: 
+        globals:
           console: true
           module: true
 
@@ -19,14 +25,14 @@ module.exports = (grunt) ->
 
     mochaTest:
       test:
-        src: ['test/**/*.js', '!test/fixture/**/*.js']
+        src: ['test/**/*.coffee', '!test/fixture/**/*.coffee']
         options:
           reporter: 'spec'
           growl: true
 
-    esteWatch: 
-      dirs: ['src', 'test']
-      tasks: ['jshint', 'jsonlint', 'mochaTest']
+    watch:
+      files: ['<%= coffeelint.files %>', '<%= jsonlint.files %>']
+      tasks: ['coffeelint', 'jsonlint', 'mochaTest', 'coffee']
   )
 
-  grunt.registerTask('default', ['jshint', 'jsonlint', 'mochaTest'])
+  grunt.registerTask('default', ['coffeelint', 'jsonlint', 'mochaTest'])
