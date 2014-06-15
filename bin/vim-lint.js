@@ -1,10 +1,10 @@
 var fs = require('fs');
 
-var VimLParser = require('./vimlparser.js');
-var Reporter = require('./reporter/reporter.js');
-var getEnabledPolicies = require('./config.js').getEnabledPolicies;
-var SeverityLevel = require('./level.js').SeverityLevel;
-var lint = require('./lint.js').lint;
+var VimLParser = require('../extlib/vimlparser.js');
+var Reporter = require('../lib/reporter/reporter.js');
+var getEnabledPolicies = require('../lib/config.js').getEnabledPolicies;
+var SeverityLevel = require('../lib/level.js').SeverityLevel;
+var lint = require('../lib/lint.js').lint;
 
 var filepath = '/Users/OrgaChem/.vimrc';
 
