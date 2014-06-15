@@ -1,20 +1,22 @@
 var inherits = require('util').inherits;
-var Policy = require('./policy.js');
+var Policy = require('../policy.js');
 var NodeType = require('../ast/nodetype.js').NodeType;
+var SeverityLevel = require('../level.js').SeverityLevel;
+var Sections = require('../reference/google_vim_script_style_guide.js').Sections;
+var getReferenceSource = require('../reference/google_vim_script_style_guide.js').getReferenceSource;
 
 
 
 /**
  * A class for validation policy of double quoted string.
- * @param {number} violationId Violation ID.
  * @constructor
  * @extends {Policy}
  */
-function ProhibitUnnecessaryDoubleQuote(violationId) {
-  Policy.call(this, violationId);
-  this.desc = 'Prefer single quoted strings.';
-  this.name = 'ProhibitUnnecessaryDoubleQuote';
-  this.ref = 'Google VimScript Style Guide #Strings';
+function ProhibitUnnecessaryDoubleQuote() {
+  Policy.call(this);
+  this.desc = 'Prefer single quoted strings';
+  this.ref = getReferenceSource(Sections.STRINGS);
+  this.level = SeverityLevel.WARNING;
 };
 inherits(ProhibitUnnecessaryDoubleQuote, Policy);
 

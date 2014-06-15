@@ -13,16 +13,22 @@ var Violation;
 
 
 /**
+ * Linting environment.
+ * @typedef {{ path: string }}
+ */
+var Environment;
+
+
+/**
  * A class for abstract validation policy.
- * @param {number} violationId Violation ID.
  * @constructor
  */
-function Policy(violationId) {
+function Policy() {
   this.violations = [];
-  this.violationId = violationId;
-  this.name = null;
+  this.name = this.constructor.name;
   this.desc = null;
   this.ref = null;
+  this.level = null;
 };
 
 
@@ -40,12 +46,12 @@ Policy.prototype.listeningNodeType = function() {
  * In default, store a violation object if the node has any violations.
  * @param {Node} node Vim language AST node to check.
  * @param {Node} root Root Vim language AST node.
- * @param {string} path File path ot the AST.
+ * @param {Environment} env Linting environment.
  */
-Policy.prototype.handleNode = function(node, root, path) {
+Policy.prototype.handleNode = function(node, root, env) {
   var isValidNode = this.isValid(node, root);
   if (!isValidNode) {
-    this.violations.push(this.createViolationReport(node.pos, path, node));
+    this.violations.push(this.createViolationReport(node.pos, env, node));
   }
 };
 
@@ -53,16 +59,17 @@ Policy.prototype.handleNode = function(node, root, path) {
 /**
  * Creates a violation report.
  * @param {Position} pos Violation position.
- * @param {string} path File path ot the AST.
+ * @param {Environment} env Linting environment.
  * @return {Violation} Violation object.
  * @protected
  */
-Policy.prototype.createViolationReport = function(pos, path) {
+Policy.prototype.createViolationReport = function(pos, env) {
   return {
-    id: this.violationId,
+    name: this.name,
+    level: this.level,
     desc: this.desc,
     ref: this.ref,
-    path: path,
+    path: env.path,
     pos: pos,
   };
 };
