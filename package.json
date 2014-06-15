@@ -1,0 +1,48 @@
+{
+  "name": "vim-lint",
+  "version": "0.0.0",
+  "description": "Vim script linter.",
+  "main": "lib/index.js",
+  "bin": {
+    "vim-lint": "bin/vim-lint.js"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha test",
+    "build": "./node_modules/coffee-script/bin/coffee --compile --output lib/ src/",
+    "prepublish": "./node_modules/coffee-script/bin/coffee --compile --output lib/ src/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Kuniwak/vim-lint"
+  },
+  "keywords": [
+    "vim",
+    "lint"
+  ],
+  "author": "Kuniwak",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Kuniwak/vim-lint/issues"
+  },
+  "homepage": "https://github.com/Kuniwak/vim-lint",
+  "devDependencies": {
+    "chai": "^1.9.1",
+    "chai-as-promised": "^4.1.1",
+    "coffee-script": "^1.7.1",
+    "grunt": "^0.4.5",
+    "grunt-contrib-coffee": "^0.10.1",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-este-watch": "^0.1.16",
+    "grunt-jsonlint": "^1.0.4",
+    "grunt-mocha-test": "^0.11.0",
+    "jshint": "^2.5.1",
+    "jsonlint": "^1.6.0",
+    "mocha": "^1.20.1"
+  },
+  "dependencies": {
+    "promised-io": "^0.3.4"
+  }
+}
