@@ -1,5 +1,5 @@
 # coffeelint: disable=max_line_length
-NodeType = require('./nodetype.js').NodeType
+NodeType = require('./nodetype').NodeType
 
 ChildNodePropertyStructure =
   NODE: (func, node) ->
