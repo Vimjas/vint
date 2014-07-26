@@ -26,9 +26,9 @@ class ProhibitUnnecessaryDoubleQuote extends Policy
 
   # @override
   isValid: (node, root) ->
-    isSingleQuoted = node.value[0] != '"'
+    isDoubleQuoted = node.value[0] == '"'
 
-    return true if isSingleQuoted
+    return true if not isDoubleQuoted
     return STRING_SPECIAL_CHAR_MATCHER.test(node.value)
 
 
