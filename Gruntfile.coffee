@@ -13,7 +13,7 @@ module.exports = (grunt) ->
         expand: true,
         flatten: true,
         cwd: 'src',
-        src: ['*.coffee'],
+        src: ['**/*.coffee'],
         dest: 'lib',
         ext: '.js'
 
