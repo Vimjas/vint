@@ -9,9 +9,13 @@ module.exports = (grunt) ->
     pkg: grunt.file.readJSON('package.json')
 
     coffee:
-      compile:
-        files:
-          'lib/**/*.js': ['src/**/*.coffee']
+      glob_to_multiple:
+        expand: true,
+        flatten: true,
+        cwd: 'src',
+        src: ['*.coffee'],
+        dest: 'lib',
+        ext: '.js'
 
     coffeelint:
       files: ['src/**/*.coffee', 'test/**/*.coffee']
