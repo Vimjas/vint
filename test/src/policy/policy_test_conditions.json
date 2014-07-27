@@ -1,0 +1,12 @@
+[
+  {
+    "policy": "src/policy/prohibit_unnecessary_double_quote.coffee",
+    "path": "test/fixture/prohibit_unnecessary_double_quote_invalid.vim",
+    "expected_violations": 2
+  },
+  {
+    "policy": "src/policy/prohibit_unnecessary_double_quote.coffee",
+    "path": "test/fixture/prohibit_unnecessary_double_quote_valid.vim",
+    "expected_violations": 0
+  }
+]

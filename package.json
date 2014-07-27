@@ -38,6 +38,7 @@
     "grunt-contrib-watch": "^0.6.1",
     "grunt-jsonlint": "^1.0.4",
     "grunt-mocha-test": "^0.11.0",
+    "grunt-notify": "^0.3.0",
     "jshint": "^2.5.1",
     "jsonlint": "^1.6.0",
     "mocha": "^1.20.1"

@@ -1,4 +1,4 @@
-traverse = require('./ast/traverse.js').traverse
+traverse = require('./ast/traverse.coffee').traverse
 
 lint = (policies, ast, env) ->
   listenersMap = {}

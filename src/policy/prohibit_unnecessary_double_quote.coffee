@@ -1,4 +1,3 @@
-inherits = require('util').inherits
 Policy = require('../policy')
 NodeType = require('../ast/nodetype').NodeType
 SeverityLevel = require('../level').SeverityLevel
@@ -27,10 +26,10 @@ class ProhibitUnnecessaryDoubleQuote extends Policy
 
   # @override
   isValid: (node, root) ->
-    isDoubleQuoted = node.value[0] != '"'
-    return false if not isDoubleQuoted
+    isDoubleQuoted = node.value[0] == '"'
 
-    return Boolean(STRING_SPECIAL_CHAR_MATCHER.test(node.value))
+    return true if not isDoubleQuoted
+    return STRING_SPECIAL_CHAR_MATCHER.test(node.value)
 
 
 # Special character mathcer for string constants.

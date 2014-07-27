@@ -1,3 +1,5 @@
+# Token types for Vim Script.
+# @enum {number}
 NodeType =
   TOPLEVEL:    1
   COMMENT:     2
@@ -88,6 +90,10 @@ NodeType =
   ENV:         88
   REG:         89
 
+
+# Retur a node type name.
+# @param {NodeType} nodeType Node type.
+# @return {string} Node type name.
 getNodeTypeName = (() ->
   reverseMap = {}
   for nodeTypeName of NodeType
@@ -96,5 +102,6 @@ getNodeTypeName = (() ->
 
   return (nodeType) -> reverseMap[nodeType])()
 
-exports.NodeType = NodeType
-exports.getNodeTypeName = getNodeTypeName
+module.exports =
+  NodeType: NodeType,
+  getNodeTypeName: getNodeTypeName

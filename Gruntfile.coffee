@@ -10,8 +10,15 @@ module.exports = (grunt) ->
 
     coffee:
       compile:
-        files:
-          'lib/**/*.js': ['src/**/*.coffee']
+        options:
+          sourceMap: true
+        files: [
+            expand: true,
+            cwd: 'src',
+            src: ['**/*.coffee'],
+            dest: 'lib/',
+            ext: '.js'
+        ]
 
     coffeelint:
       files: ['src/**/*.coffee', 'test/**/*.coffee']
