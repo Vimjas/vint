@@ -82,6 +82,7 @@ NodeType = {
     'STRING': 81,
     'LIST': 82,
     'DICT': 83,
+    'NESTING': 84,
     'OPTION': 85,
     'IDENTIFIER': 86,
     'CURLYNAME': 87,
