@@ -1,8 +1,8 @@
 import unittest
-import lib.ast.traverse
-from lib.ast.parser import Parser
+from lib.ast.parsing import Parser
 from lib.ast.node_type import get_node_type_name
 
+from lib.ast.traversing import traverse
 
 
 class TestTraverse(unittest.TestCase):
@@ -31,11 +31,11 @@ class TestTraverse(unittest.TestCase):
 
         actual_order_of_visit = []
 
-        # Records visited node type name in order
-        record_node_type_in_order = lambda node: actual_order_of_visit.append(
+        # Records visit node type name in order
+        record_visit_node_in_order = lambda node: actual_order_of_visit.append(
             get_node_type_name(node['type']))
 
-        lib.ast.traverse.traverse(record_node_type_in_order, self.ast)
+        traverse(record_visit_node_in_order, self.ast)
 
         self.assertEqual(actual_order_of_visit, expected_order_of_visit)
 
