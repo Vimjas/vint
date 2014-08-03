@@ -1,5 +1,5 @@
 import unittest
-from lib.policy.abstract_policy import AbstractPolicy
+from lib.lint.policy.abstract_policy import AbstractPolicy
 
 
 class ConcretePolicy(AbstractPolicy):
