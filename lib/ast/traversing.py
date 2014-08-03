@@ -174,12 +174,13 @@ class UnknownNodeTypeException(BaseException):
 
 
 def for_each(func, nodes):
+    """ Calls func for each the specified nodes. """
     for node in nodes:
         func(node)
 
 
 def call_if_def(func, node):
-    """ Calls function if the node is defined.
+    """ Calls func if the node is defined.
     VimLParser return an empty array if a child node is not defined.
     """
     if hasattr(node, 'type'):
@@ -187,12 +188,15 @@ def call_if_def(func, node):
 
 
 def traverse(func, node):
-    func(node)
-
+    """ Traverses the specified Vim script AST node (depth first order).
+    The func will be called the specified node and the children.
+    """
     node_type = node['type']
 
     if node_type not in ChildNodeAccessorMap:
         raise UnknownNodeTypeException(node_type)
+
+    func(node)
 
     for property_accessor in ChildNodeAccessorMap[node_type]:
         accessor_func = property_accessor['accessor']
