@@ -1,5 +1,5 @@
-from lib.ast.node_type import NodeType
-from lib.ast.node_type import get_node_type_name
+from lib.ast.nodetype import NodeType
+from lib.ast.nodetype import get_node_type_name
 
 
 ChildNodeAccessor = {

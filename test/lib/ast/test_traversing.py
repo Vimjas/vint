@@ -1,6 +1,6 @@
 import unittest
 from lib.ast.parsing import Parser
-from lib.ast.node_type import get_node_type_name
+from lib.ast.nodetype import get_node_type_name
 
 from lib.ast.traversing import traverse
 
