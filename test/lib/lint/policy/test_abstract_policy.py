@@ -22,6 +22,7 @@ class TestAbstractPolicy(unittest.TestCase):
             'lnum': 3,
         }
 
+        node = {'pos': pos}
         env = {'path': 'path/to/file.vim'}
 
         expected_violation = {
@@ -29,13 +30,16 @@ class TestAbstractPolicy(unittest.TestCase):
             'level': 0,
             'description': 'Found something invalid',
             'reference': 'http://example.com',
-            'path': 'path/to/file.vim',
-            'position': pos,
+            'position': {
+                'column': 3,
+                'line': 3,
+                'path': 'path/to/file.vim',
+            },
         }
 
         policy = ConcretePolicy()
         self.assertEqual(
-            policy.create_violation_report(pos, env),
+            policy.create_violation_report(node, env),
             expected_violation)
 
 
