@@ -4,27 +4,32 @@ class AbstractPolicy(object):
         self.description = None
         self.reference = None
         self.level = None
-        self.violations = []
 
 
     def listen_node_types(self):
         return []
 
 
-    def visit_node(self):
-        pass
+    def is_valid(self, node, env):
+        return True
 
 
-    def create_violation_report(self, pos, env):
+    def create_violation_report(self, node, env):
         return {
             'name': self.name,
             'level': self.level,
             'description': self.description,
             'reference': self.reference,
-            'path': env['path'],
-            'position': pos,
+            'position': {
+                'line': node['pos']['lnum'],
+                'column': node['pos']['col'],
+                'path': env['path'],
+            },
         }
 
 
-    def is_valid(self, node, root):
-        return True
+    def get_violation_if_found(self, node, env):
+        if self.is_valid(node, env):
+            return None
+
+        return self.create_violation_report(node, env)
