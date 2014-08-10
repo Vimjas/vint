@@ -7,14 +7,19 @@ class AbstractPolicy(object):
 
 
     def listen_node_types(self):
+        """ Listening node type.
+        is_valid will be called when a linter visit the listening node type.
+        """
         return []
 
 
     def is_valid(self, node, env):
+        """ Whether the specified node is valid for the policy. """
         return True
 
 
     def create_violation_report(self, node, env):
+        """ Returns a violation report for the node. """
         return {
             'name': self.name,
             'level': self.level,
@@ -29,6 +34,7 @@ class AbstractPolicy(object):
 
 
     def get_violation_if_found(self, node, env):
+        """ Returns a violation if the node is invalid. """
         if self.is_valid(node, env):
             return None
 
