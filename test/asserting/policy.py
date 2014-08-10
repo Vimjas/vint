@@ -1,7 +1,7 @@
 import unittest
 import os.path
 from itertools import zip_longest
-from lib.lint.linter import Linter
+from lib.linting.linter import Linter
 
 
 class PolicyAssertion(unittest.TestCase):

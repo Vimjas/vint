@@ -1,8 +1,8 @@
 import re
 from lib.ast.nodetype import NodeType
-from lib.lint.level import Levels
-from lib.lint.policy.abstract_policy import AbstractPolicy
-from lib.lint.policy.reference.googlevimscriptstyleguide import get_reference_source
+from lib.linting.level import Levels
+from lib.linting.policy.abstract_policy import AbstractPolicy
+from lib.linting.policy.reference.googlevimscriptstyleguide import get_reference_source
 
 
 # see `:help expr-string`
