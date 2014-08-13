@@ -1,6 +1,8 @@
 VimL Lint
 =========
 
+[![Build Status](https://travis-ci.org/Kuniwak/viml-lint.svg?branch=master)](https://travis-ci.org/Kuniwak/viml-lint)
+
 VimL Lint is a faster and highly extensible Vim script Language Lint.
 This is implemented by Python 3.4.x.
 
