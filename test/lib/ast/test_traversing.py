@@ -1,14 +1,17 @@
 import unittest
+from test.asserting.ast import get_fixture_path
+
 from lib.ast.parsing import Parser
 from lib.ast.nodetype import get_node_type_name
-
 from lib.ast.traversing import traverse
+
+FIXTURE_FILE = get_fixture_path('fixture_to_traverse.vim')
 
 
 class TestTraverse(unittest.TestCase):
     def setUp(self):
         parser = Parser()
-        self.ast = parser.parse_file('test/fixture/fixture_to_traverse.vim')
+        self.ast = parser.parse_file(FIXTURE_FILE)
 
     def test_traverse(self):
         expected_order_of_visit = [
