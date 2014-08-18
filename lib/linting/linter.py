@@ -1,5 +1,6 @@
 from lib.ast.parsing import Parser
 from lib.ast.traversing import traverse
+from lib.ast.nodetype import NodeType
 
 
 class Linter(object):
@@ -22,7 +23,7 @@ class Linter(object):
 
 
     def visit_node(self, node, env):
-        node_type = node['type']
+        node_type = NodeType(node['type'])
 
         if node_type not in self._listeners_map:
             return

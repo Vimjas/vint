@@ -32,7 +32,7 @@ class ProhibitUnnecessaryDoubleQuote(AbstractPolicy):
 
 
     def listen_node_types(self):
-        return [NodeType['STRING']]
+        return [NodeType.STRING]
 
 
     def is_valid(self, node, env):

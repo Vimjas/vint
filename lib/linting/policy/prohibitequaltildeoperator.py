@@ -14,16 +14,16 @@ class ProhibitEqualTildeOperator(AbstractPolicy):
 
     def listen_node_types(self):
         return [
-            NodeType['EQUAL'],
-            NodeType['NEQUAL'],
-            NodeType['GREATER'],
-            NodeType['GEQUAL'],
-            NodeType['SMALLER'],
-            NodeType['SEQUAL'],
-            NodeType['MATCH'],
-            NodeType['NOMATCH'],
-            NodeType['IS'],
-            NodeType['ISNOT'],
+            NodeType.EQUAL,
+            NodeType.NEQUAL,
+            NodeType.GREATER,
+            NodeType.GEQUAL,
+            NodeType.SMALLER,
+            NodeType.SEQUAL,
+            NodeType.MATCH,
+            NodeType.NOMATCH,
+            NodeType.IS,
+            NodeType.ISNOT,
         ]
 
 
@@ -39,15 +39,13 @@ class ProhibitEqualTildeOperator(AbstractPolicy):
             False-positive case is: '1' =~ 1
             False-negative case is: ('1') =~ 1
         """
-        node_type = node['type']
+        node_type = NodeType(node['type'])
 
-        if node_type is NodeType['MATCH'] or node_type is NodeType['NOMATCH']:
+        if node_type is NodeType.MATCH or node_type is NodeType.NOMATCH:
             return False
 
-        string_type = NodeType['STRING']
+        left_type = NodeType(node['left']['type'])
+        right_type = NodeType(node['right']['type'])
 
-        left_type = node['left']['type']
-        right_type = node['right']['type']
-
-        is_like_string_comparison = left_type is string_type or right_type is string_type
+        is_like_string_comparison = left_type is NodeType.STRING or right_type is NodeType.STRING
         return not is_like_string_comparison
