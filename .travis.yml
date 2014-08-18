@@ -6,5 +6,8 @@ notifications:
 python:
   - "3.4"
 
+install:
+  - "pip install ."
+
 # command to run tests
-script: python -m unittest discover
+script: "py.test"
