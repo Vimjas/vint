@@ -1,5 +1,5 @@
 import unittest
-from lib.ast.nodetype import NodeType
+from lib.ast.node_type import NodeType
 
 
 class TestNodeType(unittest.TestCase):

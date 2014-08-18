@@ -1,4 +1,4 @@
-from lib.ast.nodetype import NodeType
+from lib.ast.node_type import NodeType
 
 
 ChildNodeAccessor = {
