@@ -1,12 +1,12 @@
-VimL Lint
-=========
+Vint
+====
 
-[![Build Status](https://travis-ci.org/Kuniwak/viml-lint.svg?branch=master)](https://travis-ci.org/Kuniwak/viml-lint)
+[![Build Status](https://travis-ci.org/Kuniwak/viml-lint.svg?branch=master)](https://travis-ci.org/Kuniwak/vint)
 
-VimL Lint is a faster and highly extensible Vim script Language Lint.
+Vint is a faster and highly extensible Vim script Language Lint.
 This is implemented by Python 3.4.x.
 
-**But now, VimL Lint is under development.**
+**But now, Vint is under development.**
 
 
 How to Add New Policy

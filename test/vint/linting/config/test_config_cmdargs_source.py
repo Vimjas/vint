@@ -1,8 +1,8 @@
 import unittest
 from test.asserting.config_source import ConfigSourceAssertion
 
-from lib.linting.config.config_cmdargs_source import ConfigCmdargsSource
-from lib.linting.level import Level
+from vint.linting.config.config_cmdargs_source import ConfigCmdargsSource
+from vint.linting.level import Level
 
 
 

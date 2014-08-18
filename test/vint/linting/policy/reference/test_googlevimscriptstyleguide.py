@@ -1,5 +1,5 @@
 import unittest
-from lib.linting.policy.reference.googlevimscriptstyleguide import get_reference_source
+from vint.linting.policy.reference.googlevimscriptstyleguide import get_reference_source
 
 
 class TestGoogleVimScriptStyleGuide(unittest.TestCase):

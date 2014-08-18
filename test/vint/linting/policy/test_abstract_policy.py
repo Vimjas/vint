@@ -1,5 +1,5 @@
 import unittest
-from lib.linting.policy.abstract_policy import AbstractPolicy
+from vint.linting.policy.abstract_policy import AbstractPolicy
 
 
 class ConcretePolicy(AbstractPolicy):

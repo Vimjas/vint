@@ -2,8 +2,8 @@ import unittest
 from test.asserting.policy import PolicyAssertion
 from test.asserting.policy import get_fixture_path
 
-from lib.linting.level import Level
-from lib.linting.policy.prohibit_unnecessary_double_quote import ProhibitUnnecessaryDoubleQuote
+from vint.linting.level import Level
+from vint.linting.policy.prohibit_unnecessary_double_quote import ProhibitUnnecessaryDoubleQuote
 
 PATH_VALID_VIM_SCRIPT = get_fixture_path('prohibit_unnecessary_double_quote_valid.vim')
 PATH_INVALID_VIM_SCRIPT = get_fixture_path('prohibit_unnecessary_double_quote_invalid.vim')

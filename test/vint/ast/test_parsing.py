@@ -1,5 +1,5 @@
 import unittest
-from lib.ast.parsing import Parser
+from vint.ast.parsing import Parser
 from test.asserting.ast import get_fixture_path
 
 FIXTURE_FILE = get_fixture_path('fixture_to_parse.vim')

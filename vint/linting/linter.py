@@ -1,6 +1,6 @@
-from lib.ast.parsing import Parser
-from lib.ast.traversing import traverse
-from lib.ast.node_type import NodeType
+from vint.ast.parsing import Parser
+from vint.ast.traversing import traverse
+from vint.ast.node_type import NodeType
 
 
 class Linter(object):

@@ -1,6 +1,6 @@
 import yaml
-from lib.linting.config.config_source import ConfigSource
-from lib.linting.level import Level
+from vint.linting.config.config_source import ConfigSource
+from vint.linting.level import Level
 
 
 

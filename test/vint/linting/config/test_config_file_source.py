@@ -2,8 +2,8 @@ import unittest
 from test.asserting.config_source import ConfigSourceAssertion
 from test.asserting.config_source import get_fixture_path
 
-from lib.linting.config.config_file_source import ConfigFileSource
-from lib.linting.level import Level
+from vint.linting.config.config_file_source import ConfigFileSource
+from vint.linting.level import Level
 
 FIXTURE_CONFIG_FILE = get_fixture_path('fixture_config_file')
 

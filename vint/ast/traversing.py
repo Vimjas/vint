@@ -1,4 +1,4 @@
-from lib.ast.node_type import NodeType
+from vint.ast.node_type import NodeType
 
 
 ChildNodeAccessor = {

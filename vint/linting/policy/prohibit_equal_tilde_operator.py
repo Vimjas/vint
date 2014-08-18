@@ -1,7 +1,7 @@
-from lib.linting.policy.abstract_policy import AbstractPolicy
-from lib.linting.policy.reference.googlevimscriptstyleguide import get_reference_source
-from lib.linting.level import Level
-from lib.ast.node_type import NodeType
+from vint.linting.policy.abstract_policy import AbstractPolicy
+from vint.linting.policy.reference.googlevimscriptstyleguide import get_reference_source
+from vint.linting.level import Level
+from vint.ast.node_type import NodeType
 
 
 class ProhibitEqualTildeOperator(AbstractPolicy):

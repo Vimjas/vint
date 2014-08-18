@@ -1,9 +1,9 @@
 import unittest
 from test.asserting.ast import get_fixture_path
 
-from lib.ast.parsing import Parser
-from lib.ast.node_type import NodeType
-from lib.ast.traversing import traverse
+from vint.ast.parsing import Parser
+from vint.ast.node_type import NodeType
+from vint.ast.traversing import traverse
 
 FIXTURE_FILE = get_fixture_path('fixture_to_traverse.vim')
 
