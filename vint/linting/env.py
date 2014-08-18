@@ -3,6 +3,7 @@ import os.path
 from argparse import ArgumentParser
 
 
+
 def build_environment(argv):
     env = {}
     parser = ArgumentParser(prog='vint', description='Lint Vim script')
@@ -21,7 +22,7 @@ def build_environment(argv):
     print(cmdargs)
 
     found_files = set()
-    collect_file(cmdargs['files'], result=found_files)
+    _collect_file(cmdargs['files'], result=found_files)
     env['file_paths'] = found_files
 
     env['cwd'] = os.getcwd()
@@ -29,19 +30,19 @@ def build_environment(argv):
     return env
 
 
-def collect_file(file_paths, result):
+def _collect_file(file_paths, result):
     for file_path in file_paths:
         if os.path.isdir(file_path):
-            collect_file_from_dir(file_path, result)
+            _collect_file_from_dir(file_path, result)
         else:
             result.add(file_path)
 
 
-def collect_file_from_dir(dir_path_to_search, result):
+def _collect_file_from_dir(dir_path_to_search, result):
     for dir_path, sub_dir_names, file_names in os.walk(dir_path_to_search):
         for sub_dir_name in sub_dir_names:
             sub_dir_path = os.path.join(dir_path, sub_dir_name)
 
-            collect_file_from_dir(sub_dir_path, result)
+            _collect_file_from_dir(sub_dir_path, result)
 
         result.update([os.path.join(dir_path, file_name) for file_name in file_names])
