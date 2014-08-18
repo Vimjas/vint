@@ -22,8 +22,8 @@ def env_factory(prior_env):
     if prior_env is None:
         return preset_env
 
-    filled_env = dict(preset_env.items() + prior_env.items())
-    return filled_env
+    preset_env.update(prior_env)
+    return preset_env
 
 
 
