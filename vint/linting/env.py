@@ -19,8 +19,6 @@ def build_environment(argv):
     cmdargs = vars(namespace)
     env['cmdargs'] = cmdargs
 
-    print(cmdargs)
-
     found_files = set()
     _collect_file(cmdargs['files'], result=found_files)
     env['file_paths'] = found_files
