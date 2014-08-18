@@ -8,6 +8,7 @@ setup(name='vint',
       author='Kuniwak (Orga Chem)',
       author_email='orga.chem.job+vint@gmail.com',
       url='https://github.com/Kuniwak/vint',
+      license='MIT',
       install_requires=[
           'PyYAML',
       ],
