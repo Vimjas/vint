@@ -3,7 +3,7 @@ from test.asserting.config_source import ConfigSourceAssertion
 from test.asserting.config_source import get_fixture_path
 
 from lib.linting.config.config_file_source import ConfigFileSource
-from lib.linting.level import Levels
+from lib.linting.level import Level
 
 FIXTURE_CONFIG_FILE = get_fixture_path('fixture_config_file')
 
@@ -17,7 +17,7 @@ class TestConfigFileSource(ConfigSourceAssertion, unittest.TestCase):
         expected_config_dict = {
             'cmdargs': {
                 'verbose': True,
-                'severity': Levels['WARNING'],
+                'severity': Level.WARNING,
                 'error-limit': 10,
             },
             'policies': {

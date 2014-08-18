@@ -1,6 +1,6 @@
 import yaml
 from lib.linting.config.config_source import ConfigSource
-from lib.linting.level import Levels
+from lib.linting.level import Level
 
 
 
@@ -18,7 +18,7 @@ class ConfigFileSource(ConfigSource):
         if 'cmdargs' in yaml_dict:
             cmdargs_dict = yaml_dict['cmdargs']
             if 'severity' in cmdargs_dict:
-                cmdargs_dict['severity'] = Levels[cmdargs_dict['severity'].upper()]
+                cmdargs_dict['severity'] = Level[cmdargs_dict['severity'].upper()]
 
         return yaml_dict
 

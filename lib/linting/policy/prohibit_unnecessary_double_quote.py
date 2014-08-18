@@ -1,6 +1,6 @@
 import re
 from lib.ast.node_type import NodeType
-from lib.linting.level import Levels
+from lib.linting.level import Level
 from lib.linting.policy.abstract_policy import AbstractPolicy
 from lib.linting.policy.reference.googlevimscriptstyleguide import get_reference_source
 
@@ -28,7 +28,7 @@ class ProhibitUnnecessaryDoubleQuote(AbstractPolicy):
         super().__init__()
         self.description = 'Prefer single quoted strings'
         self.reference = get_reference_source('STRINGS')
-        self.level = Levels['WARNING']
+        self.level = Level.WARNING
 
 
     def listen_node_types(self):

@@ -2,7 +2,7 @@ import unittest
 from test.asserting.policy import PolicyAssertion
 from test.asserting.policy import get_fixture_path
 
-from lib.linting.level import Levels
+from lib.linting.level import Level
 from lib.linting.policy.prohibit_unnecessary_double_quote import ProhibitUnnecessaryDoubleQuote
 
 PATH_VALID_VIM_SCRIPT = get_fixture_path('prohibit_unnecessary_double_quote_valid.vim')
@@ -17,7 +17,7 @@ class TestProhibitUnnecessaryDoubleQuote(PolicyAssertion, unittest.TestCase):
         expected_violations = [
             {
                 'name': 'ProhibitUnnecessaryDoubleQuote',
-                'level': Levels['WARNING'],
+                'level': Level.WARNING,
                 'position': {
                     'line': 2,
                     'column': 6,
@@ -26,7 +26,7 @@ class TestProhibitUnnecessaryDoubleQuote(PolicyAssertion, unittest.TestCase):
             },
             {
                 'name': 'ProhibitUnnecessaryDoubleQuote',
-                'level': Levels['WARNING'],
+                'level': Level.WARNING,
                 'position': {
                     'line': 3,
                     'column': 6,
