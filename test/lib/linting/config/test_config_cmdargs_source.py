@@ -12,15 +12,16 @@ class TestConfigFileSource(ConfigSourceAssertion, unittest.TestCase):
             'cmdargs': {
                 'verbose': True,
                 'severity': Level.WARNING,
-                'error-limit': 10,
+                'max-violations': 10,
             },
         }
 
         env = {
             'cmdargs': {
                 'verbose': True,
-                'severity': Level.WARNING,
-                'error-limit': 10,
+                'style': True,
+                'warning': True,
+                'max-violations': 10,
             },
         }
         self.assertConfigDict(ConfigCmdargsSource,
