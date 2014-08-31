@@ -1,7 +1,8 @@
 Vint
 ====
 
-[![Build Status](https://travis-ci.org/Kuniwak/viml-lint.svg?branch=master)](https://travis-ci.org/Kuniwak/vint)
+[![Build Status](https://travis-ci.org/Kuniwak/vint.svg?branch=master)](https://travis-ci.org/Kuniwak/vint)
+[![Code Health](https://landscape.io/github/Kuniwak/vint/master/landscape.png)](https://landscape.io/github/Kuniwak/vint/master)
 
 Vint is a faster and highly extensible Vim script Language Lint.
 This is implemented by Python 3.4.x.
