@@ -12,7 +12,6 @@ install:
 
 script:
   - py.test --cov vint test
-  - coverage report -m
 
 after_success:
   coveralls --verbose
