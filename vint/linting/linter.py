@@ -9,7 +9,7 @@ class Linter(object):
         self.policies = policies
         self.violations = []
 
-        self._listeners_map = self.build_listeners_map(policies)
+        self._listeners_map = self.build_listeners_map()
 
 
     def lint(self, path):
@@ -37,7 +37,7 @@ class Linter(object):
                 self.violations.append(violation)
 
 
-    def build_listeners_map(self, policies):
+    def build_listeners_map(self):
         lisnters_map = {}
 
         for policy in self.policies:
