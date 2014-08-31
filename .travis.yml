@@ -7,7 +7,12 @@ python:
   - "3.4"
 
 install:
-  - "pip install ."
+  - pip install -U -r requirements.txt --use-mirrors
+  - pip install -U -r test-requirements.txt --use-mirrors
 
-# command to run tests
-script: "py.test"
+script:
+  - py.test --cov vint test
+  - coverage report -m
+
+after_success:
+  coveralls --verbose
