@@ -31,8 +31,8 @@ class TestConfigFileSource(ConfigSourceAssertion, unittest.TestCase):
         }
         env = None
         self.assertConfigDict(TestConfigFileSource.ConcreteConfigFileSource,
-                              env,
-                              expected_config_dict)
+                              expected_config_dict,
+                              env)
 
 
 if __name__ == '__main__':

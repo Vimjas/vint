@@ -25,8 +25,8 @@ class TestConfigFileSource(ConfigSourceAssertion, unittest.TestCase):
             },
         }
         self.assertConfigDict(ConfigCmdargsSource,
-                              env,
-                              expected_config_dict)
+                              expected_config_dict,
+                              env)
 
 
 if __name__ == '__main__':

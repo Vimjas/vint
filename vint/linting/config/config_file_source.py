@@ -15,6 +15,9 @@ class ConfigFileSource(ConfigSource):
 
 
     def convert_config_dict(self, yaml_dict):
+        if not yaml_dict:
+            return {}
+
         if 'cmdargs' in yaml_dict:
             cmdargs_dict = yaml_dict['cmdargs']
             if 'severity' in cmdargs_dict:
