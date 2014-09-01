@@ -1,8 +1,8 @@
-import os.path
+from pathlib import Path
 from vint.linting.config.config_file_source import ConfigFileSource
 
 
-DEFAULT_CONFIG_PATH = os.path.join('asset', 'default_config.yaml')
+DEFAULT_CONFIG_PATH = Path('asset') / 'default_config.yaml'
 
 
 class ConfigDefaultSource(ConfigFileSource):

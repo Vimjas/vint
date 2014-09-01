@@ -1,18 +1,18 @@
 import unittest
-import os.path
+from pathlib import Path
 
 
 def get_fixture_path(filename):
-    return os.path.join('test', 'fixture', 'config', filename)
+    return Path('test') / 'fixture' / 'config' / filename
 
 
 def env_factory(prior_env=None):
     preset_env = {
-        'cwd': os.path.join('path', 'to', 'project'),
+        'cwd': Path('path') / 'to' / 'project',
         'cmd_args': {
             'verbose': True,
         },
-        'home_path': os.path.join('/', 'home', 'vint'),
+        'home_path': Path('/') / 'home' / 'vint',
         'file_paths': [
             '1.vim',
             '2.vim',
