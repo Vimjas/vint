@@ -1,11 +1,30 @@
 import os
-import os.path
+from pathlib import Path
 from argparse import ArgumentParser
 
 
 
 def build_environment(argv):
     env = {}
+    env = _set_cmdargs(env, argv)
+    env = _set_file_paths(env, argv)
+    env = _set_cwd(env, argv)
+
+    return env
+
+
+def _set_cwd(env, argv):
+    if 'cwd' in env:
+        return env
+
+    env['cwd'] = os.getcwd()
+    return env
+
+
+def _set_cmdargs(env, argv):
+    if 'cmdargs' in env:
+        return env
+
     parser = ArgumentParser(prog='vint', description='Lint Vim script')
 
     parser.add_argument('-v', '--verbose', action='store_true', help='output verbose message')
@@ -18,29 +37,31 @@ def build_environment(argv):
 
     cmdargs = vars(namespace)
     env['cmdargs'] = cmdargs
-
-    found_files = set()
-    _collect_file(cmdargs['files'], result=found_files)
-    env['file_paths'] = found_files
-
-    env['cwd'] = os.getcwd()
-
     return env
 
 
-def _collect_file(file_paths, result):
-    for file_path in file_paths:
-        if os.path.isdir(file_path):
-            _collect_file_from_dir(file_path, result)
+def _set_file_paths(env, argv):
+    if 'file_paths' in env:
+        return env
+
+    env_with_cmdargs = _set_cmdargs(env, argv)
+    cmdargs = env_with_cmdargs['cmdargs']
+
+    found_files = _collect_files([Path(path) for path in cmdargs['files']])
+
+    env_with_cmdargs['file_paths'] = found_files
+    return env_with_cmdargs
+
+
+def _collect_files(paths):
+    result = set()
+    for path in paths:
+        if path.is_dir():
+            dir_path = path
+            result |= _collect_files(tuple(dir_path.iterdir()))
+
         else:
+            file_path = path
             result.add(file_path)
 
-
-def _collect_file_from_dir(dir_path_to_search, result):
-    for dir_path, sub_dir_names, file_names in os.walk(dir_path_to_search):
-        for sub_dir_name in sub_dir_names:
-            sub_dir_path = os.path.join(dir_path, sub_dir_name)
-
-            _collect_file_from_dir(sub_dir_path, result)
-
-        result.update([os.path.join(dir_path, file_name) for file_name in file_names])
+    return result
