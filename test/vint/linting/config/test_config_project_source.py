@@ -18,7 +18,9 @@ class TestConfigProjectSource(ConfigSourceAssertion, unittest.TestCase):
                 'severity': Enum,
             }
         }
-        self.assertConfigValueType(ConfigProjectSource, expected_type, env)
+
+        config_source = self.initialize_config_source(ConfigProjectSource, env)
+        self.assertConfigValueType(config_source, expected_type)
 
 
     def test_get_config_dict_on_sub_directory(self):
@@ -33,7 +35,9 @@ class TestConfigProjectSource(ConfigSourceAssertion, unittest.TestCase):
                 'severity': Enum,
             }
         }
-        self.assertConfigValueType(ConfigProjectSource, expected_type, env)
+
+        config_source = self.initialize_config_source(ConfigProjectSource, env)
+        self.assertConfigValueType(config_source, expected_type)
 
 
     def test_get_config_dict_with_no_global_config(self):
@@ -42,7 +46,9 @@ class TestConfigProjectSource(ConfigSourceAssertion, unittest.TestCase):
         }
 
         expected_config_dict = {}
-        self.assertConfigDict(ConfigProjectSource, expected_config_dict, env)
+
+        config_source = self.initialize_config_source(ConfigProjectSource, env)
+        self.assertConfigDict(config_source, expected_config_dict)
 
 
 if __name__ == '__main__':

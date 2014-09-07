@@ -17,7 +17,9 @@ class TestConfigGlobalSource(ConfigSourceAssertion, unittest.TestCase):
                 'severity': Enum,
             }
         }
-        self.assertConfigValueType(ConfigGlobalSource, expected_type, env)
+
+        config_source = self.initialize_config_source(ConfigGlobalSource, env)
+        self.assertConfigValueType(config_source, expected_type)
 
 
     def test_get_config_dict_with_no_global_config(self):
@@ -26,7 +28,9 @@ class TestConfigGlobalSource(ConfigSourceAssertion, unittest.TestCase):
         }
 
         expected_config_dict = {}
-        self.assertConfigDict(ConfigGlobalSource, expected_config_dict, env)
+
+        config_source = self.initialize_config_source(ConfigGlobalSource, env)
+        self.assertConfigDict(config_source, expected_config_dict)
 
 
 if __name__ == '__main__':

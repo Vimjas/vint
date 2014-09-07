@@ -13,7 +13,9 @@ class TestConfigDefaultSource(ConfigSourceAssertion, unittest.TestCase):
                 'severity': Enum,
             }
         }
-        self.assertConfigValueType(ConfigDefaultSource, expected_type)
+
+        config_source = self.initialize_config_source(ConfigDefaultSource)
+        self.assertConfigValueType(config_source, expected_type)
 
 if __name__ == '__main__':
     unittest.main()

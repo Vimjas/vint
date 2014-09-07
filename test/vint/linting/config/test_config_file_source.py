@@ -13,6 +13,7 @@ class TestConfigFileSource(ConfigSourceAssertion, unittest.TestCase):
         def get_file_path(self, env):
             return FIXTURE_CONFIG_FILE
 
+
     def test_get_config_dict(self):
         expected_config_dict = {
             'cmdargs': {
@@ -29,10 +30,10 @@ class TestConfigFileSource(ConfigSourceAssertion, unittest.TestCase):
                 },
             }
         }
-        env = None
-        self.assertConfigDict(TestConfigFileSource.ConcreteConfigFileSource,
-                              expected_config_dict,
-                              env)
+
+        config_source = self.initialize_config_source(
+            TestConfigFileSource.ConcreteConfigFileSource)
+        self.assertConfigDict(config_source, expected_config_dict)
 
 
 if __name__ == '__main__':
