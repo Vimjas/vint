@@ -13,12 +13,12 @@ class AbstractPolicy(object):
         return []
 
 
-    def is_valid(self, node, env):
+    def is_valid(self, node, lint_context):
         """ Whether the specified node is valid for the policy. """
         return True
 
 
-    def create_violation_report(self, node, env):
+    def create_violation_report(self, node, lint_context):
         """ Returns a violation report for the node. """
         return {
             'name': self.name,
@@ -28,14 +28,14 @@ class AbstractPolicy(object):
             'position': {
                 'line': node['pos']['lnum'],
                 'column': node['pos']['col'],
-                'path': env['path'],
+                'path': lint_context['path'],
             },
         }
 
 
-    def get_violation_if_found(self, node, env):
+    def get_violation_if_found(self, node, lint_context):
         """ Returns a violation if the node is invalid. """
-        if self.is_valid(node, env):
+        if self.is_valid(node, lint_context):
             return None
 
-        return self.create_violation_report(node, env)
+        return self.create_violation_report(node, lint_context)

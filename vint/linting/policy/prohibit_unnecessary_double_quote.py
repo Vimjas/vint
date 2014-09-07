@@ -7,7 +7,8 @@ from vint.linting.policy.reference.googlevimscriptstyleguide import get_referenc
 
 # see `:help expr-string`
 _special_char_matcher = re.compile(
-    r'\\('
+    r'\\'  # prefix back slash
+    r'('
     r'(?P<octal>[0-7]{1,3})'
     r'|(?P<hexadecimal>[xX][0-9a-fA-F]{1,2})'
     r'|(?P<numeric_character_reference>[uU][0-9a-fA-F]{4})'
@@ -35,7 +36,7 @@ class ProhibitUnnecessaryDoubleQuote(AbstractPolicy):
         return [NodeType.STRING]
 
 
-    def is_valid(self, node, env):
+    def is_valid(self, node, lint_context):
         """ Whether the specified node is valid.
 
         In this policy, valid node is only 2 cases;
