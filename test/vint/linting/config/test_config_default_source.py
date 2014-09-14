@@ -14,7 +14,7 @@ class TestConfigDefaultSource(ConfigSourceAssertion, unittest.TestCase):
             }
         }
 
-        config_source = self.initialize_config_source(ConfigDefaultSource)
+        config_source = self.initialize_config_source_with_env(ConfigDefaultSource)
         self.assertConfigValueType(config_source, expected_type)
 
 if __name__ == '__main__':

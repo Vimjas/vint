@@ -9,7 +9,7 @@ def get_fixture_path(filename):
 
 
 class ConfigSourceAssertion(unittest.TestCase):
-    def initialize_config_source(self, ConfigSourceToTest, env=None):
+    def initialize_config_source_with_env(self, ConfigSourceToTest, env=None):
         """ Returns a new config source instance by a common env.
         You can override the common env by the specified env argument.
         """

@@ -7,9 +7,5 @@ class ConfigSource(object):
             return self.msg
 
 
-    def __init__(self, env):
-        pass
-
-
     def get_config_dict(self):
         raise NotImplementedError()

@@ -4,7 +4,6 @@ from vint.linting.level import Level
 
 class ConfigCmdargsSource(ConfigSource):
     def __init__(self, env):
-        super().__init__(env)
         self._config_dict = self._build_config_dict(env)
 
 

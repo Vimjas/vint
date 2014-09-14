@@ -31,7 +31,7 @@ class TestConfigFileSource(ConfigSourceAssertion, unittest.TestCase):
             }
         }
 
-        config_source = self.initialize_config_source(
+        config_source = self.initialize_config_source_with_env(
             TestConfigFileSource.ConcreteConfigFileSource)
         self.assertConfigDict(config_source, expected_config_dict)
 

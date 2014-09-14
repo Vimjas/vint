@@ -18,7 +18,7 @@ class TestConfigGlobalSource(ConfigSourceAssertion, unittest.TestCase):
             }
         }
 
-        config_source = self.initialize_config_source(ConfigGlobalSource, env)
+        config_source = self.initialize_config_source_with_env(ConfigGlobalSource, env)
         self.assertConfigValueType(config_source, expected_type)
 
 
@@ -29,7 +29,7 @@ class TestConfigGlobalSource(ConfigSourceAssertion, unittest.TestCase):
 
         expected_config_dict = {}
 
-        config_source = self.initialize_config_source(ConfigGlobalSource, env)
+        config_source = self.initialize_config_source_with_env(ConfigGlobalSource, env)
         self.assertConfigDict(config_source, expected_config_dict)
 
 

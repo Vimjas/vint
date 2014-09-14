@@ -22,7 +22,7 @@ class TestConfigCommentSource(ConfigSourceAssertion, unittest.TestCase):
             'str': ' vint: -Policy1 +Policy2',
         }
 
-        config_source = self.initialize_config_source(ConfigCommentSource)
+        config_source = self.initialize_config_source_with_env(ConfigCommentSource)
         config_source.update_by_node(node)
         self.assertConfigDict(config_source, expected_config_dict)
 
@@ -37,7 +37,7 @@ class TestConfigCommentSource(ConfigSourceAssertion, unittest.TestCase):
             'policies': {}
         }
 
-        config_source = self.initialize_config_source(ConfigCommentSource)
+        config_source = self.initialize_config_source_with_env(ConfigCommentSource)
         config_source.update_by_node(node)
 
         self.assertConfigDict(config_source, expected_config_dict)
@@ -57,7 +57,7 @@ class TestConfigCommentSource(ConfigSourceAssertion, unittest.TestCase):
             }
         }
 
-        config_source = self.initialize_config_source(ConfigCommentSource)
+        config_source = self.initialize_config_source_with_env(ConfigCommentSource)
         config_source.update_by_node(node)
 
         self.assertConfigDict(config_source, expected_config_dict)
@@ -80,7 +80,7 @@ class TestConfigCommentSource(ConfigSourceAssertion, unittest.TestCase):
             }
         }
 
-        config_source = self.initialize_config_source(ConfigCommentSource)
+        config_source = self.initialize_config_source_with_env(ConfigCommentSource)
         config_source.update_by_node(node)
 
         self.assertConfigDict(config_source, expected_config_dict)
@@ -92,7 +92,7 @@ class TestConfigCommentSource(ConfigSourceAssertion, unittest.TestCase):
             'str': ' vint: -Policy1 +Policy2',
         }
 
-        config_source = self.initialize_config_source(ConfigCommentSource)
+        config_source = self.initialize_config_source_with_env(ConfigCommentSource)
         is_requesting_update = config_source.is_requesting_update(node)
 
         self.assertTrue(is_requesting_update, 'Expected true was returned')
@@ -104,7 +104,7 @@ class TestConfigCommentSource(ConfigSourceAssertion, unittest.TestCase):
             'str': ' Lorem ipsum',
         }
 
-        config_source = self.initialize_config_source(ConfigCommentSource)
+        config_source = self.initialize_config_source_with_env(ConfigCommentSource)
         is_requesting_update = config_source.is_requesting_update(node)
 
         self.assertFalse(is_requesting_update, 'Expected false was returned')
@@ -115,7 +115,7 @@ class TestConfigCommentSource(ConfigSourceAssertion, unittest.TestCase):
             'type': NodeType.EXCALL,
         }
 
-        config_source = self.initialize_config_source(ConfigCommentSource)
+        config_source = self.initialize_config_source_with_env(ConfigCommentSource)
         is_requesting_update = config_source.is_requesting_update(node)
 
         self.assertFalse(is_requesting_update, 'Expected false was returned')

@@ -19,7 +19,7 @@ class TestConfigProjectSource(ConfigSourceAssertion, unittest.TestCase):
             }
         }
 
-        config_source = self.initialize_config_source(ConfigProjectSource, env)
+        config_source = self.initialize_config_source_with_env(ConfigProjectSource, env)
         self.assertConfigValueType(config_source, expected_type)
 
 
@@ -36,7 +36,7 @@ class TestConfigProjectSource(ConfigSourceAssertion, unittest.TestCase):
             }
         }
 
-        config_source = self.initialize_config_source(ConfigProjectSource, env)
+        config_source = self.initialize_config_source_with_env(ConfigProjectSource, env)
         self.assertConfigValueType(config_source, expected_type)
 
 
@@ -47,7 +47,7 @@ class TestConfigProjectSource(ConfigSourceAssertion, unittest.TestCase):
 
         expected_config_dict = {}
 
-        config_source = self.initialize_config_source(ConfigProjectSource, env)
+        config_source = self.initialize_config_source_with_env(ConfigProjectSource, env)
         self.assertConfigDict(config_source, expected_config_dict)
 
 

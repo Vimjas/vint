@@ -19,7 +19,6 @@ class ConfigCommentSource(ConfigSource):
     means to enable the policy, and -PolicyName means to disable.
     """
     def __init__(self, env):
-        super().__init__(env)
         self._config_dict = {
             'policies': {}
         }
