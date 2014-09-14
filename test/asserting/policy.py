@@ -2,7 +2,6 @@ import unittest
 import os.path
 from itertools import zip_longest
 from vint.linting.linter import Linter
-from test.asserting.env_factory import env_factory
 
 
 class PolicyAssertion(unittest.TestCase):
@@ -45,9 +44,8 @@ class PolicyAssertion(unittest.TestCase):
 
         policy_set = PolicyAssertion.PolicySetPassThrough(policy_to_test)
         config = PolicyAssertion.ConfigPassThrough(policy_name)
-        env = env_factory()
 
-        linter = Linter(policy_set, config, env)
+        linter = Linter(policy_set, config.get_config_dict())
 
         violations = linter.lint(path)
 

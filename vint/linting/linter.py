@@ -1,6 +1,8 @@
 from vint.ast.parsing import Parser
 from vint.ast.traversing import traverse
 from vint.ast.node_type import NodeType
+from vint.linting.config.config_container import ConfigContainer
+from vint.linting.config.config_dict_source import ConfigDictSource
 from vint.linting.config.config_comment_source import ConfigCommentSource
 
 
@@ -19,19 +21,25 @@ class Linter(object):
     are found in traversing. The Linter class collect violations that are
     returned by policies.
     """
-    def __init__(self, policy_set, config, env):
-        # TODO: remove env dependency
+    def __init__(self, policy_set, config_dict_global):
         self._parser = Parser()
         self._policy_set = policy_set
-        self._config = self._decorate_config(config, env)
         self.violations = []
+
+        self._config_comment_source = ConfigCommentSource()
+        self._config = self._decorate_config(config_dict_global,
+                                             self._config_comment_source)
 
         self._listeners_map = self._build_listeners_map()
 
 
-    def _decorate_config(self, config, env):
-        self._add_config_comment_source(config, env)
-        return config
+    def _decorate_config(self, config_dict_global, config_comment_source):
+        config_dict_source = ConfigDictSource(config_dict_global)
+
+        config_container = ConfigContainer(config_dict_source,
+                                           config_comment_source)
+
+        return config_container
 
 
     def _add_config_comment_source(self, config, env):

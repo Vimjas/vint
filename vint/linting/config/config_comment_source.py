@@ -18,7 +18,7 @@ class ConfigCommentSource(ConfigSource):
     Prefix vint: means that the comment is a config comment. And, +PolicyName
     means to enable the policy, and -PolicyName means to disable.
     """
-    def __init__(self, env):
+    def __init__(self):
         self._config_dict = {
             'policies': {}
         }
