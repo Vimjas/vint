@@ -73,5 +73,5 @@ class PolicyAssertion(unittest.TestCase):
         self.assertIsInstance(actual_violation['description'], str)
 
 
-def get_fixture_path(filename):
-    return Path('test', 'fixture', 'policy', filename)
+def get_fixture_path(*filename):
+    return Path('test', 'fixture', 'policy', *filename)
