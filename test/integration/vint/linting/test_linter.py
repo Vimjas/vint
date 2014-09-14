@@ -8,7 +8,7 @@ from vint.linting.linter import Linter
 FIXTURE_VIM_SCRIPT = Path('test', 'fixture', 'config', 'fixture.vim')
 
 
-class TestConfigMechanismIntegral(unittest.TestCase):
+class TestLinterIntegral(unittest.TestCase):
     class StubPolicy1(AbstractPolicy):
         def __init__(self):
             super().__init__()
@@ -56,15 +56,15 @@ class TestConfigMechanismIntegral(unittest.TestCase):
             self._enabled_policies = []
 
             if policy_enabling_map['StubPolicy1']['enabled']:
-                self._enabled_policies.append(TestConfigMechanismIntegral.StubPolicy1())
+                self._enabled_policies.append(TestLinterIntegral.StubPolicy1())
 
             if policy_enabling_map['StubPolicy2']['enabled']:
-                self._enabled_policies.append(TestConfigMechanismIntegral.StubPolicy2())
+                self._enabled_policies.append(TestLinterIntegral.StubPolicy2())
 
 
 
     def test_lint(self):
-        policy_set = TestConfigMechanismIntegral.StubPolicySet()
+        policy_set = TestLinterIntegral.StubPolicySet()
 
         config_dict_global = {
             'cmdargs': {
