@@ -19,7 +19,7 @@ class ProhibitNoAbortFunction(AbstractPolicy):
     def is_valid(self, node, lint_context):
         """ Whether the specified node is valid.
 
-        This policy prohibit following commands:
+        This policy prohibit that a function in autoload/ have no 'abort' or bang
         """
 
         if 'autoload' not in lint_context['path'].parts:
