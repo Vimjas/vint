@@ -9,10 +9,12 @@ PATH_INVALID_VIM_SCRIPT = get_fixture_path('prohibit_unnecessary_double_quote_in
 
 
 class TestProhibitUnnecessaryDoubleQuote(PolicyAssertion, unittest.TestCase):
-    def test_get_violation_if_found(self):
-        # Expect no violations found
-        self.assertFoundViolationsEqual(PATH_VALID_VIM_SCRIPT, ProhibitUnnecessaryDoubleQuote, [])
+    def test_get_violation_if_found_when_file_is_valid(self):
+        self.assertFoundNoViolations(PATH_VALID_VIM_SCRIPT,
+                                     ProhibitUnnecessaryDoubleQuote)
 
+
+    def test_get_violation_if_found_when_file_is_invalid(self):
         expected_violations = [
             {
                 'name': 'ProhibitUnnecessaryDoubleQuote',
@@ -34,7 +36,9 @@ class TestProhibitUnnecessaryDoubleQuote(PolicyAssertion, unittest.TestCase):
             },
         ]
 
-        self.assertFoundViolationsEqual(PATH_INVALID_VIM_SCRIPT, ProhibitUnnecessaryDoubleQuote, expected_violations)
+        self.assertFoundViolationsEqual(PATH_INVALID_VIM_SCRIPT,
+                                        ProhibitUnnecessaryDoubleQuote,
+                                        expected_violations)
 
 if __name__ == '__main__':
     unittest.main()
