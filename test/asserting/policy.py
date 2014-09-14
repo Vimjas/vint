@@ -1,11 +1,11 @@
 import unittest
-import os.path
+from pathlib import Path
 from itertools import zip_longest
 from vint.linting.linter import Linter
 
 
 class PolicyAssertion(unittest.TestCase):
-    class PolicySetPassThrough(object):
+    class StubPolicySet(object):
         def __init__(self, *policies):
             self._policies = policies
 
@@ -18,7 +18,7 @@ class PolicyAssertion(unittest.TestCase):
             pass
 
 
-    class ConfigPassThrough(object):
+    class StubConfigContainer(object):
         def __init__(self, policy_names_to_enable):
 
             policy_enabling_map = dict((policy_name, {'enabled': True})
@@ -42,8 +42,8 @@ class PolicyAssertion(unittest.TestCase):
         policy_to_test = Policy()
         policy_name = Policy.__name__
 
-        policy_set = PolicyAssertion.PolicySetPassThrough(policy_to_test)
-        config = PolicyAssertion.ConfigPassThrough(policy_name)
+        policy_set = PolicyAssertion.StubPolicySet(policy_to_test)
+        config = PolicyAssertion.StubConfigContainer(policy_name)
 
         linter = Linter(policy_set, config.get_config_dict())
 
@@ -65,4 +65,4 @@ class PolicyAssertion(unittest.TestCase):
 
 
 def get_fixture_path(filename):
-    return os.path.join('test', 'fixture', 'policy', filename)
+    return Path('test', 'fixture', 'policy', filename)

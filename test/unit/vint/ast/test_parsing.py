@@ -11,5 +11,6 @@ class TestParser(unittest.TestCase):
         ast = parser.parse_file(FIXTURE_FILE)
         self.assertIs(ast['type'], 1)
 
+
 if __name__ == '__main__':
     unittest.main()

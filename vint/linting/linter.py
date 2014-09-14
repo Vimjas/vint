@@ -30,7 +30,7 @@ class Linter(object):
         self._config = self._decorate_config(config_dict_global,
                                              self._config_comment_source)
 
-        self._listeners_map = self._build_listeners_map()
+        self._listeners_map = {}
 
 
     def _decorate_config(self, config_dict_global, config_comment_source):
@@ -42,35 +42,17 @@ class Linter(object):
         return config_container
 
 
-    def _add_config_comment_source(self, config, env):
-        config_comment_source = ConfigCommentSource(env)
-
-        # Store to update by comment configs
-        self._config_comment_source = config_comment_source
-
-        config.append_config_source(config_comment_source)
-        return config
-
-
     def lint(self, path):
         """ Lint the file and return the violations found. """
         root_ast = self._parser.parse_file(path)
 
-        self._setup_policy_set()
+        self._update_listeners_map()
 
         # Given root AST to makepolicy flexibility
         lint_context = {'path': path, 'root_node': root_ast}
         traverse(lambda node: self._visit_node(node, lint_context), root_ast)
 
         return self.violations
-
-
-    def _setup_policy_set(self):
-        policy_set = self._policy_set
-        config = self._config
-
-        config_dict = config.get_config_dict()
-        policy_set.update_by_config(config_dict)
 
 
     def _visit_node(self, node, lint_context):
@@ -80,6 +62,7 @@ class Linter(object):
 
     def _fire_listeners(self, node, lint_context):
         node_type = NodeType(node['type'])
+
         if node_type not in self._listeners_map:
             return
 
@@ -94,6 +77,7 @@ class Linter(object):
 
     def _refresh_policies_if_necessary(self, node):
         config_comment_source = self._config_comment_source
+
         if not config_comment_source.is_requesting_update(node):
             return
 
@@ -104,25 +88,28 @@ class Linter(object):
         config_comment_source = self._config_comment_source
         config_comment_source.update_by_node(node)
 
-        config = self._config
-        new_config_dict = config.get_config_dict()
+        self._update_listeners_map()
 
+
+    def _update_enabled_policies(self):
         policy_set = self._policy_set
-        policy_set.update_by_config(new_config_dict['policies'])
+        config = self._config
 
-        self._build_listeners_map()
+        config_dict = config.get_config_dict()
+        policy_set.update_by_config(config_dict['policies'])
 
 
-    def _build_listeners_map(self):
-        lisnters_map = {}
+    def _update_listeners_map(self):
+        self._update_enabled_policies()
 
-        for policy in self._policy_set.get_enabled_policies():
+        self._listeners_map = {}
+        policy_set = self._policy_set
+
+        for policy in policy_set.get_enabled_policies():
             listened_node_types = policy.listen_node_types()
 
             for listened_node_type in listened_node_types:
-                if listened_node_type not in lisnters_map:
-                    lisnters_map[listened_node_type] = [policy]
+                if listened_node_type not in self._listeners_map:
+                    self._listeners_map[listened_node_type] = [policy]
                 else:
-                    lisnters_map[listened_node_type].append(policy)
-
-        return lisnters_map
+                    self._listeners_map[listened_node_type].append(policy)

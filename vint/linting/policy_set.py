@@ -72,7 +72,7 @@ def import_all_policies():
     Dynamic policy importing is comprised of the 3 steps
       1. Try to import all policy modules (then we can't know what policies exist)
       2. In policy module, register itself by using vint.linting.policy_loader
-      3. After all policies registered itself, we can get policy classes
+      3. After all policies registered by itself, we can get policy classes
     """
     pkg_name = _get_policy_package_name_for_test()
     pkg_path_list = pkg_name.split('.')

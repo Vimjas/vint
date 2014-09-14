@@ -1,6 +1,5 @@
 import unittest
-from test.asserting.policy import PolicyAssertion
-from test.asserting.policy import get_fixture_path
+from test.asserting.policy import PolicyAssertion, get_fixture_path
 
 from vint.linting.level import Level
 from vint.linting.policy.prohibit_equal_tilde_operator import ProhibitEqualTildeOperator
