@@ -27,7 +27,7 @@ class ProhibitEqualTildeOperator(AbstractPolicy):
         ]
 
 
-    def is_valid(self, node, env):
+    def is_valid(self, node, lint_context):
         """ Whether the specified node is valid to the policy.
 
         In this policy, comparing between a string and any value by

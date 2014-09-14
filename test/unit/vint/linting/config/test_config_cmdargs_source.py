@@ -5,7 +5,6 @@ from vint.linting.config.config_cmdargs_source import ConfigCmdargsSource
 from vint.linting.level import Level
 
 
-
 class TestConfigFileSource(ConfigSourceAssertion, unittest.TestCase):
     def test_get_config_dict(self):
         expected_config_dict = {
@@ -24,9 +23,9 @@ class TestConfigFileSource(ConfigSourceAssertion, unittest.TestCase):
                 'max-violations': 10,
             },
         }
-        self.assertConfigDict(ConfigCmdargsSource,
-                              env,
-                              expected_config_dict)
+
+        config_source = self.initialize_config_source_with_env(ConfigCmdargsSource, env)
+        self.assertConfigDict(config_source, expected_config_dict)
 
 
 if __name__ == '__main__':

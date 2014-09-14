@@ -1,12 +1,52 @@
 import unittest
-import os.path
+from pathlib import Path
 from itertools import zip_longest
 from vint.linting.linter import Linter
 
 
 class PolicyAssertion(unittest.TestCase):
+    class StubPolicySet(object):
+        def __init__(self, *policies):
+            self._policies = policies
+
+
+        def get_enabled_policies(self):
+            return self._policies
+
+
+        def update_by_config(self, policy_enabling_map):
+            pass
+
+
+    class StubConfigContainer(object):
+        def __init__(self, policy_names_to_enable):
+
+            policy_enabling_map = dict((policy_name, {'enabled': True})
+                                       for policy_name in policy_names_to_enable)
+
+            self._config_dict = {
+                'policies': policy_enabling_map
+            }
+
+
+        def append_config_source(self, config_source):
+            # Ignore a comment config source
+            pass
+
+
+        def get_config_dict(self):
+            return self._config_dict
+
+
     def assertFoundViolationsEqual(self, path, Policy, expected_violations):
-        linter = Linter([Policy()])
+        policy_to_test = Policy()
+        policy_name = Policy.__name__
+
+        policy_set = PolicyAssertion.StubPolicySet(policy_to_test)
+        config = PolicyAssertion.StubConfigContainer(policy_name)
+
+        linter = Linter(policy_set, config.get_config_dict())
+
         violations = linter.lint(path)
 
         for violation, expected_violation in zip_longest(violations, expected_violations):
@@ -25,4 +65,4 @@ class PolicyAssertion(unittest.TestCase):
 
 
 def get_fixture_path(filename):
-    return os.path.join('test', 'fixture', 'policy', filename)
+    return Path('test', 'fixture', 'policy', filename)

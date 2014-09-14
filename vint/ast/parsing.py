@@ -5,6 +5,7 @@ class Parser(object):
     def __init__(self):
         pass
 
+
     def parse(self, string):
         lines = string.split('\n')
 
@@ -13,6 +14,7 @@ class Parser(object):
         ast = parser.parse(reader)
         return ast
 
+
     def parse_file(self, file_path):
-        with open(file_path) as f:
+        with file_path.open() as f:
             return self.parse(f.read())

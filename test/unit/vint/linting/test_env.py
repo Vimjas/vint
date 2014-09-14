@@ -1,18 +1,18 @@
 import unittest
 from unittest.mock import patch
-import os.path
+from pathlib import Path
 from vint.linting.env import build_environment
 
-FIXTURE_PATH = os.path.join('test', 'fixture', 'env')
+FIXTURE_PATH = Path('test', 'fixture', 'env')
 
 
 class TestEnv(unittest.TestCase):
     def test_build_environment(self):
-        cwd = os.path.join('path', 'to', 'cwd')
+        cwd = Path('path', 'to', 'cwd')
 
         expected_env = {
             'cmdargs': {
-                'files': [FIXTURE_PATH],
+                'files': [str(FIXTURE_PATH)],
                 'verbose': True,
                 'error': False,
                 'warning': True,
@@ -20,10 +20,10 @@ class TestEnv(unittest.TestCase):
                 'max_violations': 10,
             },
             'file_paths': set([
-                os.path.join(FIXTURE_PATH, '1.vim'),
-                os.path.join(FIXTURE_PATH, '2.vim'),
-                os.path.join(FIXTURE_PATH, 'sub', '3.vim'),
-                os.path.join(FIXTURE_PATH, 'sub', '4.vim'),
+                Path(FIXTURE_PATH, '1.vim'),
+                Path(FIXTURE_PATH, '2.vim'),
+                Path(FIXTURE_PATH, 'sub', '3.vim'),
+                Path(FIXTURE_PATH, 'sub', '4.vim'),
             ]),
             'cwd': cwd
         }

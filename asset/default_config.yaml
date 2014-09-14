@@ -1,0 +1,4 @@
+cmdargs:
+  verbose: false
+  severity: warning
+  error-limit: 50

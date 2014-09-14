@@ -1,0 +1,13 @@
+cmdargs:
+  verbose: true
+  severity: warning
+  error-limit: 10
+
+
+policies:
+  ProhibitSomethingEvil:
+    # Some comments
+    enabled: false
+
+  ProhibitSomethingDengerous:
+    enabled: true

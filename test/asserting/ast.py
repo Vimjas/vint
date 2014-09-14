@@ -1,4 +1,5 @@
-import os.path
+from pathlib import Path
+
 
 def get_fixture_path(filename):
-    return os.path.join('test', 'fixture', 'ast', filename)
+    return Path('test', 'fixture', 'ast', filename)
