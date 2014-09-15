@@ -9,7 +9,7 @@ class JSONFormatter(object):
 
 
     def format_violations(self, violations):
-        return json.dumps(self._normalize_violations(violations)) + '\n'
+        return json.dumps(self._normalize_violations(violations))
 
 
     def _normalize_violations(self, violations):
