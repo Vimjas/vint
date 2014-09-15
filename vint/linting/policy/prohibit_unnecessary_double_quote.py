@@ -3,6 +3,7 @@ from vint.ast.node_type import NodeType
 from vint.linting.level import Level
 from vint.linting.policy.abstract_policy import AbstractPolicy
 from vint.linting.policy.reference.googlevimscriptstyleguide import get_reference_source
+from vint.linting.policy_loader import register_policy
 
 
 # see `:help expr-string`
@@ -24,6 +25,7 @@ _special_char_matcher = re.compile(
     r')')
 
 
+@register_policy
 class ProhibitUnnecessaryDoubleQuote(AbstractPolicy):
     def __init__(self):
         super().__init__()
