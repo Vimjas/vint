@@ -8,7 +8,7 @@ from vint.linting.level import Level
 class TestFormatter(FormatterAssertion, unittest.TestCase):
     def test_format_violations_with_format_option(self):
         config_dict = {
-            'cmd_args': {
+            'cmdargs': {
                 'format': '{file_name}|{file_path}|{line_number}|{column_number}|{severity}|{description}|{policy_name}|{reference}'
             }
         }

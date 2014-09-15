@@ -1,6 +1,5 @@
 import unittest
 from test.asserting.formatter import FormatterAssertion
-from test.asserting.env_factory import env_factory
 
 import json
 from pathlib import Path
@@ -10,8 +9,8 @@ from vint.linting.level import Level
 
 class TestJSONFormatter(FormatterAssertion, unittest.TestCase):
     def test_format_violations(self):
-        env = env_factory()
-        formatter = JSONFormatter(env)
+        cmdargs = {}
+        formatter = JSONFormatter(cmdargs)
 
         violations = [
             {

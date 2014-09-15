@@ -6,6 +6,7 @@ DEFAULT_FORMAT = '{file_path}:{line_number}:{column_number}: {description} (see 
 
 FORMAT_COLOR_MAP = {
     'file_path': Colors.Cyan,
+    'file_name': Colors.Cyan,
     'line_number': Colors.White,
     'column_number': Colors.White,
     'severity': Colors.Red,
@@ -17,18 +18,18 @@ FORMAT_COLOR_MAP = {
 
 class Formatter(object):
     def __init__(self, config_dict):
-        if 'cmd_args' in config_dict:
-            cmd_args = config_dict['cmd_args']
+        if 'cmdargs' in config_dict:
+            cmdargs = config_dict['cmdargs']
         else:
-            cmd_args = {}
+            cmdargs = {}
 
-        if 'format' in cmd_args:
-            self._format = cmd_args['format']
+        if 'format' in cmdargs:
+            self._format = cmdargs['format']
         else:
             self._format = DEFAULT_FORMAT
 
-        if 'color' in cmd_args:
-            self._should_be_colorized = cmd_args['color']
+        if 'color' in cmdargs:
+            self._should_be_colorized = cmdargs['color']
         else:
             self._should_be_colorized = False
 
@@ -44,17 +45,30 @@ class Formatter(object):
 
 
     def format_violation(self, violation):
-        formatter_map = self._assign_violation_attribute(violation)
-
         if self._should_be_colorized:
-            for key, value in formatter_map:
-                formatter_map[key] = colorize(value, FORMAT_COLOR_MAP[key])
+            formatter_map = self._get_colorize_formatter_map(violation)
+        else:
+            formatter_map = self._get_formatter_map(violation)
 
         formatted_line = self._format.format(**formatter_map)
         return formatted_line
 
 
-    def _assign_violation_attribute(self, violation):
+    def _get_colorize_formatter_map(self, violation):
+        formatter_map = self._get_formatter_map(violation)
+        colorized_formatter_map = {}
+
+        for key, value in formatter_map.items():
+            if key in FORMAT_COLOR_MAP:
+                Color = FORMAT_COLOR_MAP[key]
+                colorized_formatter_map[key] = colorize(str(value), Color())
+            else:
+                colorized_formatter_map[key] = value
+
+        return colorized_formatter_map
+
+
+    def _get_formatter_map(self, violation):
         file_path = Path(violation['position']['path'])
 
         return {
