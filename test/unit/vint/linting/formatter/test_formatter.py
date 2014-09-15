@@ -2,7 +2,7 @@ import unittest
 from pathlib import Path
 from test.asserting.formatter import FormatterAssertion
 from test.asserting.env_factory import env_factory
-from vint.linting.formatter import Formatter
+from vint.linting.formatter.formatter import Formatter
 from vint.linting.level import Level
 
 

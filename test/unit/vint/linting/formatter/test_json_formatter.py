@@ -4,7 +4,7 @@ from test.asserting.env_factory import env_factory
 
 import json
 from pathlib import Path
-from vint.linting.json_formatter import JSONFormatter
+from vint.linting.formatter.json_formatter import JSONFormatter
 from vint.linting.level import Level
 
 
