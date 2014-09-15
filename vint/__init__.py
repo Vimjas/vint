@@ -12,6 +12,27 @@ from vint.linting.policy_set import PolicySet
 VERSION = '0.0.0'
 
 
+def main(argv):
+    env = _build_env(argv)
+    config_dict = _build_config_dict(env)
+    parser = _build_argparser()
+
+    paths_to_lint = env['file_paths']
+
+    if len(paths_to_lint) == 0:
+        print('error: nothing to lint\n')
+        parser.print_help()
+        parser.exit(status=1)
+
+    violations = _lint_all(paths_to_lint, config_dict)
+
+    if len(violations) == 0:
+        parser.exit(status=0)
+
+    _print_violations(violations, config_dict)
+    parser.exit(status=1)
+
+
 def _build_config_dict(env):
     config = ConfigContainer(
         ConfigDefaultSource(env),
@@ -74,24 +95,3 @@ def _print_violations(violations, env):
     output = formatter.format_violations(violations)
 
     print(output)
-
-
-def main(argv):
-    env = _build_env(argv)
-    config_dict = _build_config_dict(env)
-    parser = _build_argparser()
-
-    paths_to_lint = env['file_paths']
-
-    if len(paths_to_lint) == 0:
-        print('error: nothing to lint\n')
-        parser.print_help()
-        parser.exit(status=1)
-
-    violations = _lint_all(paths_to_lint, config_dict)
-
-    if len(violations) == 0:
-        parser.exit(status=0)
-
-    _print_violations(violations, config_dict)
-    parser.exit(status=1)

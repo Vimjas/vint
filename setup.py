@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from setuptools import setup, find_packages
+from vint import VERSION
 
 
 def load_requires_from_file(filepath):
@@ -15,9 +16,13 @@ def test_requires():
     return load_requires_from_file('test-requirements.txt')
 
 
+def get_version():
+    return VERSION
+
+
 setup(
     name='vint',
-    version='0.0',
+    version=get_version(),
     description='Lint tool for Vim script Language',
     author='Kuniwak',
     author_email='orga.chem.job+vint@gmail.com',
