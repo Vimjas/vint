@@ -11,16 +11,19 @@ class TestEnv(unittest.TestCase):
         cwd = Path('path', 'to', 'cwd')
         home = Path('/', 'home', 'user')
 
+        cmdargs = {
+            'verbose': True,
+            'warning': True,
+            'max_violations': 10,
+            'files': [str(FIXTURE_PATH)],
+        }
+
         expected_env = {
             'cmdargs': {
                 'files': [str(FIXTURE_PATH)],
                 'verbose': True,
-                'error': False,
                 'warning': True,
-                'style_problem': False,
                 'max_violations': 10,
-                'color': False,
-                'json': False,
             },
             'file_paths': set([
                 Path(FIXTURE_PATH, '1.vim'),
@@ -32,16 +35,13 @@ class TestEnv(unittest.TestCase):
             'cwd': cwd,
         }
 
-        cmd = '-v --warning --max-violations 10 {file_paths}'.format(file_paths=FIXTURE_PATH)
-        argv = cmd.split()
-
         # we should mock os.getcwd() because env get the cwd by os.getcwd()
         with patch('os.getcwd') as mocked_getcwd:
             mocked_getcwd.return_value = str(cwd)
 
             with patch('os.path.expanduser') as mocked_expanduser:
                 mocked_expanduser.return_value = str(home)
-                env = build_environment(argv)
+                env = build_environment(cmdargs)
 
         self.maxDiff = 1000
         self.assertEqual(env, expected_env)

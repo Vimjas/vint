@@ -1,19 +1,18 @@
 import unittest
 from pathlib import Path
 from test.asserting.formatter import FormatterAssertion
-from test.asserting.env_factory import env_factory
 from vint.linting.formatter.formatter import Formatter
 from vint.linting.level import Level
 
 
 class TestFormatter(FormatterAssertion, unittest.TestCase):
     def test_format_violations_with_format_option(self):
-        env = env_factory({
+        config_dict = {
             'cmd_args': {
                 'format': '{file_name}|{file_path}|{line_number}|{column_number}|{severity}|{description}|{policy_name}|{reference}'
             }
-        })
-        formatter = Formatter(env)
+        }
+        formatter = Formatter(config_dict)
 
         violations = [
             {
@@ -49,8 +48,8 @@ file2|path/to/file2|11|21|warning|this code is tooooo dangerous|ProhibitSomethin
 
 
     def test_format_violations(self):
-        env = env_factory()
-        formatter = Formatter(env)
+        config_dict = {}
+        formatter = Formatter(config_dict)
 
         violations = [
             {
@@ -78,8 +77,8 @@ file2|path/to/file2|11|21|warning|this code is tooooo dangerous|ProhibitSomethin
         ]
 
         expected_output = """\
-path/to/file1|1 col 2 warning| this code is tooooo evil [ProhibitSomethingEvil|me]
-path/to/file2|11 col 21 warning| this code is tooooo dangerous [ProhibitSomethingDangerous|you]\
+path/to/file1:1:2: this code is tooooo evil (see me)
+path/to/file2:11:21: this code is tooooo dangerous (see you)\
 """
 
         self.assertFormattedViolations(formatter, violations, expected_output)

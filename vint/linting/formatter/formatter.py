@@ -2,7 +2,7 @@ from pathlib import Path
 from ansicolor import Colors, colorize
 
 
-DEFAULT_FORMAT = '{file_path}|{line_number} col {column_number} {severity}| {description} [{policy_name}|{reference}]'
+DEFAULT_FORMAT = '{file_path}:{line_number}:{column_number}: {description} (see {reference})'
 
 FORMAT_COLOR_MAP = {
     'file_path': Colors.Cyan,
@@ -16,9 +16,9 @@ FORMAT_COLOR_MAP = {
 
 
 class Formatter(object):
-    def __init__(self, env):
-        if 'cmd_args' in env:
-            cmd_args = env['cmd_args']
+    def __init__(self, config_dict):
+        if 'cmd_args' in config_dict:
+            cmd_args = config_dict['cmd_args']
         else:
             cmd_args = {}
 
