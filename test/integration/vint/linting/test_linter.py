@@ -5,7 +5,8 @@ from vint.linting.level import Level
 from vint.linting.policy.abstract_policy import AbstractPolicy
 from vint.linting.linter import Linter
 
-FIXTURE_VIM_SCRIPT = Path('test', 'fixture', 'config', 'fixture.vim')
+INVALID_VIM_SCRIPT = Path('test', 'fixture', 'linter', 'invalid.vim')
+BROKEN_VIM_SCRIPT = Path('test', 'fixture', 'linter', 'broken.vim')
 
 
 class TestLinterIntegral(unittest.TestCase):
@@ -83,7 +84,7 @@ class TestLinterIntegral(unittest.TestCase):
         }
 
         linter = Linter(policy_set, config_dict_global)
-        got_violations = linter.lint_file(FIXTURE_VIM_SCRIPT)
+        got_violations = linter.lint_file(INVALID_VIM_SCRIPT)
 
         expected_violations = [
             {
@@ -94,7 +95,7 @@ class TestLinterIntegral(unittest.TestCase):
                 'position': {
                     'line': 1,
                     'column': 1,
-                    'path': FIXTURE_VIM_SCRIPT
+                    'path': INVALID_VIM_SCRIPT
                 },
             },
             {
@@ -105,7 +106,7 @@ class TestLinterIntegral(unittest.TestCase):
                 'position': {
                     'line': 7,
                     'column': 1,
-                    'path': FIXTURE_VIM_SCRIPT
+                    'path': INVALID_VIM_SCRIPT
                 },
             },
             {
@@ -116,10 +117,49 @@ class TestLinterIntegral(unittest.TestCase):
                 'position': {
                     'line': 8,
                     'column': 1,
-                    'path': FIXTURE_VIM_SCRIPT
+                    'path': INVALID_VIM_SCRIPT
                 },
             },
         ]
+        self.assertEqual(got_violations, expected_violations)
+
+
+    def test_lint_with_broken_file(self):
+        policy_set = TestLinterIntegral.StubPolicySet()
+
+        config_dict_global = {
+            'cmdargs': {
+                'verbose': True,
+                'severity': Level.WARNING,
+                'error-limit': 10,
+            },
+            'policies': {
+                'StubPolicy1': {
+                    'enabled': True,
+                },
+                'StubPolicy2': {
+                    'enabled': False,
+                },
+            }
+        }
+
+        linter = Linter(policy_set, config_dict_global)
+        got_violations = linter.lint_file(BROKEN_VIM_SCRIPT)
+
+        expected_violations = [
+            {
+                'name': 'SyntaxError',
+                'level': Level.ERROR,
+                'description': 'unexpected token: ==',
+                'reference': 'ynkdir/vim-vimlparser',
+                'position': {
+                    'line': 1,
+                    'column': 6,
+                    'path': BROKEN_VIM_SCRIPT
+                },
+            },
+        ]
+
         self.assertEqual(got_violations, expected_violations)
 
 
