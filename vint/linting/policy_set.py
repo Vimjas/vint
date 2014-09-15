@@ -23,6 +23,7 @@ class PolicySet(object):
         policy_map = dict([(policy_name, PolicyClass())
                            for policy_name, PolicyClass
                            in policy_class_map.items()])
+
         return policy_map
 
 

@@ -1,0 +1,4 @@
+#!/bin/sh
+
+bin_dir="$(dirname $0)"
+python $bin_dir/../vint.py $@

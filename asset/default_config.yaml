@@ -2,3 +2,10 @@ cmdargs:
   verbose: false
   severity: warning
   error-limit: 50
+
+policies:
+  ProhibitEqualTildeOperator:
+    enabled: True
+
+  ProhibitUnnecessaryDoubleQuote:
+    enabled: True

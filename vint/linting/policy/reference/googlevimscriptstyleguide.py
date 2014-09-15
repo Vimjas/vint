@@ -32,5 +32,5 @@ SectionNames = {
 
 
 def get_reference_source(section):
-    return 'Section `{section_name}` at Google VimScript Style Guide'.format(
+    return 'Google VimScript Style Guide ({section_name})'.format(
         section_name=SectionNames[section])

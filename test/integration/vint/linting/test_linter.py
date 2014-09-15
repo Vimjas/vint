@@ -83,7 +83,7 @@ class TestLinterIntegral(unittest.TestCase):
         }
 
         linter = Linter(policy_set, config_dict_global)
-        got_violations = linter.lint(FIXTURE_VIM_SCRIPT)
+        got_violations = linter.lint_file(FIXTURE_VIM_SCRIPT)
 
         expected_violations = [
             {

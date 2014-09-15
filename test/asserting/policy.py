@@ -50,7 +50,7 @@ class PolicyAssertion(unittest.TestCase):
         config = PolicyAssertion.StubConfigContainer(policy_name)
 
         linter = Linter(policy_set, config.get_config_dict())
-        violations = linter.lint(path)
+        violations = linter.lint_file(path)
 
         self.assertEqual(len(violations), len(expected_violations),
                          'Expected number of violations found')
