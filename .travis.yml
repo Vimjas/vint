@@ -4,6 +4,7 @@ notifications:
   email: false
 
 python:
+  - "3.3"
   - "3.4"
 
 install:
