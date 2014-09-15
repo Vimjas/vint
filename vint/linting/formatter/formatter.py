@@ -5,8 +5,8 @@ from ansicolor import Colors, colorize
 DEFAULT_FORMAT = '{file_path}:{line_number}:{column_number}: {description} (see {reference})'
 
 FORMAT_COLOR_MAP = {
-    'file_path': Colors.Cyan,
-    'file_name': Colors.Cyan,
+    'file_path': Colors.Red,
+    'file_name': Colors.Red,
     'line_number': Colors.White,
     'column_number': Colors.White,
     'severity': Colors.Red,
