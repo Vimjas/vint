@@ -42,7 +42,7 @@ class TestFormatter(FormatterAssertion, unittest.TestCase):
 
         expected_output = """\
 file1|path/to/file1|1|2|warning|this code is tooooo evil|ProhibitSomethingEvil|me
-file2|path/to/file2|11|21|warning|this code is tooooo dangerous|ProhibitSomethingDangerous|you
+file2|path/to/file2|11|21|warning|this code is tooooo dangerous|ProhibitSomethingDangerous|you\
 """
 
         self.assertFormattedViolations(formatter, violations, expected_output)
@@ -79,7 +79,7 @@ file2|path/to/file2|11|21|warning|this code is tooooo dangerous|ProhibitSomethin
 
         expected_output = """\
 path/to/file1|1 col 2 warning| this code is tooooo evil [ProhibitSomethingEvil|me]
-path/to/file2|11 col 21 warning| this code is tooooo dangerous [ProhibitSomethingDangerous|you]
+path/to/file2|11 col 21 warning| this code is tooooo dangerous [ProhibitSomethingDangerous|you]\
 """
 
         self.assertFormattedViolations(formatter, violations, expected_output)

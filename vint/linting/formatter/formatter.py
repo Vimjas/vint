@@ -17,13 +17,20 @@ FORMAT_COLOR_MAP = {
 
 class Formatter(object):
     def __init__(self, env):
-        if 'cmd_args' not in env:
-            return
+        if 'cmd_args' in env:
+            cmd_args = env['cmd_args']
+        else:
+            cmd_args = {}
 
-        cmd_args = env['cmd_args']
+        if 'format' in cmd_args:
+            self._format = cmd_args['format']
+        else:
+            self._format = DEFAULT_FORMAT
 
-        self._format = cmd_args['format'] if 'format' in cmd_args else DEFAULT_FORMAT
-        self._should_be_colorized = 'color' in cmd_args and cmd_args['color']
+        if 'color' in cmd_args:
+            self._should_be_colorized = cmd_args['color']
+        else:
+            self._should_be_colorized = False
 
 
     def format_violations(self, violations):
@@ -33,7 +40,7 @@ class Formatter(object):
         formatted_lines = map(lambda violation: self.format_violation(violation),
                               sorted_violations)
 
-        return '\n'.join(formatted_lines) + '\n'
+        return '\n'.join(formatted_lines)
 
 
     def format_violation(self, violation):
