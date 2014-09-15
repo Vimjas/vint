@@ -1,9 +1,12 @@
+import re
+from pathlib import Path
 from vint.ast.parsing import Parser
 from vint.ast.traversing import traverse
 from vint.ast.node_type import NodeType
 from vint.linting.config.config_container import ConfigContainer
 from vint.linting.config.config_dict_source import ConfigDictSource
 from vint.linting.config.config_comment_source import ConfigCommentSource
+from vint.linting.level import Level
 
 
 class Linter(object):
@@ -41,9 +44,37 @@ class Linter(object):
         return config_container
 
 
+    def _parse_vimlparser_error(self, err_message):
+        match = re.match(r'vimlparser: (?P<description>.*): line (?P<line_number>\d+) col (?P<column_number>\d+)$', err_message)
+        return match.groupdict()
+
+
+    def _create_parse_error(self, path, err_message):
+        parser_error = self._parse_vimlparser_error(err_message)
+
+        return {
+            'name': 'SyntaxError',
+            'level': Level.ERROR,
+            'description': parser_error['description'],
+            'reference': 'ynkdir/vim-vimlparser',
+            'position': {
+                'line': int(parser_error['line_number']),
+                'column': int(parser_error['column_number']),
+                'path': Path(path),
+            },
+        }
+
+
     def lint_file(self, path):
         """ Lint the file and return the violations found. """
-        root_ast = self._parser.parse_file(path)
+        try:
+            root_ast = self._parser.parse_file(path)
+        except Exception as exception:
+            if 'vimlparser' not in str(exception):
+                raise exception
+
+            parse_error = self._create_parse_error(path, str(exception))
+            return [parse_error]
 
         self._violations = []
         self._update_listeners_map()
