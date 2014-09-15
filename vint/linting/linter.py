@@ -24,7 +24,6 @@ class Linter(object):
     def __init__(self, policy_set, config_dict_global):
         self._parser = Parser()
         self._policy_set = policy_set
-        self.violations = []
 
         self._config_comment_source = ConfigCommentSource()
         self._config = self._decorate_config(config_dict_global,
@@ -42,17 +41,18 @@ class Linter(object):
         return config_container
 
 
-    def lint(self, path):
+    def lint_file(self, path):
         """ Lint the file and return the violations found. """
         root_ast = self._parser.parse_file(path)
 
+        self._violations = []
         self._update_listeners_map()
 
         # Given root AST to makepolicy flexibility
         lint_context = {'path': path, 'root_node': root_ast}
         traverse(lambda node: self._visit_node(node, lint_context), root_ast)
 
-        return self.violations
+        return self._violations
 
 
     def _visit_node(self, node, lint_context):
@@ -72,7 +72,7 @@ class Linter(object):
             violation = listening_policy.get_violation_if_found(node, lint_context)
 
             if violation is not None:
-                self.violations.append(violation)
+                self._violations.append(violation)
 
 
     def _refresh_policies_if_necessary(self, node):

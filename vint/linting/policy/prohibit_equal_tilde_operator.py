@@ -2,8 +2,10 @@ from vint.linting.policy.abstract_policy import AbstractPolicy
 from vint.linting.policy.reference.googlevimscriptstyleguide import get_reference_source
 from vint.linting.level import Level
 from vint.ast.node_type import NodeType
+from vint.linting.policy_loader import register_policy
 
 
+@register_policy
 class ProhibitEqualTildeOperator(AbstractPolicy):
     def __init__(self):
         super().__init__()
