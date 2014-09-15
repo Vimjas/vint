@@ -1,3 +1,4 @@
+import sys
 from vint.linting.linter import Linter
 from vint.linting.formatter.formatter import Formatter
 from vint.linting.env import build_environment
@@ -33,7 +34,12 @@ def main(argv):
     for file_path in paths_to_lint:
         violations += linter.lint_file(file_path)
 
+    if len(violations) == 0:
+        sys.exit(0)
+
     formatter = Formatter(env)
     output = formatter.format_violations(violations)
 
     print(output)
+
+    sys.exit(1)
