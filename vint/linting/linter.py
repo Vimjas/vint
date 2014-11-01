@@ -1,15 +1,23 @@
 from vint.ast.parsing import Parser
 from vint.ast.traversing import traverse
 from vint.ast.node_type import NodeType
+from vint.ast.plugin.scope_plugin import ScopePlugin
 
 
 class Linter(object):
     def __init__(self, policies):
-        self.parser = Parser()
+        self.parser = self.build_parser()
         self.policies = policies
         self.violations = []
 
         self._listeners_map = self.build_listeners_map(policies)
+
+
+    def build_parser(self):
+        plugins = [ScopePlugin()]
+
+        parser = Parser(plugins)
+        return parser
 
 
     def lint(self, path):
