@@ -44,7 +44,6 @@ class ProhibitUsingUndeclaredVariable(AbstractPolicy):
         """
 
         is_declared_identifier = self._is_declared_identifier(node)
-        print(node['value'], is_declared_identifier)
 
         return is_declared_identifier
 
