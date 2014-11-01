@@ -52,6 +52,8 @@ class PolicyAssertion(unittest.TestCase):
         linter = Linter(policy_set, config.get_config_dict())
         violations = linter.lint_file(path)
 
+        print(violations)
+
         self.assertEqual(len(violations), len(expected_violations),
                          'Expected number of violations found')
 
@@ -60,8 +62,8 @@ class PolicyAssertion(unittest.TestCase):
 
 
     def assertViolation(self, actual_violation, expected_violation):
-        self.assertIsNot(actual_violation, None)
-        self.assertIsNot(expected_violation, None)
+        assert actual_violation is not None
+        assert expected_violation is not None
 
         self.assertEqual(actual_violation['name'], expected_violation['name'],
                          'Expected violation name was returned')

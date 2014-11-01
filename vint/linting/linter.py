@@ -88,15 +88,24 @@ class Linter(object):
         self._update_listeners_map()
 
         # Given root AST to makepolicy flexibility
-        lint_context = {'path': path, 'root_node': root_ast}
-        traverse(root_ast, on_enter=lambda node: self._visit_node(node, lint_context))
+        lint_context = {'path': path, 'root_node': root_ast, 'stack_trace': []}
+
+        traverse(root_ast,
+                 on_enter=lambda node: self._handle_enter(node, lint_context),
+                 on_leave=lambda node: self._handle_leave(node, lint_context))
 
         return self._violations
 
 
-    def _visit_node(self, node, lint_context):
+    def _handle_enter(self, node, lint_context):
         self._refresh_policies_if_necessary(node)
         self._fire_listeners(node, lint_context)
+
+        lint_context['stack_trace'].append(node)
+
+
+    def _handle_leave(self, node, lint_context):
+        lint_context['stack_trace'].pop()
 
 
     def _fire_listeners(self, node, lint_context):

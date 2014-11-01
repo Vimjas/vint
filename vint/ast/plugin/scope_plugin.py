@@ -12,6 +12,7 @@ class DeclarationScope(Enum):
     SCRIPT_LOCAL = 5
     FUNCTION_LOCAL = 6
     PARAMETER = 7
+    BUILTIN = 8
 
 
 class ScopeType(Enum):
@@ -21,6 +22,9 @@ class ScopeType(Enum):
 
 class ScopePlugin(AbstractASTPlugin):
     SCOPE_TREE_KEY = 'vint_scope_tree'
+    SCOPE_KEY = 'vint_scope'
+    DEFINITION_IDENTIFIER_FLAG_KEY = 'vint_scope_identifier_is_definition'
+
 
     prefix_to_declaration_scope_map = {
         'g:': DeclarationScope.GLOBAL,
@@ -30,6 +34,7 @@ class ScopePlugin(AbstractASTPlugin):
         's:': DeclarationScope.SCRIPT_LOCAL,
         'l:': DeclarationScope.FUNCTION_LOCAL,
         'a:': DeclarationScope.PARAMETER,
+        'v:': DeclarationScope.BUILTIN,
     }
 
 
@@ -39,6 +44,7 @@ class ScopePlugin(AbstractASTPlugin):
             NodeType.FUNCTION: self._handle_enter_function,
             NodeType.LET: self._handle_enter_let,
             NodeType.FOR: self._handle_enter_for,
+            NodeType.IDENTIFIER: self._handle_enter_identifier,
         }
 
         self.node_type_to_on_leave_handler_map = {
@@ -77,8 +83,10 @@ class ScopePlugin(AbstractASTPlugin):
 
 
     def _handle_enter_function(self, node):
-        func_name = node['left']['value']
+        func_name_identifier = node['left']
+        func_name = func_name_identifier['value']
 
+        self._mark_difinition_identifier(func_name_identifier)
         self._handle_new_variable(func_name)
         self._handle_new_scope(func_name)
 
@@ -99,17 +107,47 @@ class ScopePlugin(AbstractASTPlugin):
                 # So we should ignore '...' token.
                 continue
 
+            self._mark_difinition_identifier(param)
             self._handle_new_variable('a:' + param_name)
 
 
+    def _mark_difinition_identifier(self, identifier):
+        """ Mark the identifier as definition.
+
+        For example:
+
+            " IDENTIFIER1 is definition.
+            functrion IDENTIFIER1():
+            endfunction
+
+            " IDENTIFIER2 is not definition
+            call IDENTIFIER2()
+        """
+        identifier[ScopePlugin.DEFINITION_IDENTIFIER_FLAG_KEY] = True
+
+
     def _handle_enter_let(self, node):
-        var_name = node['left']['value']
-        self._handle_new_variable(var_name)
+        identifier = node['left']
+        identifier_name = identifier['value']
+
+        self._mark_difinition_identifier(identifier)
+        self._handle_new_variable(identifier_name)
 
 
     def _handle_enter_for(self, node):
-        loop_var_name = node['left']['value']
-        self._handle_new_variable(loop_var_name)
+        loop_identifier = node['left']
+        loop_identifier_name = loop_identifier['value']
+
+        self._mark_difinition_identifier(loop_identifier)
+        self._handle_new_variable(loop_identifier_name)
+
+
+    def _handle_enter_identifier(self, node):
+        node[ScopePlugin.SCOPE_KEY] = self.current_scope
+
+        # Make all idenifiers to contain DEFINITION_IDENTIFIER_FLAG.
+        if ScopePlugin.DEFINITION_IDENTIFIER_FLAG_KEY not in node:
+            node[ScopePlugin.DEFINITION_IDENTIFIER_FLAG_KEY] = False
 
 
     def _handle_leave(self, node):
@@ -149,47 +187,60 @@ class ScopePlugin(AbstractASTPlugin):
         self.current_scope = new_scope
 
 
-    def _handle_new_variable(self, name):
+    def _handle_new_variable(self, identifier_name):
         variables_map = self.current_scope['variables']
 
-        declaration_scope = self.detect_variable_declaration_scope(name)
-
-        # No declaration scope means implicit declaration.
-        is_declared_with_implicit_scope = declaration_scope is None
-
-        if is_declared_with_implicit_scope:
-            is_toplevel_context = self.current_scope['type'] is ScopeType.TOPLEVEL
-
-            # See :help internal-variables
-            # > In a function: local to a function; otherwise: global
-            declaration_scope = None
-            if is_toplevel_context:
-                declaration_scope = DeclarationScope.GLOBAL
-            else:
-                declaration_scope = DeclarationScope.FUNCTION_LOCAL
-
-        var = {
-            'declaration_scope': declaration_scope,
-            'is_declared_with_implicit_scope': is_declared_with_implicit_scope,
+        variable = {
+            'declaration_scope':
+                ScopePlugin.detect_scope(identifier_name, self.current_scope),
+            'is_declared_with_implicit_scope':
+                ScopePlugin.is_declared_with_implicit_scope(identifier_name),
         }
 
-        if name in variables_map:
+        if identifier_name in variables_map:
             # We can declare duplicated variables, and the older variable
             # will be overwrited by newer. But we interested in searching
             # duplicated variable declaration. So variables map should
             # have an array that contains all variable declaration.
-            variables_map[name].append(var)
+            variables_map[identifier_name].append(variable)
         else:
-            variables_map[name] = [var]
+            variables_map[identifier_name] = [variable]
 
 
-    def detect_variable_declaration_scope(self, var_name):
-        """ Returns a DeclarationScope by the specified variable name.
+    @classmethod
+    def is_declared_with_implicit_scope(cls, identifier_name):
+        # No declaration scope means implicit declaration.
+        return ScopePlugin.detect_explicit_scope(identifier_name) is None
+
+
+    @classmethod
+    def detect_scope(cls, identifier_name, scope):
+        if ScopePlugin.is_declared_with_implicit_scope(identifier_name):
+            return ScopePlugin.detect_implicit_scope(identifier_name, scope)
+        else:
+            return ScopePlugin.detect_explicit_scope(identifier_name)
+
+
+    @classmethod
+    def detect_explicit_scope(cls, identifier_name):
+        """ Returns a DeclarationScope by the specified identifier name.
         Return None when the variable have no scope-prefix.
         """
-        prefix = var_name[0:2]
+        prefix = identifier_name[0:2]
 
         if prefix not in ScopePlugin.prefix_to_declaration_scope_map:
             return None
 
         return ScopePlugin.prefix_to_declaration_scope_map[prefix]
+
+
+    @classmethod
+    def detect_implicit_scope(cls, identifier_name, scope):
+        is_toplevel_context = scope['type'] is ScopeType.TOPLEVEL
+
+        # See :help internal-variables
+        # > In a function: local to a function; otherwise: global
+        if is_toplevel_context:
+            return DeclarationScope.GLOBAL
+        else:
+            return DeclarationScope.FUNCTION_LOCAL

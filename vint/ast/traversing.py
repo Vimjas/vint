@@ -74,7 +74,7 @@ ChildNodeAccessorMap = {
     NodeType.TOPLEVEL: [ChildType['BODY']],
     NodeType.COMMENT: [],
     NodeType.EXCMD: [],
-    NodeType.FUNCTION: [ChildType['BODY'], ChildType['LEFT'], ChildType['RLIST']],
+    NodeType.FUNCTION: [ChildType['LEFT'], ChildType['RLIST'], ChildType['BODY']],
     NodeType.ENDFUNCTION: [],
     NodeType.DELFUNCTION: [ChildType['LEFT']],
     NodeType.RETURN: [ChildType['LEFT']],
