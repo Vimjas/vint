@@ -38,13 +38,17 @@ class ScopePlugin(AbstractASTPlugin):
     }
 
 
+    class IdentifierNormalizationError(Exception):
+        pass
+
+
     def __init__(self):
         self.node_type_to_on_enter_handler_map = {
             NodeType.TOPLEVEL: self._handle_enter_toplevel,
             NodeType.FUNCTION: self._handle_enter_function,
-            NodeType.LET: self._handle_enter_let,
-            NodeType.FOR: self._handle_enter_for,
             NodeType.IDENTIFIER: self._handle_enter_identifier,
+            NodeType.LET: self._handle_enter_node_have_left_identifier,
+            NodeType.FOR: self._handle_enter_node_have_left_identifier,
         }
 
         self.node_type_to_on_leave_handler_map = {
@@ -84,7 +88,7 @@ class ScopePlugin(AbstractASTPlugin):
 
     def _handle_enter_function(self, node):
         func_name_identifier = node['left']
-        func_name = func_name_identifier['value']
+        func_name = ScopePlugin.get_normalized_identifier(func_name_identifier)
 
         self._mark_difinition_identifier(func_name_identifier)
         self._handle_new_variable(func_name)
@@ -126,20 +130,20 @@ class ScopePlugin(AbstractASTPlugin):
         identifier[ScopePlugin.DEFINITION_IDENTIFIER_FLAG_KEY] = True
 
 
-    def _handle_enter_let(self, node):
-        identifier = node['left']
-        identifier_name = identifier['value']
+    def _handle_enter_node_have_left_identifier(self, node):
+        left_node = node['left']
+        identifier_name = ScopePlugin.get_normalized_identifier(left_node)
 
-        self._mark_difinition_identifier(identifier)
+        self._mark_difinition_identifier(left_node)
         self._handle_new_variable(identifier_name)
 
 
-    def _handle_enter_for(self, node):
-        loop_identifier = node['left']
-        loop_identifier_name = loop_identifier['value']
+    def _handle_enter_subscript(self, node):
+        self._handle_enter_node_have_left_identifier(node)
 
-        self._mark_difinition_identifier(loop_identifier)
-        self._handle_new_variable(loop_identifier_name)
+
+    def _handle_enter_dot(self, node):
+        self._handle_enter_node_have_left_identifier(node)
 
 
     def _handle_enter_identifier(self, node):
@@ -205,6 +209,24 @@ class ScopePlugin(AbstractASTPlugin):
             variables_map[identifier_name].append(variable)
         else:
             variables_map[identifier_name] = [variable]
+
+
+    @classmethod
+    def get_normalized_identifier(cls, node):
+        node_type = NodeType(node['type'])
+
+        if node_type is NodeType.IDENTIFIER:
+            return node['value']
+
+        if node_type is NodeType.DOT or node_type is NodeType.SUBSCRIPT:
+            dict_name = node['left']['value']
+            key_name = ScopePlugin.get_normalized_identifier(node['right'])
+            return '{dict_name}["{key_name}"]'.format(dict_name=dict_name,
+                                                      key_name=key_name)
+        if node_type is NodeType.STRING:
+            return node['value'].strip('"\'')
+
+        raise ScopePlugin.IdentifierNormalizationError()
 
 
     @classmethod
