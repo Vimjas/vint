@@ -2,8 +2,8 @@ from vint.ast.node_type import NodeType
 
 
 ChildNodeAccessor = {
-    'NODE': lambda func, node: call_if_def(func, node),
-    'LIST': lambda func, nodes: for_each(func, nodes),
+    'NODE': lambda node, func: call_if_def(func, node),
+    'LIST': lambda nodes, func: for_each(func, nodes),
 }
 
 ChildType = {
@@ -83,11 +83,11 @@ ChildNodeAccessorMap = {
     NodeType.UNLET: [ChildType['LIST']],
     NodeType.LOCKVAR: [ChildType['LIST']],
     NodeType.UNLOCKVAR: [ChildType['LIST']],
-    NodeType.IF: [ChildType['BODY'], ChildType['COND'], ChildType['ELSEIF'], ChildType['ELSE'], ChildType['ENDIF']],
-    NodeType.ELSEIF: [ChildType['BODY'], ChildType['COND']],
+    NodeType.IF: [ChildType['COND'], ChildType['BODY'], ChildType['ELSEIF'], ChildType['ELSE'], ChildType['ENDIF']],
+    NodeType.ELSEIF: [ChildType['COND'], ChildType['BODY']],
     NodeType.ELSE: [ChildType['BODY']],
     NodeType.ENDIF: [],
-    NodeType.WHILE: [ChildType['BODY'], ChildType['COND'], ChildType['ENDWHILE']],
+    NodeType.WHILE: [ChildType['COND'], ChildType['BODY'], ChildType['ENDWHILE']],
     NodeType.ENDWHILE: [],
     NodeType.FOR: [ChildType['BODY'], ChildType['LEFT'], ChildType['LIST'], ChildType['REST'], ChildType['RIGHT'], ChildType['ENDFOR']],
     NodeType.ENDFOR: [],
@@ -186,19 +186,25 @@ def call_if_def(func, node):
         func(node)
 
 
-def traverse(func, node):
+def traverse(node, on_enter=None, on_leave=None):
     """ Traverses the specified Vim script AST node (depth first order).
-    The func will be called the specified node and the children.
+    The on_enter/on_leave handler will be called the specified node and the
+    children.
     """
     node_type = NodeType(node['type'])
 
     if node_type not in ChildNodeAccessorMap:
         raise UnknownNodeTypeException(node_type)
 
-    func(node)
+    if on_enter:
+        on_enter(node)
 
     for property_accessor in ChildNodeAccessorMap[node_type]:
         accessor_func = property_accessor['accessor']
         prop_name = property_accessor['property_name']
 
-        accessor_func(lambda child_node: traverse(func, child_node), node[prop_name])
+        accessor_func(node[prop_name],
+                      lambda child_node: traverse(child_node, on_enter, on_leave))
+
+    if on_leave:
+        on_leave(node)

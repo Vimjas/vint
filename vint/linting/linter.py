@@ -17,7 +17,7 @@ class Linter(object):
 
         # Given root AST to make policy flexibility
         env = {'path': path, 'root': root_ast}
-        traverse(lambda node: self.visit_node(node, env), root_ast)
+        traverse(root_ast, on_enter=lambda node: self.visit_node(node, env))
 
         return self.violations
 
