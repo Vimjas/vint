@@ -7,6 +7,7 @@ from vint.linting.config.config_container import ConfigContainer
 from vint.linting.config.config_dict_source import ConfigDictSource
 from vint.linting.config.config_comment_source import ConfigCommentSource
 from vint.linting.level import Level
+from vint.ast.plugin.scope_plugin import ScopePlugin
 
 
 class Linter(object):
@@ -25,7 +26,7 @@ class Linter(object):
     returned by policies.
     """
     def __init__(self, policy_set, config_dict_global):
-        self._parser = Parser()
+        self._parser = self.build_parser()
         self._policy_set = policy_set
 
         self._config_comment_source = ConfigCommentSource()
@@ -33,6 +34,13 @@ class Linter(object):
                                              self._config_comment_source)
 
         self._listeners_map = {}
+
+
+    def build_parser(self):
+        plugins = [ScopePlugin()]
+
+        parser = Parser(plugins)
+        return parser
 
 
     def _decorate_config(self, config_dict_global, config_comment_source):
@@ -81,7 +89,7 @@ class Linter(object):
 
         # Given root AST to makepolicy flexibility
         lint_context = {'path': path, 'root_node': root_ast}
-        traverse(lambda node: self._visit_node(node, lint_context), root_ast)
+        traverse(root_ast, on_enter=lambda node: self._visit_node(node, lint_context))
 
         return self._violations
 
