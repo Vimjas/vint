@@ -20,6 +20,8 @@ class ScopeType(Enum):
 
 
 class ScopePlugin(AbstractASTPlugin):
+    SCOPE_TREE_KEY = 'vint_scope_tree'
+
     prefix_to_declaration_scope_map = {
         'g:': DeclarationScope.GLOBAL,
         'b:': DeclarationScope.BUFFER_LOCAL,
@@ -52,7 +54,7 @@ class ScopePlugin(AbstractASTPlugin):
                  on_enter=self._handle_enter,
                  on_leave=self._handle_leave)
 
-        ast.vint_scope_tree = self.root_scope
+        ast[ScopePlugin.SCOPE_TREE_KEY] = self.root_scope
 
 
     def _handle_enter(self, node):
