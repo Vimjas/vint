@@ -82,6 +82,8 @@ class ScopePlugin(AbstractASTPlugin):
 
         is_declared_with_range = node['attr']['range'] is not 0
         if is_declared_with_range:
+            # "a:firstline" and "a:lastline" are declared automatically when
+            # the function has a "range" attribute. See :func-range
             self._handle_new_variable('a:firstline')
             self._handle_new_variable('a:lastline')
 
