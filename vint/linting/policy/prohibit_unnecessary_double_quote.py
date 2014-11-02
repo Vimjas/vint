@@ -49,7 +49,7 @@ class ProhibitUnnecessaryDoubleQuote(AbstractPolicy):
 
         value = node['value']
 
-        is_double_quoted = value[0] is '"'
+        is_double_quoted = value[0] == '"'
         if not is_double_quoted:
             return True
 

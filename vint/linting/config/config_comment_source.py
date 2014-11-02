@@ -55,7 +55,7 @@ class ConfigCommentSource(ConfigSource):
         config_dict = {}
         for policy_switch in policy_switches:
             policy_name = policy_switch[1:]
-            is_enabling_switch = policy_switch[0] is '+'
+            is_enabling_switch = policy_switch[0] == '+'
 
             config_dict[policy_name] = {
                 'enabled': is_enabling_switch
