@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import patch
+from compat.unittest.mock import patch
 from pathlib import Path
 from vint.linting.env import build_environment
 

@@ -1,5 +1,5 @@
 from unittest import main, skip, TestCase
-from unittest.mock import patch
+from compat.unittest.mock import patch
 from vint.linting.policy_loader import get_policy_class_map
 from vint.linting.policy_set import PolicySet, import_all_policies
 
