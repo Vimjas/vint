@@ -39,7 +39,7 @@ class TestEnv(unittest.TestCase):
         with mock.patch('os.getcwd') as mocked_getcwd:
             mocked_getcwd.return_value = str(cwd)
 
-            with patch('os.path.expanduser') as mocked_expanduser:
+            with mock.patch('os.path.expanduser') as mocked_expanduser:
                 mocked_expanduser.return_value = str(home)
                 env = build_environment(cmdargs)
 
