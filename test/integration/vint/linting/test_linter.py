@@ -161,6 +161,7 @@ class TestLinterIntegral(unittest.TestCase):
             },
         ]
 
+        self.maxDiff = 1000
         self.assertEqual(got_violations, expected_violations)
 
 

@@ -1,0 +1,2 @@
+norm! gg
+normal! gg

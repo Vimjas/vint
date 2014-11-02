@@ -9,10 +9,12 @@ PATH_INVALID_VIM_SCRIPT = get_fixture_path('prohibit_equal_tilde_operator_invali
 
 
 class TestProhibitEqualTildeOperator(PolicyAssertion, unittest.TestCase):
-    def test_get_violation_if_found(self):
-        # Expect no violations found
-        self.assertFoundViolationsEqual(PATH_VALID_VIM_SCRIPT, ProhibitEqualTildeOperator, [])
+    def test_get_violation_if_found_when_file_is_valid(self):
+        self.assertFoundNoViolations(PATH_VALID_VIM_SCRIPT,
+                                     ProhibitEqualTildeOperator)
 
+
+    def test_get_violation_if_found_when_file_is_invalid(self):
         expected_violations = [
             {
                 'name': 'ProhibitEqualTildeOperator',
@@ -196,7 +198,9 @@ class TestProhibitEqualTildeOperator(PolicyAssertion, unittest.TestCase):
             },
         ]
 
-        self.assertFoundViolationsEqual(PATH_INVALID_VIM_SCRIPT, ProhibitEqualTildeOperator, expected_violations)
+        self.assertFoundViolationsEqual(PATH_INVALID_VIM_SCRIPT,
+                                        ProhibitEqualTildeOperator,
+                                        expected_violations)
 
 if __name__ == '__main__':
     unittest.main()

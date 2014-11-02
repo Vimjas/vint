@@ -19,6 +19,8 @@ Fixtures = {
         Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_func_param.vim'),
     'LOOP_VAR':
         Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_loop_var.vim'),
+    'DICT_KEY':
+        Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_declaring_with_dict_key.vim'),
 }
 
 
@@ -350,6 +352,45 @@ class TestScopePlugin(unittest.TestCase):
 
         self.maxDiff = 1024
         self.assertProcessing(Fixtures['LOOP_VAR'], expected_scope_tree)
+
+
+    def test_process_with_declaring_with_dict_key(self):
+        expected_scope_tree = {
+            'type': ScopeType.TOPLEVEL,
+            'variables': {
+                'g:dict["Function1"]': [{
+                    'declaration_scope': DeclarationScope.GLOBAL,
+                    'is_declared_with_implicit_scope': False,
+                }],
+                'g:dict["Function2"]': [{
+                    'declaration_scope': DeclarationScope.GLOBAL,
+                    'is_declared_with_implicit_scope': False,
+                }],
+                'g:dict["key1"]': [{
+                    'declaration_scope': DeclarationScope.GLOBAL,
+                    'is_declared_with_implicit_scope': False,
+                }],
+                'g:dict["key2"]': [{
+                    'declaration_scope': DeclarationScope.GLOBAL,
+                    'is_declared_with_implicit_scope': False,
+                }],
+            },
+            'child_scopes': {
+                'g:dict["Function1"]': [{
+                    'type': ScopeType.FUNCTION,
+                    'variables': {},
+                    'child_scopes': {},
+                }],
+                'g:dict["Function2"]': [{
+                    'type': ScopeType.FUNCTION,
+                    'variables': {},
+                    'child_scopes': {},
+                }],
+            },
+        }
+
+        self.maxDiff = 1024
+        self.assertProcessing(Fixtures['DICT_KEY'], expected_scope_tree)
 
 
 if __name__ == '__main__':

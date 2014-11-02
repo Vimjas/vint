@@ -1,6 +1,5 @@
 from argparse import ArgumentParser
 from vint.linting.linter import Linter
-from vint.linting.formatter.formatter import Formatter
 from vint.linting.env import build_environment
 from vint.linting.config.config_container import ConfigContainer
 from vint.linting.config.config_cmdargs_source import ConfigCmdargsSource
@@ -8,6 +7,8 @@ from vint.linting.config.config_default_source import ConfigDefaultSource
 from vint.linting.config.config_global_source import ConfigGlobalSource
 from vint.linting.config.config_project_source import ConfigProjectSource
 from vint.linting.policy_set import PolicySet
+from vint.linting.formatter.formatter import Formatter
+from vint.linting.formatter.json_formatter import JSONFormatter
 
 VERSION = '0.0.0'
 
@@ -90,8 +91,19 @@ def _lint_all(paths_to_lint, config_dict):
     return violations
 
 
-def _print_violations(violations, env):
-    formatter = Formatter(env)
+def _get_formatter(config_dict):
+    if 'cmdargs' not in config_dict:
+        return Formatter(config_dict)
+
+    cmdargs = config_dict['cmdargs']
+    if 'json' in cmdargs and cmdargs['json']:
+        return JSONFormatter(config_dict)
+    else:
+        return Formatter(config_dict)
+
+
+def _print_violations(violations, config_dict):
+    formatter = _get_formatter(config_dict)
     output = formatter.format_violations(violations)
 
     print(output)

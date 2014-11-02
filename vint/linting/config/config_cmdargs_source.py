@@ -15,6 +15,7 @@ class ConfigCmdargsSource(ConfigSource):
         config_dict = {'cmdargs': {}}
 
         config_dict = self._normalize_color(env, config_dict)
+        config_dict = self._normalize_json(env, config_dict)
         config_dict = self._normalize_verbose(env, config_dict)
         config_dict = self._normalize_severity(env, config_dict)
         config_dict = self._normalize_max_violations(env, config_dict)
@@ -30,6 +31,10 @@ class ConfigCmdargsSource(ConfigSource):
             config_dict_cmdargs[key] = env_cmdargs[key]
 
         return config_dict
+
+
+    def _normalize_json(self, env, config_dict):
+        return self._pass_config_by_key('json', env, config_dict)
 
 
     def _normalize_color(self, env, config_dict):

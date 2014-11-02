@@ -38,6 +38,10 @@ class PolicyAssertion(unittest.TestCase):
             return self._config_dict
 
 
+    def assertFoundNoViolations(self, path, Policy):
+        self.assertFoundViolationsEqual(path, Policy, [])
+
+
     def assertFoundViolationsEqual(self, path, Policy, expected_violations):
         policy_to_test = Policy()
         policy_name = Policy.__name__
@@ -46,23 +50,30 @@ class PolicyAssertion(unittest.TestCase):
         config = PolicyAssertion.StubConfigContainer(policy_name)
 
         linter = Linter(policy_set, config.get_config_dict())
-
         violations = linter.lint_file(path)
+
+        print(violations)
+
+        self.assertEqual(len(violations), len(expected_violations),
+                         'Expected number of violations found')
 
         for violation, expected_violation in zip_longest(violations, expected_violations):
             self.assertViolation(violation, expected_violation)
 
 
     def assertViolation(self, actual_violation, expected_violation):
-        self.assertIsNot(actual_violation, None)
-        self.assertIsNot(expected_violation, None)
+        assert actual_violation is not None
+        assert expected_violation is not None
 
-        self.assertEqual(actual_violation['name'], expected_violation['name'])
-        self.assertEqual(actual_violation['position'], expected_violation['position'])
-        self.assertEqual(actual_violation['level'], expected_violation['level'])
+        self.assertEqual(actual_violation['name'], expected_violation['name'],
+                         'Expected violation name was returned')
+        self.assertEqual(actual_violation['position'], expected_violation['position'],
+                         'Expected violation position was returned')
+        self.assertEqual(actual_violation['level'], expected_violation['level'],
+                         'Expected violation level was returned')
 
         self.assertIsInstance(actual_violation['description'], str)
 
 
-def get_fixture_path(filename):
-    return Path('test', 'fixture', 'policy', filename)
+def get_fixture_path(*filename):
+    return Path('test', 'fixture', 'policy', *filename)
