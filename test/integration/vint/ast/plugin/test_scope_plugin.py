@@ -29,15 +29,17 @@ class TestScopePlugin(unittest.TestCase):
         """ Asserts the specified scope tree equals to the expected.
         NOTE: expected_scope should not have "parent_scope".
         """
-        assert type(actual_scope) is dict
-        assert type(expected_scope) is dict
+        self.assertIsInstance(actual_scope, dict)
+        self.assertIsInstance(expected_scope, dict)
 
-        assert actual_scope['type'] is expected_scope['type']
-        assert actual_scope['variables'] == expected_scope['variables']
+        self.assertIs(actual_scope['type'], expected_scope['type'])
+        self.assertEqual(actual_scope['variables'], expected_scope['variables'])
 
         actual_child_scopes = actual_scope['child_scopes']
         expected_child_scopes = expected_scope['child_scopes']
-        assert set(actual_child_scopes.keys()) == set(expected_child_scopes.keys())
+
+        self.assertEqual(set(actual_child_scopes.keys()),
+                         set(expected_child_scopes.keys()))
 
         for child_scope_name in expected_child_scopes.keys():
             for actual_child_scope, expected_child_scope in zip_longest(
@@ -47,7 +49,7 @@ class TestScopePlugin(unittest.TestCase):
                 self.assertScopeTree(actual_child_scope, expected_child_scope)
 
                 # Check parent_scope is correct.
-                assert actual_child_scope['parent_scope'] is actual_scope
+                self.assertIs(actual_child_scope['parent_scope'], actual_scope)
 
 
     def assertProcessing(self, file_path, expected_scope_tree):
