@@ -6,7 +6,7 @@ from vint.linting.policy.reference.googlevimscriptstyleguide import get_referenc
 
 class ProhibitNoAbortFunction(AbstractPolicy):
     def __init__(self):
-        super().__init__()
+        super(ProhibitNoAbortFunction, self).__init__()
         self.description = 'Use abort attribute for functions in autoload/'
         self.reference = get_reference_source('FUNCTIONS')
         self.level = Level.WARNING

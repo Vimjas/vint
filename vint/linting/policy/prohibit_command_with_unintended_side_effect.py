@@ -17,7 +17,7 @@ PROHIBITED_COMMAND_PATTERNS = ('s/',
 
 class ProhibitCommandWithUnintendedSideEffect(AbstractPolicy):
     def __init__(self):
-        super().__init__()
+        super(ProhibitCommandWithUnintendedSideEffect, self).__init__()
         self.level = Level.WARNING
         self.description = 'Do not use the command that has unintended side effect'
         self.reference = get_reference_source('DANGEROUS')

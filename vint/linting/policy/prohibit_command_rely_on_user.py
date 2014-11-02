@@ -11,7 +11,7 @@ PROHIBITED_COMMAND_PATTERN = re.compile(r'norm(al)?\s|'
 
 class ProhibitCommandRelyOnUser(AbstractPolicy):
     def __init__(self):
-        super().__init__()
+        super(ProhibitCommandRelyOnUser, self).__init__()
         self.description = 'Prefer single quoted strings'
         self.reference = get_reference_source('FRAGILE')
         self.level = Level.WARNING

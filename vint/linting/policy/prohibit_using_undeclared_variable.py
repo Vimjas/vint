@@ -20,7 +20,7 @@ class ProhibitUsingUndeclaredVariable(AbstractPolicy):
 
 
     def __init__(self):
-        super().__init__()
+        super(ProhibitUsingUndeclaredVariable, self).__init__()
         self.description = 'Variable is not declared'
         self.reference = ':help E738'
         self.level = Level.WARNING
