@@ -1,5 +1,5 @@
 import unittest
-from compat.unittest.mock import patch
+from compat.unittest import mock
 from pathlib import Path
 from vint.linting.env import build_environment
 
@@ -36,7 +36,7 @@ class TestEnv(unittest.TestCase):
         }
 
         # we should mock os.getcwd() because env get the cwd by os.getcwd()
-        with patch('os.getcwd') as mocked_getcwd:
+        with mock.patch('os.getcwd') as mocked_getcwd:
             mocked_getcwd.return_value = str(cwd)
 
             with patch('os.path.expanduser') as mocked_expanduser:
