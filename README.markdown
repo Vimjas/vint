@@ -67,6 +67,7 @@ How to Add New Policy
 		unittest.main()
 	```
 
+
 3. Write a policy code
 
 	You should inherit `lib.linting.policy.AbstractPolicy` and implement 2 methods;
@@ -82,25 +83,23 @@ How to Add New Policy
 		This method should return listened `NodeType` such as `NodeType.STRING`.
 		Use `NodeType.TOPLEVEL` if you need to lint only once.
 
+
 4. Run the test
 
-	You can use [tox](https://tox.readthedocs.org/en/latest/) or [py.test]()
+	You can test by [tox](https://tox.readthedocs.org/en/latest/) or [py.test](http://pytest.org/latest/) or the default unittest module.
 
-		$ tox
+	There test command examples;
 
-	or
-
-		$ py.test test
-
-	or
-
-		$ python -m unittest discover test
+	* `$ tox`
+	* `$ py.test test`
+	* `$ python -m unittest discover test`
 
 
 License
 -------
 
 [MIT](http://orgachem.mit-license.org/)
+
 
 
 Acknowledgement
