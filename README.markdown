@@ -88,7 +88,7 @@ How to Add New Policy
 
 	You can test by [tox](https://tox.readthedocs.org/en/latest/) or [py.test](http://pytest.org/latest/) or the default unittest module.
 
-	There test command examples;
+	There are test command examples;
 
 	* `$ tox`
 	* `$ py.test test`
