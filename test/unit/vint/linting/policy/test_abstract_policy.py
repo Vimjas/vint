@@ -4,7 +4,7 @@ from vint.linting.policy.abstract_policy import AbstractPolicy
 
 class ConcretePolicy(AbstractPolicy):
     def __init__(self):
-        super().__init__()
+        super(ConcretePolicy, self).__init__()
         self.description = 'Found something invalid'
         self.reference = 'http://example.com'
         self.level = 0

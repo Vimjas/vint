@@ -8,7 +8,7 @@ from vint.linting.policy_loader import register_policy
 @register_policy
 class ProhibitEqualTildeOperator(AbstractPolicy):
     def __init__(self):
-        super().__init__()
+        super(ProhibitEqualTildeOperator, self).__init__()
         self.level = Level.WARNING
         self.description = 'Use the =~# or =~? operator families over the =~ family.'
         self.reference = get_reference_source('MATCHING')
