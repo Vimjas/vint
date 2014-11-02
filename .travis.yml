@@ -4,10 +4,10 @@ notifications:
   email: false
 
 python:
+  - "2.7"
   - "3.4"
 
 install:
-  - pip install -U -r requirements.txt --use-mirrors
   - pip install -U -r test-requirements.txt --use-mirrors
 
 script:

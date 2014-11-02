@@ -1,5 +1,5 @@
 from unittest import main, skip, TestCase
-from unittest.mock import patch
+from compat.unittest import mock
 from vint.linting.policy_loader import get_policy_class_map
 from vint.linting.policy_set import PolicySet, import_all_policies
 
@@ -9,7 +9,7 @@ FIXTURE_PACKAGE_NAME = 'test.fixture.policy_set'
 
 class TestPolicySet(TestCase):
     @skip('This test is very fragile because it depends to run sequence')
-    @patch(PACKAGE_NAME_GETTER, lambda: FIXTURE_PACKAGE_NAME)
+    @mock.patch(PACKAGE_NAME_GETTER, lambda: FIXTURE_PACKAGE_NAME)
     def test_import_all_policies(self):
         """ Expect policy classes to be imported. """
         policy_class_map_before_importing = get_policy_class_map()
@@ -24,7 +24,7 @@ class TestPolicySet(TestCase):
 
 
     # Mock policy package directory
-    @patch(PACKAGE_NAME_GETTER, lambda: FIXTURE_PACKAGE_NAME)
+    @mock.patch(PACKAGE_NAME_GETTER, lambda: FIXTURE_PACKAGE_NAME)
     def test_get_enabled_policies_when_no_updated(self):
         policy_set = PolicySet()
 
@@ -34,7 +34,7 @@ class TestPolicySet(TestCase):
 
 
     # Mock policy package directory
-    @patch(PACKAGE_NAME_GETTER, lambda: FIXTURE_PACKAGE_NAME)
+    @mock.patch(PACKAGE_NAME_GETTER, lambda: FIXTURE_PACKAGE_NAME)
     def test_get_enabled_policies(self):
         policy_enabling_map_to_enable_policy1 = {
             'PolicyFixture1': {

@@ -1,5 +1,5 @@
 import unittest
-from itertools import zip_longest
+from compat.itertools import zip_longest
 from pathlib import Path
 from vint.ast.plugin.scope_plugin import ScopePlugin, ScopeType, DeclarationScope
 from vint.ast.parsing import Parser
