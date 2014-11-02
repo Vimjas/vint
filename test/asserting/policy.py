@@ -1,6 +1,6 @@
 import unittest
 from pathlib import Path
-from itertools import zip_longest
+from compat.itertools import zip_longest
 from vint.linting.linter import Linter
 
 

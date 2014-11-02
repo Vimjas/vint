@@ -12,7 +12,7 @@ BROKEN_VIM_SCRIPT = Path('test', 'fixture', 'linter', 'broken.vim')
 class TestLinterIntegral(unittest.TestCase):
     class StubPolicy1(AbstractPolicy):
         def __init__(self):
-            super().__init__()
+            super(TestLinterIntegral.StubPolicy1, self).__init__()
             self.reference = 'ref1'
             self.description = 'desc1'
             self.level = Level.WARNING
@@ -29,7 +29,7 @@ class TestLinterIntegral(unittest.TestCase):
 
     class StubPolicy2(AbstractPolicy):
         def __init__(self):
-            super().__init__()
+            super(TestLinterIntegral.StubPolicy2, self).__init__()
             self.reference = 'ref2'
             self.description = 'desc2'
             self.level = Level.WARNING
@@ -121,7 +121,7 @@ class TestLinterIntegral(unittest.TestCase):
                 },
             },
         ]
-        self.maxDiff = 1000
+        self.maxDiff = 1024
         self.assertEqual(got_violations, expected_violations)
 
 
