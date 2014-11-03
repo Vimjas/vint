@@ -1,17 +1,18 @@
 language: python
 
-notifications:
-  email: false
-
-python:
-  - "2.7"
-  - "3.4"
+env:
+  - TOXENV=py27
+  - TOXENV=py34
+  - TOXENV=coverage
 
 install:
-  - pip install -U -r test-requirements.txt --use-mirrors
+  - pip install tox
+  - if test "$TOXENV" = coverage ; then pip install python-coveralls ; fi
 
-script:
-  - py.test --cov vint test
+script: tox
 
 after_success:
-  coveralls --verbose
+  - if test "$TOXENV" = coverage ; then coveralls ; fi
+
+notifications:
+  email: false
