@@ -77,13 +77,19 @@ def import_all_policies():
     """
     pkg_name = _get_policy_package_name_for_test()
     pkg_path_list = pkg_name.split('.')
-    pkg_path = str(Path(*pkg_path_list))
+
+    # TODO: Fix policy loading mechanism. It seems too fragile and complex.
+    pkg_path = str(Path(_get_vint_root(), *pkg_path_list).resolve())
 
     for loader, module_name, is_pkg in pkgutil.iter_modules([pkg_path]):
         if not is_pkg:
             module_fqn = pkg_name + '.' + module_name
             logging.info('Loading the policy module `{fqn}`'.format(fqn=module_fqn))
             importlib.import_module(module_fqn)
+
+
+def _get_vint_root():
+    return Path(__file__).parent.parent.parent
 
 
 def _get_policy_package_name_for_test():
