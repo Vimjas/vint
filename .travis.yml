@@ -11,7 +11,7 @@ install:
   - pip install -U -r test-requirements.txt --use-mirrors
 
 script:
-  - py.test --cov vint test
+  - PATH="./bin:$PATH" py.test --cov vint test
 
 after_success:
   coveralls --verbose
