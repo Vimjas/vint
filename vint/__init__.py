@@ -1,6 +1,6 @@
 import sys
 from argparse import ArgumentParser
-from pathlib import Path
+import pkg_resources
 
 from vint.linting.linter import Linter
 from vint.linting.env import build_environment
@@ -120,8 +120,5 @@ def _print_violations(violations, config_dict):
 
 
 def _get_version():
-    vint_root = Path(__file__).parent.parent
-    version_file = Path(vint_root, 'VERSION.txt')
-
-    with version_file.open() as f:
-        return f.read().strip()
+    version = pkg_resources.require('vim-vint')[0].version
+    return version
