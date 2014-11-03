@@ -8,8 +8,8 @@ env:
   - TOXENV=coverage
 
 install:
-  - pip install tox
-  - if test "$TOXENV" = coverage ; then pip install python-coveralls ; fi
+  - travis_retry pip install coveralls
+  - travis_retry pip install tox
 
 script: tox
 
