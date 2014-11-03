@@ -1,13 +1,23 @@
 Vint
 ====
 
+[![Development Status](https://pypip.in/status/vim-vint/badge.svg)](https://pypi.python.org/pypi/vim-vint/)
+[![Latest Version](https://pypip.in/version/vim-vint/badge.svg)](https://pypi.python.org/pypi/vim-vint/)
+[![Supported Python versions](https://pypip.in/py_versions/vim-vint/badge.svg)](https://pypi.python.org/pypi/vim-vint/)
 [![Build Status](https://travis-ci.org/Kuniwak/vint.svg?branch=master)](https://travis-ci.org/Kuniwak/vint)
-[![Coverage Status](https://img.shields.io/coveralls/Kuniwak/vint.svg)](https://coveralls.io/r/Kuniwak/vint)
-[![Code Health](https://landscape.io/github/Kuniwak/vint/master/landscape.png)](https://landscape.io/github/Kuniwak/vint/master)
 
 Vint is a faster and highly extensible Vim script Language Lint.
 
-**But now, Vint is under development.**
+**But now, Vint is under development. We hope you develop a policy to help us.**
+
+
+Quick start
+-----------
+
+Two quick start options are available:
+
+	* Install with pip: `pip install vim-vint`
+	* Clone the repo: `git clone https://github.com/Kuniwak/vint; `
 
 
 How to Add New Policy
@@ -97,6 +107,13 @@ How to Add New Policy
 
 	* `$ PATH="./bin:$PATH" py.test test`
 	* `$ PATH="./bin:$PATH" python -m unittest discover test`
+
+
+Code health
+-----------
+
+[![Coverage Status](https://img.shields.io/coveralls/Kuniwak/vint.svg)](https://coveralls.io/r/Kuniwak/vint)
+[![Code Health](https://landscape.io/github/Kuniwak/vint/master/landscape.png)](https://landscape.io/github/Kuniwak/vint/master)
 
 
 License
