@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
+import os.path
 from setuptools import setup, find_packages
-from vint import VERSION
 
 
 def load_requires_from_file(filepath):
@@ -16,6 +16,15 @@ def test_requires():
     return load_requires_from_file('test-requirements.txt')
 
 
+def get_version():
+    vint_root = os.path.dirname(__file__)
+    version_file = open(os.path.join(vint_root, 'VERSION.txt'))
+    return version_file.read().strip()
+
+
+VERSION = get_version()
+
+
 setup(
     name='vim-vint',
     version=VERSION,
@@ -27,7 +36,13 @@ setup(
     install_requires=install_requires(),
     tests_require=test_requires(),
     packages=find_packages(),
-    classfiers=[
+    package_data={
+        'vint': [
+            'asset/default_config.yaml',
+            'asset/void_config.yaml',
+        ],
+    },
+    classifiers=[
         'Development Status :: 3 - Alpha',
         'Topic :: Software Development :: Quality Assurance',
         'Intended Audience :: Developers',

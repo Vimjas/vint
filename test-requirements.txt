@@ -1,9 +1,4 @@
-PyYAML >= 3.11
-ansicolor >= 0.2.4
-enum34 >= 1.0.3
-pathlib >= 1.0.1
 pytest >= 2.6
 pytest-cov >= 1.8
 coverage >= 3.7
-coveralls >= 0.4
 mock >= 1.0.1

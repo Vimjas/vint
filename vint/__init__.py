@@ -1,5 +1,7 @@
 import sys
 from argparse import ArgumentParser
+import pkg_resources
+
 from vint.linting.linter import Linter
 from vint.linting.env import build_environment
 from vint.linting.config.config_container import ConfigContainer
@@ -10,8 +12,6 @@ from vint.linting.config.config_project_source import ConfigProjectSource
 from vint.linting.policy_set import PolicySet
 from vint.linting.formatter.formatter import Formatter
 from vint.linting.formatter.json_formatter import JSONFormatter
-
-VERSION = '0.1.0'
 
 
 def main():
@@ -49,7 +49,7 @@ def _build_config_dict(env):
 def _build_argparser():
     parser = ArgumentParser(prog='vint', description='Lint Vim script')
 
-    parser.add_argument('-v', '--version', action='version', version=VERSION)
+    parser.add_argument('-v', '--version', action='version', version=_get_version())
     parser.add_argument('-V', '--verbose', action='store_true', help='output verbose message')
     parser.add_argument('-e', '--error', action='store_true', help='report only errors')
     parser.add_argument('-w', '--warning', action='store_true', help='report errors and warnings')
@@ -117,3 +117,8 @@ def _print_violations(violations, config_dict):
     output = formatter.format_violations(violations)
 
     print(output)
+
+
+def _get_version():
+    version = pkg_resources.require('vim-vint')[0].version
+    return version

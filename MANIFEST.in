@@ -4,4 +4,4 @@ include VERSION.txt
 include MANIFEST.in
 include requirements.txt
 include test-requirements.txt
-recursive-include assert *
+recursive-include vint/asset *
