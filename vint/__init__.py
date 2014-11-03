@@ -11,7 +11,7 @@ from vint.linting.policy_set import PolicySet
 from vint.linting.formatter.formatter import Formatter
 from vint.linting.formatter.json_formatter import JSONFormatter
 
-VERSION = '0.0.0'
+VERSION = '0.1.0'
 
 
 def main():
