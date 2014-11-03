@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
+import os.path
 from setuptools import setup, find_packages
-from vint import VERSION
 
 
 def load_requires_from_file(filepath):
@@ -14,6 +14,14 @@ def install_requires():
 
 def test_requires():
     return load_requires_from_file('test-requirements.txt')
+
+
+def get_version():
+    vint_root = os.path.dirname(__file__)
+    version_file = open(os.path.join(vint_root, 'VERSION.txt'))
+    return version_file.read().strip()
+
+VERSION = get_version()
 
 
 setup(
