@@ -17,7 +17,7 @@ def test_requires():
 
 
 setup(
-    name='vint',
+    name='vim-vint',
     version=VERSION,
     description='Lint tool for Vim script Language',
     author='Kuniwak',
