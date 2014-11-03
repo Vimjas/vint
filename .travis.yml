@@ -8,7 +8,7 @@ env:
   - TOXENV=coverage
 
 install:
-  - travis_retry pip install -r test-requirements.txt
+  - travis_retry pip install -r test-requirements.txt --allow-external
   - travis_retry pip install coveralls
 
 script: tox
