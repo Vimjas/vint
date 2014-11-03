@@ -72,13 +72,13 @@ How to Add New Policy
 
 	You should inherit `lib.linting.policy.AbstractPolicy` and implement 2 methods;
 
-	 * `is_valid(Node: ast_node, Environment: env): Boolean`
+	* `is_valid(Node: ast_node, Environment: env): Boolean`
 
 		This method should return whether the given node is valid for the policy as Boolean.
 		And you can use an environment that has `root_ast: Node` and `file_path: String` to
 		special lint.
 
-	 * `listen_node_type(): NodeType[]`
+	* `listen_node_type(): NodeType[]`
 
 		This method should return listened `NodeType` such as `NodeType.STRING`.
 		Use `NodeType.TOPLEVEL` if you need to lint only once.
@@ -91,8 +91,12 @@ How to Add New Policy
 	There are test command examples;
 
 	* `$ tox`
-	* `$ py.test test`
-	* `$ python -m unittest discover test`
+
+	If you want to test by py.test or the default unittest module,
+	you should add `vint/bin` to `$PATH` to make acceptance tests pass.
+
+	* `$ PATH="./bin:$PATH" py.test test`
+	* `$ PATH="./bin:$PATH" python -m unittest discover test`
 
 
 License

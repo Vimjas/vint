@@ -1,3 +1,4 @@
+import sys
 from argparse import ArgumentParser
 from vint.linting.linter import Linter
 from vint.linting.env import build_environment
@@ -13,8 +14,8 @@ from vint.linting.formatter.json_formatter import JSONFormatter
 VERSION = '0.0.0'
 
 
-def main(argv):
-    env = _build_env(argv)
+def main():
+    env = _build_env(sys.argv)
     config_dict = _build_config_dict(env)
     parser = _build_argparser()
 
@@ -62,14 +63,23 @@ def _build_argparser():
 
 
 def _build_cmdargs(argv):
+    """ Build command line arguments dict to use;
+    - displaying usages
+    - vint.linting.env.build_environment
+
+    This method take an argv parameter to make function pure.
+    """
     parser = _build_argparser()
-    namespace = parser.parse_args(argv)
+    namespace = parser.parse_args(argv[1:])
 
     cmdargs = vars(namespace)
     return cmdargs
 
 
 def _build_env(argv):
+    """ Build an environment object.
+    This method take an argv parameter to make function pure.
+    """
     cmdargs = _build_cmdargs(argv)
     env = build_environment(cmdargs)
     return env

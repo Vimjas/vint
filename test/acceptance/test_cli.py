@@ -7,7 +7,7 @@ import json
 class TestCLI(unittest.TestCase):
     def test_exec_vint_with_valid_file_on_project_root(self):
         valid_file = str(Path('test', 'fixture', 'cli', 'valid1.vim'))
-        cmd = ['bin/vint', valid_file]
+        cmd = ['vint', valid_file]
 
         got_output = subprocess.check_output(cmd, universal_newlines=True)
 
@@ -17,7 +17,7 @@ class TestCLI(unittest.TestCase):
 
     def test_exec_vint_with_invalid_file_on_project_root(self):
         invalid_file = str(Path('test', 'fixture', 'cli', 'invalid1.vim'))
-        cmd = ['bin/vint', invalid_file]
+        cmd = ['vint', invalid_file]
 
         with self.assertRaises(subprocess.CalledProcessError) as context_manager:
             subprocess.check_output(cmd, universal_newlines=True)
@@ -29,7 +29,7 @@ class TestCLI(unittest.TestCase):
 
 
     def test_exec_vint_with_no_args(self):
-        cmd = ['bin/vint']
+        cmd = ['vint']
 
         with self.assertRaises(subprocess.CalledProcessError):
             subprocess.check_output(cmd, universal_newlines=True)
@@ -37,7 +37,7 @@ class TestCLI(unittest.TestCase):
 
     def test_exec_vint_with_json_flag(self):
         invalid_file = str(Path('test', 'fixture', 'cli', 'invalid1.vim'))
-        cmd = ['bin/vint', '--json', invalid_file]
+        cmd = ['vint', '--json', invalid_file]
 
         with self.assertRaises(subprocess.CalledProcessError) as context_manager:
             subprocess.check_output(cmd, universal_newlines=True)
@@ -49,7 +49,7 @@ class TestCLI(unittest.TestCase):
 
     def test_exec_vint_with_color_flag(self):
         invalid_file = str(Path('test', 'fixture', 'cli', 'invalid1.vim'))
-        cmd = ['bin/vint', '--color', invalid_file]
+        cmd = ['vint', '--color', invalid_file]
 
         with self.assertRaises(subprocess.CalledProcessError) as context_manager:
             subprocess.check_output(cmd, universal_newlines=True)
