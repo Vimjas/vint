@@ -2,7 +2,7 @@ from pathlib import Path
 from vint.linting.config.config_file_source import ConfigFileSource
 
 PROJECT_CONFIG_FILENAME = '.vintrc.yaml'
-VOID_CONFIG_PATH = Path('asset', 'void_config.yaml')
+VOID_CONFIG_PATH = Path('vint', 'asset', 'void_config.yaml')
 
 
 class ConfigProjectSource(ConfigFileSource):
