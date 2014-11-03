@@ -14,10 +14,7 @@ Vint is a faster and highly extensible Vim script Language Lint.
 Quick start
 -----------
 
-Two quick start options are available:
-
-	* Install with pip: `pip install vim-vint`
-	* Clone the repo: `git clone https://github.com/Kuniwak/vint; `
+You can install with [pip](https://pip.pypa.io/en/latest/): `pip install vim-vint`
 
 
 How to Add New Policy
