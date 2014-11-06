@@ -4,6 +4,7 @@ Vint
 [![Development Status](https://pypip.in/status/vim-vint/badge.svg)](https://pypi.python.org/pypi/vim-vint/)
 [![Latest Version](https://pypip.in/version/vim-vint/badge.svg)](https://pypi.python.org/pypi/vim-vint/)
 [![Supported Python versions](https://pypip.in/py_versions/vim-vint/badge.svg)](https://pypi.python.org/pypi/vim-vint/)
+[![Supported Python implementations](https://pypip.in/implementation/vim-vint/badge.svg)](https://pypi.python.org/pypi/vim-vint/)
 [![Build Status](https://travis-ci.org/Kuniwak/vint.svg?branch=master)](https://travis-ci.org/Kuniwak/vint)
 
 Vint is a faster and highly extensible Vim script Language Lint.
