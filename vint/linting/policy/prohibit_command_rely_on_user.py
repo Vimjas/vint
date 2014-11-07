@@ -3,12 +3,14 @@ from vint.ast.node_type import NodeType
 from vint.linting.level import Level
 from vint.linting.policy.abstract_policy import AbstractPolicy
 from vint.linting.policy.reference.googlevimscriptstyleguide import get_reference_source
+from vint.linting.policy_loader import register_policy
 
 
 PROHIBITED_COMMAND_PATTERN = re.compile(r'norm(al)?\s|'
                                         r's(u(bstitute)?)?/')
 
 
+@register_policy
 class ProhibitCommandRelyOnUser(AbstractPolicy):
     def __init__(self):
         super(ProhibitCommandRelyOnUser, self).__init__()
