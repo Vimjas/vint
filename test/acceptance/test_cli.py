@@ -31,8 +31,23 @@ class TestCLI(unittest.TestCase):
     def test_exec_vint_with_no_args(self):
         cmd = ['vint']
 
-        with self.assertRaises(subprocess.CalledProcessError):
+        with self.assertRaises(subprocess.CalledProcessError) as context_manager:
             subprocess.check_output(cmd, universal_newlines=True)
+
+        got_output = context_manager.exception.output
+
+        self.assertTrue(got_output.startswith('vint error:'))
+
+
+    def test_exec_vint_with_unexistent_file(self):
+        cmd = ['vint', '/path/to/unexistent']
+
+        with self.assertRaises(subprocess.CalledProcessError) as context_manager:
+            subprocess.check_output(cmd, universal_newlines=True)
+
+        got_output = context_manager.exception.output
+
+        self.assertTrue(got_output.startswith('vint error:'))
 
 
     def test_exec_vint_with_json_flag(self):
