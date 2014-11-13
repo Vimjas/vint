@@ -4,3 +4,6 @@ let w:window_local_var = 103
 let t:tab_local_var = 104
 let s:script_local_var = 105
 let implicit_global_var = 106
+let $ENV_VAR = 107
+let @" = 108
+let &opt_var = 109

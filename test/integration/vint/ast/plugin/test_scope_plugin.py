@@ -90,6 +90,18 @@ class TestScopePlugin(unittest.TestCase):
                     'declaration_scope': DeclarationScope.GLOBAL,
                     'is_declared_with_implicit_scope': True,
                 }],
+                '$ENV_VAR': [{
+                    'declaration_scope': DeclarationScope.GLOBAL,
+                    'is_declared_with_implicit_scope': False,
+                }],
+                '@"': [{
+                    'declaration_scope': DeclarationScope.GLOBAL,
+                    'is_declared_with_implicit_scope': False,
+                }],
+                '&opt_var': [{
+                    'declaration_scope': DeclarationScope.GLOBAL,
+                    'is_declared_with_implicit_scope': False,
+                }],
             },
             'child_scopes': {},
         }
