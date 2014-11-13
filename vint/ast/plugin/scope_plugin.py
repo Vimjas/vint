@@ -215,7 +215,7 @@ class ScopePlugin(AbstractASTPlugin):
     def get_normalized_identifier(cls, node):
         node_type = NodeType(node['type'])
 
-        if node_type is NodeType.IDENTIFIER:
+        if node_type in {NodeType.IDENTIFIER, NodeType.ENV, NodeType.OPTION, NodeType.REG}:
             return node['value']
 
         if node_type is NodeType.DOT or node_type is NodeType.SUBSCRIPT:
@@ -248,12 +248,24 @@ class ScopePlugin(AbstractASTPlugin):
         """ Returns a DeclarationScope by the specified identifier name.
         Return None when the variable have no scope-prefix.
         """
+
+        # See:
+        #   :help let-&
+        #   :help let-$
+        #   :help let-@
+        first_char = identifier_name[0]
+        if first_char in '&$@':
+            return DeclarationScope.GLOBAL
+
+        # See:
+        #   :help E738
         prefix = identifier_name[0:2]
+        if prefix in ScopePlugin.prefix_to_declaration_scope_map:
+            return ScopePlugin.prefix_to_declaration_scope_map[prefix]
 
-        if prefix not in ScopePlugin.prefix_to_declaration_scope_map:
-            return None
-
-        return ScopePlugin.prefix_to_declaration_scope_map[prefix]
+        # It is GLOBAL or FUNCTION_LOCAL, but we cannot determine without the
+        # parent scope.
+        return None
 
 
     @classmethod
