@@ -22,9 +22,15 @@ def main():
     paths_to_lint = env['file_paths']
 
     if len(paths_to_lint) == 0:
-        print('error: nothing to lint\n')
+        print('vint error: nothing to lint\n')
         parser.print_help()
         parser.exit(status=1)
+
+    for path_to_lint in paths_to_lint:
+        if not path_to_lint.exists() or not path_to_lint.is_file():
+            print('vint error: no such file: `{path}`\n'.format(
+                path=str(path_to_lint)))
+            parser.exit(status=1)
 
     violations = _lint_all(paths_to_lint, config_dict)
 
