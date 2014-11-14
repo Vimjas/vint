@@ -12,6 +12,11 @@ def main():
     for line in c.compile(p.parse(r)):
         print(line)
 
+
+class VimLParserException(Exception):
+    pass
+
+
 class AttributeDict(dict):
     __getattribute__ = dict.__getitem__
     __setattr__ = dict.__setitem__
@@ -146,7 +151,7 @@ def viml_remove(lst, idx):
 def viml_split(s, sep):
     if sep == "\\zs":
         return s
-    raise Exception("NotImplemented")
+    raise VimLParserException("NotImplemented")
 
 def viml_str2nr(s, base=10):
     return int(s, base)
@@ -173,7 +178,7 @@ def viml_type(obj):
         return 4
     elif isinstance(obj, float):
         return 5
-    raise Exception('Unknown Type')
+    raise VimLParserException('Unknown Type')
 
 NIL = []
 NODE_TOPLEVEL = 1
@@ -536,23 +541,23 @@ class VimLParser:
 
     def check_missing_endfunction(self, ends, pos):
         if self.context[0].type == NODE_FUNCTION:
-            raise Exception(Err(viml_printf("E126: Missing :endfunction:    %s", ends), pos))
+            raise VimLParserException(Err(viml_printf("E126: Missing :endfunction:    %s", ends), pos))
 
     def check_missing_endif(self, ends, pos):
         if self.context[0].type == NODE_IF or self.context[0].type == NODE_ELSEIF or self.context[0].type == NODE_ELSE:
-            raise Exception(Err(viml_printf("E171: Missing :endif:    %s", ends), pos))
+            raise VimLParserException(Err(viml_printf("E171: Missing :endif:    %s", ends), pos))
 
     def check_missing_endtry(self, ends, pos):
         if self.context[0].type == NODE_TRY or self.context[0].type == NODE_CATCH or self.context[0].type == NODE_FINALLY:
-            raise Exception(Err(viml_printf("E600: Missing :endtry:    %s", ends), pos))
+            raise VimLParserException(Err(viml_printf("E600: Missing :endtry:    %s", ends), pos))
 
     def check_missing_endwhile(self, ends, pos):
         if self.context[0].type == NODE_WHILE:
-            raise Exception(Err(viml_printf("E170: Missing :endwhile:    %s", ends), pos))
+            raise VimLParserException(Err(viml_printf("E170: Missing :endwhile:    %s", ends), pos))
 
     def check_missing_endfor(self, ends, pos):
         if self.context[0].type == NODE_FOR:
-            raise Exception(Err(viml_printf("E170: Missing :endfor:    %s", ends), pos))
+            raise VimLParserException(Err(viml_printf("E170: Missing :endfor:    %s", ends), pos))
 
     def parse(self, reader):
         self.reader = reader
@@ -716,7 +721,7 @@ class VimLParser:
                         self.reader.seek_cur(2)
                         viml_add(tokens, "\\" + m)
                     else:
-                        raise Exception(Err("E10: \\\\ should be followed by /, ? or &", self.reader.getpos()))
+                        raise VimLParserException(Err("E10: \\\\ should be followed by /, ? or &", self.reader.getpos()))
                 elif isdigit(c):
                     viml_add(tokens, self.reader.read_digit())
                 while 1:
@@ -759,7 +764,7 @@ class VimLParser:
             if c == "\\":
                 c = self.reader.peekn(1)
                 if c == "":
-                    raise Exception(Err("E682: Invalid search pattern or delimiter", self.reader.getpos()))
+                    raise VimLParserException(Err("E682: Invalid search pattern or delimiter", self.reader.getpos()))
                 self.reader.getn(1)
                 pattern += c
             elif c == "[":
@@ -778,14 +783,14 @@ class VimLParser:
         self.ea.cmd = self.find_command()
         if self.ea.cmd is NIL:
             self.reader.setpos(self.ea.cmdpos)
-            raise Exception(Err(viml_printf("E492: Not an editor command: %s", self.reader.peekline()), self.ea.cmdpos))
+            raise VimLParserException(Err(viml_printf("E492: Not an editor command: %s", self.reader.peekline()), self.ea.cmdpos))
         if self.reader.peekn(1) == "!" and self.ea.cmd.name != "substitute" and self.ea.cmd.name != "smagic" and self.ea.cmd.name != "snomagic":
             self.reader.getn(1)
             self.ea.forceit = 1
         else:
             self.ea.forceit = 0
         if not viml_eqregh(self.ea.cmd.flags, "\\<BANG\\>") and self.ea.forceit:
-            raise Exception(Err("E477: No ! allowed", self.ea.cmdpos))
+            raise VimLParserException(Err("E477: No ! allowed", self.ea.cmdpos))
         if self.ea.cmd.name != "!":
             self.reader.skip_white()
         self.ea.argpos = self.reader.getpos()
@@ -794,7 +799,7 @@ class VimLParser:
         if self.ea.cmd.name == "write" or self.ea.cmd.name == "update":
             if self.reader.p(0) == ">":
                 if self.reader.p(1) != ">":
-                    raise Exception(Err("E494: Use w or w>>", self.ea.cmdpos))
+                    raise VimLParserException(Err("E494: Use w or w>>", self.ea.cmdpos))
                 self.reader.seek_cur(2)
                 self.reader.skip_white()
                 self.ea.append = 1
@@ -894,7 +899,7 @@ class VimLParser:
                 else:
                     self.ea.bad_char = self.reader.getn(1)
             elif viml_eqregh(s, "^++"):
-                raise Exception("VimLParser: E474: Invalid Argument")
+                raise VimLParserException("VimLParser: E474: Invalid Argument")
             else:
                 break
             self.reader.skip_white()
@@ -925,7 +930,7 @@ class VimLParser:
         npos = self.reader.getpos()
         c = self.reader.get()
         if c != "\"":
-            raise Exception(Err(viml_printf("unexpected character: %s", c), npos))
+            raise VimLParserException(Err(viml_printf("unexpected character: %s", c), npos))
         node = Node(NODE_COMMENT)
         node.pos = npos
         node.str = self.reader.getn(-1)
@@ -945,7 +950,7 @@ class VimLParser:
             self.parse_comment()
             self.reader.get()
         else:
-            raise Exception(Err(viml_printf("E488: Trailing characters: %s", c), self.reader.getpos()))
+            raise VimLParserException(Err(viml_printf("E488: Trailing characters: %s", c), self.reader.getpos()))
 
 # modifier or range only command line
     def parse_cmd_modifier_range(self):
@@ -1001,7 +1006,7 @@ class VimLParser:
                 self.parse_expr()
                 c = self.reader.peekn(1)
                 if c != "`":
-                    raise Exception(Err(viml_printf("unexpected character: %s", c), self.reader.getpos()))
+                    raise VimLParserException(Err(viml_printf("unexpected character: %s", c), self.reader.getpos()))
                 self.reader.getn(1)
             elif c == "|" or c == "\n" or c == "\"" and not viml_eqregh(self.ea.cmd.flags, "\\<NOTRLCOM\\>") and (self.ea.cmd.name != "@" and self.ea.cmd.name != "*" or self.reader.getpos() != self.ea.argpos) and (self.ea.cmd.name != "redir" or self.reader.getpos().i != self.ea.argpos.i + 1 or pc != "@"):
                 has_cpo_bar = 0
@@ -1144,7 +1149,7 @@ class VimLParser:
         if left.type == NODE_IDENTIFIER:
             s = left.value
             if s[0] != "<" and not isupper(s[0]) and viml_stridx(s, ":") == -1 and viml_stridx(s, "#") == -1:
-                raise Exception(Err(viml_printf("E128: Function name must start with a capital or contain a colon: %s", s), left.pos))
+                raise VimLParserException(Err(viml_printf("E128: Function name must start with a capital or contain a colon: %s", s), left.pos))
         # :function {name}
         if self.reader.peekn(1) != "(":
             self.reader.seek_set(pos)
@@ -1168,9 +1173,9 @@ class VimLParser:
                 token = tokenizer.get()
                 if token.type == TOKEN_IDENTIFIER:
                     if not isargname(token.value) or token.value == "firstline" or token.value == "lastline":
-                        raise Exception(Err(viml_printf("E125: Illegal argument: %s", token.value), token.pos))
+                        raise VimLParserException(Err(viml_printf("E125: Illegal argument: %s", token.value), token.pos))
                     elif viml_has_key(named, token.value):
-                        raise Exception(Err(viml_printf("E853: Duplicate argument name: %s", token.value), token.pos))
+                        raise VimLParserException(Err(viml_printf("E853: Duplicate argument name: %s", token.value), token.pos))
                     named[token.value] = 1
                     varnode = Node(NODE_IDENTIFIER)
                     varnode.pos = token.pos
@@ -1178,7 +1183,7 @@ class VimLParser:
                     viml_add(node.rlist, varnode)
                     # XXX: Vim doesn't skip white space before comma.  F(a ,b) => E475
                     if iswhite(self.reader.p(0)):
-                        raise Exception(Err(viml_printf("unexpected token: %s", self.reader.p(0)), self.reader.getpos()))
+                        raise VimLParserException(Err(viml_printf("unexpected token: %s", self.reader.p(0)), self.reader.getpos()))
                     token = tokenizer.get()
                     if token.type == TOKEN_COMMA:
                         # XXX: Vim allows last comma.  F(a, b, ) => OK
@@ -1188,7 +1193,7 @@ class VimLParser:
                     elif token.type == TOKEN_PCLOSE:
                         break
                     else:
-                        raise Exception(Err(viml_printf("unexpected token: %s", token.value), token.pos))
+                        raise VimLParserException(Err(viml_printf("unexpected token: %s", token.value), token.pos))
                 elif token.type == TOKEN_DOTDOTDOT:
                     varnode = Node(NODE_IDENTIFIER)
                     varnode.pos = token.pos
@@ -1198,9 +1203,9 @@ class VimLParser:
                     if token.type == TOKEN_PCLOSE:
                         break
                     else:
-                        raise Exception(Err(viml_printf("unexpected token: %s", token.value), token.pos))
+                        raise VimLParserException(Err(viml_printf("unexpected token: %s", token.value), token.pos))
                 else:
-                    raise Exception(Err(viml_printf("unexpected token: %s", token.value), token.pos))
+                    raise VimLParserException(Err(viml_printf("unexpected token: %s", token.value), token.pos))
         while 1:
             self.reader.skip_white()
             epos = self.reader.getpos()
@@ -1214,7 +1219,7 @@ class VimLParser:
             elif key == "dict":
                 node.attr.dict = 1
             else:
-                raise Exception(Err(viml_printf("unexpected token: %s", key), epos))
+                raise VimLParserException(Err(viml_printf("unexpected token: %s", key), epos))
         self.add_node(node)
         self.push_context(node)
 
@@ -1224,7 +1229,7 @@ class VimLParser:
         self.check_missing_endwhile("ENDFUNCTION", self.ea.cmdpos)
         self.check_missing_endfor("ENDFUNCTION", self.ea.cmdpos)
         if self.context[0].type != NODE_FUNCTION:
-            raise Exception(Err("E193: :endfunction not inside a function", self.ea.cmdpos))
+            raise VimLParserException(Err("E193: :endfunction not inside a function", self.ea.cmdpos))
         self.reader.getn(-1)
         node = Node(NODE_ENDFUNCTION)
         node.pos = self.ea.cmdpos
@@ -1241,7 +1246,7 @@ class VimLParser:
 
     def parse_cmd_return(self):
         if self.find_context(NODE_FUNCTION) == -1:
-            raise Exception(Err("E133: :return not inside a function", self.ea.cmdpos))
+            raise VimLParserException(Err("E133: :return not inside a function", self.ea.cmdpos))
         node = Node(NODE_RETURN)
         node.pos = self.ea.cmdpos
         node.ea = self.ea
@@ -1259,10 +1264,10 @@ class VimLParser:
         self.reader.skip_white()
         c = self.reader.peek()
         if self.ends_excmds(c):
-            raise Exception(Err("E471: Argument required", self.reader.getpos()))
+            raise VimLParserException(Err("E471: Argument required", self.reader.getpos()))
         node.left = self.parse_expr()
         if node.left.type != NODE_CALL:
-            raise Exception(Err("Not an function call", node.left.pos))
+            raise VimLParserException(Err("Not an function call", node.left.pos))
         self.add_node(node)
 
     def parse_cmd_let(self):
@@ -1296,7 +1301,7 @@ class VimLParser:
             self.reader.getn(1)
             node.op = s1
         else:
-            raise Exception("NOT REACHED")
+            raise VimLParserException("NOT REACHED")
         node.right = self.parse_expr()
         self.add_node(node)
 
@@ -1345,7 +1350,7 @@ class VimLParser:
 
     def parse_cmd_elseif(self):
         if self.context[0].type != NODE_IF and self.context[0].type != NODE_ELSEIF:
-            raise Exception(Err("E582: :elseif without :if", self.ea.cmdpos))
+            raise VimLParserException(Err("E582: :elseif without :if", self.ea.cmdpos))
         if self.context[0].type != NODE_IF:
             self.pop_context()
         node = Node(NODE_ELSEIF)
@@ -1358,7 +1363,7 @@ class VimLParser:
 
     def parse_cmd_else(self):
         if self.context[0].type != NODE_IF and self.context[0].type != NODE_ELSEIF:
-            raise Exception(Err("E581: :else without :if", self.ea.cmdpos))
+            raise VimLParserException(Err("E581: :else without :if", self.ea.cmdpos))
         if self.context[0].type != NODE_IF:
             self.pop_context()
         node = Node(NODE_ELSE)
@@ -1370,7 +1375,7 @@ class VimLParser:
 
     def parse_cmd_endif(self):
         if self.context[0].type != NODE_IF and self.context[0].type != NODE_ELSEIF and self.context[0].type != NODE_ELSE:
-            raise Exception(Err("E580: :endif without :if", self.ea.cmdpos))
+            raise VimLParserException(Err("E580: :endif without :if", self.ea.cmdpos))
         if self.context[0].type != NODE_IF:
             self.pop_context()
         node = Node(NODE_ENDIF)
@@ -1391,7 +1396,7 @@ class VimLParser:
 
     def parse_cmd_endwhile(self):
         if self.context[0].type != NODE_WHILE:
-            raise Exception(Err("E588: :endwhile without :while", self.ea.cmdpos))
+            raise VimLParserException(Err("E588: :endwhile without :while", self.ea.cmdpos))
         node = Node(NODE_ENDWHILE)
         node.pos = self.ea.cmdpos
         node.ea = self.ea
@@ -1413,14 +1418,14 @@ class VimLParser:
         self.reader.skip_white()
         epos = self.reader.getpos()
         if self.reader.read_alpha() != "in":
-            raise Exception(Err("Missing \"in\" after :for", epos))
+            raise VimLParserException(Err("Missing \"in\" after :for", epos))
         node.right = self.parse_expr()
         self.add_node(node)
         self.push_context(node)
 
     def parse_cmd_endfor(self):
         if self.context[0].type != NODE_FOR:
-            raise Exception(Err("E588: :endfor without :for", self.ea.cmdpos))
+            raise VimLParserException(Err("E588: :endfor without :for", self.ea.cmdpos))
         node = Node(NODE_ENDFOR)
         node.pos = self.ea.cmdpos
         node.ea = self.ea
@@ -1429,7 +1434,7 @@ class VimLParser:
 
     def parse_cmd_continue(self):
         if self.find_context(NODE_WHILE) == -1 and self.find_context(NODE_FOR) == -1:
-            raise Exception(Err("E586: :continue without :while or :for", self.ea.cmdpos))
+            raise VimLParserException(Err("E586: :continue without :while or :for", self.ea.cmdpos))
         node = Node(NODE_CONTINUE)
         node.pos = self.ea.cmdpos
         node.ea = self.ea
@@ -1437,7 +1442,7 @@ class VimLParser:
 
     def parse_cmd_break(self):
         if self.find_context(NODE_WHILE) == -1 and self.find_context(NODE_FOR) == -1:
-            raise Exception(Err("E587: :break without :while or :for", self.ea.cmdpos))
+            raise VimLParserException(Err("E587: :break without :while or :for", self.ea.cmdpos))
         node = Node(NODE_BREAK)
         node.pos = self.ea.cmdpos
         node.ea = self.ea
@@ -1456,9 +1461,9 @@ class VimLParser:
 
     def parse_cmd_catch(self):
         if self.context[0].type == NODE_FINALLY:
-            raise Exception(Err("E604: :catch after :finally", self.ea.cmdpos))
+            raise VimLParserException(Err("E604: :catch after :finally", self.ea.cmdpos))
         elif self.context[0].type != NODE_TRY and self.context[0].type != NODE_CATCH:
-            raise Exception(Err("E603: :catch without :try", self.ea.cmdpos))
+            raise VimLParserException(Err("E603: :catch without :try", self.ea.cmdpos))
         if self.context[0].type != NODE_TRY:
             self.pop_context()
         node = Node(NODE_CATCH)
@@ -1474,7 +1479,7 @@ class VimLParser:
 
     def parse_cmd_finally(self):
         if self.context[0].type != NODE_TRY and self.context[0].type != NODE_CATCH:
-            raise Exception(Err("E606: :finally without :try", self.ea.cmdos))
+            raise VimLParserException(Err("E606: :finally without :try", self.ea.cmdos))
         if self.context[0].type != NODE_TRY:
             self.pop_context()
         node = Node(NODE_FINALLY)
@@ -1486,7 +1491,7 @@ class VimLParser:
 
     def parse_cmd_endtry(self):
         if self.context[0].type != NODE_TRY and self.context[0].type != NODE_CATCH and self.context[0].type != NODE_FINALLY:
-            raise Exception(Err("E602: :endtry without :try", self.ea.cmdpos))
+            raise VimLParserException(Err("E602: :endtry without :try", self.ea.cmdpos))
         if self.context[0].type != NODE_TRY:
             self.pop_context()
         node = Node(NODE_ENDTRY)
@@ -1565,7 +1570,7 @@ class VimLParser:
         node = p.parse()
         if node.type == NODE_IDENTIFIER or node.type == NODE_CURLYNAME or node.type == NODE_SUBSCRIPT or node.type == NODE_DOT or node.type == NODE_OPTION or node.type == NODE_ENV or node.type == NODE_REG:
             return node
-        raise Exception(Err("Invalid Expression", node.pos))
+        raise VimLParserException(Err("Invalid Expression", node.pos))
 
 # FIXME:
     def parse_lvalue(self):
@@ -1573,10 +1578,10 @@ class VimLParser:
         node = p.parse()
         if node.type == NODE_IDENTIFIER:
             if not isvarname(node.value):
-                raise Exception(Err(viml_printf("E461: Illegal variable name: %s", node.value), node.pos))
-        if node.type == NODE_IDENTIFIER or node.type == NODE_CURLYNAME or node.type == NODE_SUBSCRIPT or node.type == NODE_DOT or node.type == NODE_OPTION or node.type == NODE_ENV or node.type == NODE_REG:
+                raise VimLParserException(Err(viml_printf("E461: Illegal variable name: %s", node.value), node.pos))
+        if node.type == NODE_IDENTIFIER or node.type == NODE_CURLYNAME or node.type == NODE_SUBSCRIPT or node.type == NODE_SLICE or node.type == NODE_DOT or node.type == NODE_OPTION or node.type == NODE_ENV or node.type == NODE_REG:
             return node
-        raise Exception(Err("Invalid Expression", node.pos))
+        raise VimLParserException(Err("Invalid Expression", node.pos))
 
     def parse_lvaluelist(self):
         list = []
@@ -1612,9 +1617,9 @@ class VimLParser:
                     if token.type == TOKEN_SQCLOSE:
                         break
                     else:
-                        raise Exception(Err(viml_printf("E475 Invalid argument: %s", token.value), token.pos))
+                        raise VimLParserException(Err(viml_printf("E475 Invalid argument: %s", token.value), token.pos))
                 else:
-                    raise Exception(Err(viml_printf("E475 Invalid argument: %s", token.value), token.pos))
+                    raise VimLParserException(Err(viml_printf("E475 Invalid argument: %s", token.value), token.pos))
         else:
             lhs.left = self.parse_lvalue()
         return lhs
@@ -1870,19 +1875,19 @@ class ExprTokenizer:
             r.seek_cur(1)
             return self.token(TOKEN_BACKTICK, "`", pos)
         else:
-            raise Exception(Err(viml_printf("unexpected character: %s", c), self.reader.getpos()))
+            raise VimLParserException(Err(viml_printf("unexpected character: %s", c), self.reader.getpos()))
 
     def get_sstring(self):
         self.reader.skip_white()
         c = self.reader.p(0)
         if c != "'":
-            raise Exception(Err(viml_printf("unexpected character: %s", c), self.reader.getpos()))
+            raise VimLParserException(Err(viml_printf("unexpected character: %s", c), self.reader.getpos()))
         self.reader.seek_cur(1)
         s = ""
         while 1:
             c = self.reader.p(0)
             if c == "<EOF>" or c == "<EOL>":
-                raise Exception(Err("unexpected EOL", self.reader.getpos()))
+                raise VimLParserException(Err("unexpected EOL", self.reader.getpos()))
             elif c == "'":
                 self.reader.seek_cur(1)
                 if self.reader.p(0) == "'":
@@ -1899,13 +1904,13 @@ class ExprTokenizer:
         self.reader.skip_white()
         c = self.reader.p(0)
         if c != "\"":
-            raise Exception(Err(viml_printf("unexpected character: %s", c), self.reader.getpos()))
+            raise VimLParserException(Err(viml_printf("unexpected character: %s", c), self.reader.getpos()))
         self.reader.seek_cur(1)
         s = ""
         while 1:
             c = self.reader.p(0)
             if c == "<EOF>" or c == "<EOL>":
-                raise Exception(Err("unexpectd EOL", self.reader.getpos()))
+                raise VimLParserException(Err("unexpectd EOL", self.reader.getpos()))
             elif c == "\"":
                 self.reader.seek_cur(1)
                 break
@@ -1914,7 +1919,7 @@ class ExprTokenizer:
                 s += c
                 c = self.reader.p(0)
                 if c == "<EOF>" or c == "<EOL>":
-                    raise Exception(Err("ExprTokenizer: unexpected EOL", self.reader.getpos()))
+                    raise VimLParserException(Err("ExprTokenizer: unexpected EOL", self.reader.getpos()))
                 self.reader.seek_cur(1)
                 s += c
             else:
@@ -1942,7 +1947,7 @@ class ExprParser:
             node.left = self.parse_expr1()
             token = self.tokenizer.get()
             if token.type != TOKEN_COLON:
-                raise Exception(Err(viml_printf("unexpected token: %s", token.value), token.pos))
+                raise VimLParserException(Err(viml_printf("unexpected token: %s", token.value), token.pos))
             node.right = self.parse_expr1()
             left = node
         else:
@@ -2294,7 +2299,7 @@ class ExprParser:
                         node.rlist[1] = self.parse_expr1()
                     token = self.tokenizer.get()
                     if token.type != TOKEN_SQCLOSE:
-                        raise Exception(Err(viml_printf("unexpected token: %s", token.value), token.pos))
+                        raise VimLParserException(Err(viml_printf("unexpected token: %s", token.value), token.pos))
                 else:
                     right = self.parse_expr1()
                     if self.tokenizer.peek().type == TOKEN_COLON:
@@ -2308,7 +2313,7 @@ class ExprParser:
                             node.rlist[1] = self.parse_expr1()
                         token = self.tokenizer.get()
                         if token.type != TOKEN_SQCLOSE:
-                            raise Exception(Err(viml_printf("unexpected token: %s", token.value), token.pos))
+                            raise VimLParserException(Err(viml_printf("unexpected token: %s", token.value), token.pos))
                     else:
                         node = Node(NODE_SUBSCRIPT)
                         node.pos = npos
@@ -2316,7 +2321,7 @@ class ExprParser:
                         node.right = right
                         token = self.tokenizer.get()
                         if token.type != TOKEN_SQCLOSE:
-                            raise Exception(Err(viml_printf("unexpected token: %s", token.value), token.pos))
+                            raise VimLParserException(Err(viml_printf("unexpected token: %s", token.value), token.pos))
                 left = node
                 del node
             elif token.type == TOKEN_POPEN:
@@ -2338,10 +2343,10 @@ class ExprParser:
                         elif token.type == TOKEN_PCLOSE:
                             break
                         else:
-                            raise Exception(Err(viml_printf("unexpected token: %s", token.value), token.pos))
+                            raise VimLParserException(Err(viml_printf("unexpected token: %s", token.value), token.pos))
                 if viml_len(node.rlist) > MAX_FUNC_ARGS:
                     # TODO: funcname E740: Too many arguments for function: %s
-                    raise Exception(Err("E740: Too many arguments for function", node.pos))
+                    raise VimLParserException(Err("E740: Too many arguments for function", node.pos))
                 left = node
                 del node
             elif not iswhite(c) and token.type == TOKEN_DOT:
@@ -2406,7 +2411,7 @@ class ExprParser:
                         self.tokenizer.get()
                         break
                     else:
-                        raise Exception(Err(viml_printf("unexpected token: %s", token.value), token.pos))
+                        raise VimLParserException(Err(viml_printf("unexpected token: %s", token.value), token.pos))
         elif token.type == TOKEN_COPEN:
             node = Node(NODE_DICT)
             node.pos = token.pos
@@ -2420,12 +2425,12 @@ class ExprParser:
                     token = self.tokenizer.get()
                     if token.type == TOKEN_CCLOSE:
                         if not viml_empty(node.value):
-                            raise Exception(Err(viml_printf("unexpected token: %s", token.value), token.pos))
+                            raise VimLParserException(Err(viml_printf("unexpected token: %s", token.value), token.pos))
                         self.reader.seek_set(pos)
                         node = self.parse_identifier()
                         break
                     if token.type != TOKEN_COLON:
-                        raise Exception(Err(viml_printf("unexpected token: %s", token.value), token.pos))
+                        raise VimLParserException(Err(viml_printf("unexpected token: %s", token.value), token.pos))
                     val = self.parse_expr1()
                     viml_add(node.value, [key, val])
                     token = self.tokenizer.get()
@@ -2436,12 +2441,12 @@ class ExprParser:
                     elif token.type == TOKEN_CCLOSE:
                         break
                     else:
-                        raise Exception(Err(viml_printf("unexpected token: %s", token.value), token.pos))
+                        raise VimLParserException(Err(viml_printf("unexpected token: %s", token.value), token.pos))
         elif token.type == TOKEN_POPEN:
             node = self.parse_expr1()
             token = self.tokenizer.get()
             if token.type != TOKEN_PCLOSE:
-                raise Exception(Err(viml_printf("unexpected token: %s", token.value), token.pos))
+                raise VimLParserException(Err(viml_printf("unexpected token: %s", token.value), token.pos))
         elif token.type == TOKEN_OPTION:
             node = Node(NODE_OPTION)
             node.pos = token.pos
@@ -2468,7 +2473,7 @@ class ExprParser:
             node.pos = token.pos
             node.value = token.value
         else:
-            raise Exception(Err(viml_printf("unexpected token: %s", token.value), token.pos))
+            raise VimLParserException(Err(viml_printf("unexpected token: %s", token.value), token.pos))
         return node
 
 # SUBSCRIPT or CONCAT
@@ -2512,7 +2517,7 @@ class ExprParser:
                 self.reader.skip_white()
                 c = self.reader.p(0)
                 if c != "}":
-                    raise Exception(Err(viml_printf("unexpected token: %s", c), self.reader.getpos()))
+                    raise VimLParserException(Err(viml_printf("unexpected token: %s", c), self.reader.getpos()))
                 self.reader.seek_cur(1)
                 viml_add(id, AttributeDict({"curly":1, "value":node}))
             else:
@@ -2553,7 +2558,7 @@ class LvalueParser(ExprParser):
                         node.rlist[1] = self.parse_expr1()
                     token = self.tokenizer.get()
                     if token.type != TOKEN_SQCLOSE:
-                        raise Exception(Err(viml_printf("unexpected token: %s", token.value), token.pos))
+                        raise VimLParserException(Err(viml_printf("unexpected token: %s", token.value), token.pos))
                 else:
                     right = self.parse_expr1()
                     if self.tokenizer.peek().type == TOKEN_COLON:
@@ -2567,7 +2572,7 @@ class LvalueParser(ExprParser):
                             node.rlist[1] = self.parse_expr1()
                         token = self.tokenizer.get()
                         if token.type != TOKEN_SQCLOSE:
-                            raise Exception(Err(viml_printf("unexpected token: %s", token.value), token.pos))
+                            raise VimLParserException(Err(viml_printf("unexpected token: %s", token.value), token.pos))
                     else:
                         node = Node(NODE_SUBSCRIPT)
                         node.pos = npos
@@ -2575,7 +2580,7 @@ class LvalueParser(ExprParser):
                         node.right = right
                         token = self.tokenizer.get()
                         if token.type != TOKEN_SQCLOSE:
-                            raise Exception(Err(viml_printf("unexpected token: %s", token.value), token.pos))
+                            raise VimLParserException(Err(viml_printf("unexpected token: %s", token.value), token.pos))
                 left = node
             elif not iswhite(c) and token.type == TOKEN_DOT:
                 node = self.parse_dot(token, left)
@@ -2619,7 +2624,7 @@ class LvalueParser(ExprParser):
             node.pos = token.pos
             node.value = token.value
         else:
-            raise Exception(Err(viml_printf("unexpected token: %s", token.value), token.pos))
+            raise VimLParserException(Err(viml_printf("unexpected token: %s", token.value), token.pos))
         return node
 
 class StringReader:
@@ -2980,7 +2985,7 @@ class Compiler:
         elif node.type == NODE_REG:
             return self.compile_reg(node)
         else:
-            raise Exception(viml_printf("Compiler: unknown node: %s", viml_string(node)))
+            raise VimLParserException(viml_printf("Compiler: unknown node: %s", viml_string(node)))
 
     def compile_body(self, body):
         for node in body:
@@ -3355,7 +3360,7 @@ class RegexpParser:
             epos = self.reader.getpos()
             token = self.reader.getn(5)
             if token != "\\%#=0" and token != "\\%#=1" and token != "\\%#=2":
-                raise Exception(Err("E864: \\%#= can only be followed by 0, 1, or 2", epos))
+                raise VimLParserException(Err("E864: \\%#= can only be followed by 0, 1, or 2", epos))
             viml_add(ret, token)
         while not self.isend(self.reader.peek()):
             prevtoken = ntoken
@@ -3610,7 +3615,7 @@ class RegexpParser:
                 return ["\\_.", "\\_."]
             elif c == "[":
                 return self.get_token_sq("\\_[")
-            raise Exception(Err("E63: invalid use of \\_", epos))
+            raise VimLParserException(Err("E63: invalid use of \\_", epos))
         elif viml_stridx("etrb", c) != -1:
             return ["\\" + c, "\\" + c]
         elif viml_stridx("123456789", c) != -1:
@@ -3626,7 +3631,7 @@ class RegexpParser:
                 return ["\\ze", "\\ze"]
             elif c == "(":
                 return ["\\z(", "\\z("]
-            raise Exception(Err("E68: Invalid character after \\z", epos))
+            raise VimLParserException(Err("E68: Invalid character after \\z", epos))
         elif viml_stridx("cCmMvVZ", c) != -1:
             return ["\\" + c, "\\" + c]
         elif c == "%":
@@ -3652,7 +3657,7 @@ class RegexpParser:
                 r = self.gethexchrs(8)
                 if r != "":
                     return ["\\%U" + r, "\\%U" + r]
-            raise Exception(Err("E678: Invalid character after \\%[dxouU]", epos))
+            raise VimLParserException(Err("E678: Invalid character after \\%[dxouU]", epos))
         return ["\\" + c, c]
 
 # \{}
@@ -3677,7 +3682,7 @@ class RegexpParser:
         if self.reader.p(0) == "\\":
             r += self.reader.get()
         if self.reader.p(0) != "}":
-            raise Exception(Err("E554: Syntax error in \\{...}", self.reader.getpos()))
+            raise VimLParserException(Err("E554: Syntax error in \\{...}", self.reader.getpos()))
         self.reader.get()
         return [pre + r, "\\{" + minus + n + comma + m + "}"]
 
@@ -3728,7 +3733,7 @@ class RegexpParser:
                     e, endc = self.get_token_sq_c()
                     r += e
                 if startc > endc or endc > startc + 256:
-                    raise Exception(Err("E16: Invalid range", self.reader.getpos()))
+                    raise VimLParserException(Err("E16: Invalid range", self.reader.getpos()))
 
 # [c]
     def get_token_sq_c(self):
@@ -3835,7 +3840,7 @@ class RegexpParser:
                 return [pre + "<=", "\\@<="]
             elif c == "!":
                 return [pre + "<!", "\\@<!"]
-        raise Exception(Err("E64: @ follows nothing", epos))
+        raise VimLParserException(Err("E64: @ follows nothing", epos))
 
 # \%...
     def get_token_percent(self, pre):
@@ -3861,10 +3866,10 @@ class RegexpParser:
         while 1:
             c = self.reader.peek()
             if self.isend(c):
-                raise Exception(Err("E69: Missing ] after \\%[", self.reader.getpos()))
+                raise VimLParserException(Err("E69: Missing ] after \\%[", self.reader.getpos()))
             elif c == "]":
                 if r == "":
-                    raise Exception(Err("E70: Empty \\%[", self.reader.getpos()))
+                    raise VimLParserException(Err("E70: Empty \\%[", self.reader.getpos()))
                 self.reader.seek_cur(1)
                 break
             self.reader.seek_cur(1)
@@ -3900,7 +3905,7 @@ class RegexpParser:
             elif c == "v":
                 self.reader.get()
                 return [pre + r + "v", "\\%" + cmp + d + "v"]
-        raise Exception(Err("E71: Invalid character after %", self.reader.getpos()))
+        raise VimLParserException(Err("E71: Invalid character after %", self.reader.getpos()))
 
     def getdecchrs(self):
         return self.reader.read_digit()
@@ -3917,5 +3922,5 @@ class RegexpParser:
             r += self.reader.get()
         return r
 
-if __name__ == 'main':
+if __name__ == '__main__':
     main()
