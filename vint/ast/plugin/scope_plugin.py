@@ -47,8 +47,8 @@ class ScopePlugin(AbstractASTPlugin):
             NodeType.TOPLEVEL: self._handle_enter_toplevel,
             NodeType.FUNCTION: self._handle_enter_function,
             NodeType.IDENTIFIER: self._handle_enter_identifier,
-            NodeType.LET: self._handle_enter_node_have_left_identifier,
-            NodeType.FOR: self._handle_enter_node_have_left_identifier,
+            NodeType.LET: self._handle_enter_destructuring_assignment_node,
+            NodeType.FOR: self._handle_enter_destructuring_assignment_node,
         }
 
         self.node_type_to_on_leave_handler_map = {
@@ -128,6 +128,28 @@ class ScopePlugin(AbstractASTPlugin):
             call IDENTIFIER2()
         """
         identifier[ScopePlugin.DEFINITION_IDENTIFIER_FLAG_KEY] = True
+
+
+    def _handle_enter_destructuring_assignment_node(self, node):
+        # See:
+        #   :help :for
+        #   :help :let
+        is_destructuring_assignment = len(node['list']) > 0
+
+        if is_destructuring_assignment:
+            self._handle_enter_node_have_list(node)
+        else:
+            self._handle_enter_node_have_left_identifier(node)
+
+
+    def _handle_enter_node_have_list(self, node):
+        list_nodes = node['list']
+
+        for elem_node in list_nodes:
+            identifier_name = ScopePlugin.get_normalized_identifier(elem_node)
+
+            self._mark_difinition_identifier(elem_node)
+            self._handle_new_variable(identifier_name)
 
 
     def _handle_enter_node_have_left_identifier(self, node):
