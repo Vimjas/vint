@@ -13,7 +13,7 @@ call w:declared_on_other_func3()
 call t:declared_on_other_func4()
 call declared_on_other_func5()
 call v:declared_on_other_func6()
-call &declared_on_other_func7()
+call localtime() " built-in function
 
 " Declare variables
 let g:declared_var1 = 0
@@ -63,6 +63,7 @@ function! MyFunc(param1, param2, ...) range
     call t:declared_on_other_func4()
     call v:declared_on_other_func6()
     call &declared_on_other_func7()
+    call localtime() " built-in function
 endfunction
 
 call MyFunc()
