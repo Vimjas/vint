@@ -21,6 +21,8 @@ Fixtures = {
         Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_loop_var.vim'),
     'DICT_KEY':
         Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_declaring_with_dict_key.vim'),
+    'DESTRUCTURING_ASSIGNMENT':
+        Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_destructuring_assignment.vim'),
 }
 
 
@@ -405,6 +407,34 @@ class TestScopePlugin(unittest.TestCase):
 
         self.maxDiff = 1024
         self.assertProcessing(Fixtures['DICT_KEY'], expected_scope_tree)
+
+
+    def test_process_with_destructuring_assignment(self):
+        expected_scope_tree = {
+            'type': ScopeType.TOPLEVEL,
+            'variables': {
+                'g:for_var1': [{
+                    'declaration_scope': DeclarationScope.GLOBAL,
+                    'is_declared_with_implicit_scope': False,
+                }],
+                'g:for_var2': [{
+                    'declaration_scope': DeclarationScope.GLOBAL,
+                    'is_declared_with_implicit_scope': False,
+                }],
+                'g:let_var1': [{
+                    'declaration_scope': DeclarationScope.GLOBAL,
+                    'is_declared_with_implicit_scope': False,
+                }],
+                'g:let_var2': [{
+                    'declaration_scope': DeclarationScope.GLOBAL,
+                    'is_declared_with_implicit_scope': False,
+                }],
+            },
+            'child_scopes': {},
+        }
+
+        self.maxDiff = 1024
+        self.assertProcessing(Fixtures['DESTRUCTURING_ASSIGNMENT'], expected_scope_tree)
 
 
 if __name__ == '__main__':

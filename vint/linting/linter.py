@@ -3,11 +3,12 @@ from pathlib import Path
 from vint.ast.parsing import Parser
 from vint.ast.traversing import traverse
 from vint.ast.node_type import NodeType
+from vint.ast.plugin.scope_plugin import ScopePlugin
 from vint.linting.config.config_container import ConfigContainer
 from vint.linting.config.config_dict_source import ConfigDictSource
 from vint.linting.config.config_comment_source import ConfigCommentSource
 from vint.linting.level import Level
-from vint.ast.plugin.scope_plugin import ScopePlugin
+from extlib.vimlparser import VimLParserException
 
 
 class Linter(object):
@@ -77,10 +78,7 @@ class Linter(object):
         """ Lint the file and return the violations found. """
         try:
             root_ast = self._parser.parse_file(path)
-        except Exception as exception:
-            if 'vimlparser' not in str(exception):
-                raise exception
-
+        except VimLParserException as exception:
             parse_error = self._create_parse_error(path, str(exception))
             return [parse_error]
 
