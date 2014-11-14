@@ -2,7 +2,9 @@ import unittest
 from compat.itertools import zip_longest
 from pathlib import Path
 from vint.ast.plugin.scope_plugin import ScopePlugin, ScopeType, DeclarationScope
+from vint.ast.traversing import traverse
 from vint.ast.parsing import Parser
+from vint.ast.node_type import NodeType
 
 FIXTURE_BASE_PATH = Path('test', 'fixture', 'ast')
 
@@ -23,6 +25,8 @@ Fixtures = {
         Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_declaring_with_dict_key.vim'),
     'DESTRUCTURING_ASSIGNMENT':
         Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_destructuring_assignment.vim'),
+    'BUILTIN':
+        Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_builtins.vim'),
 }
 
 
@@ -61,7 +65,7 @@ class TestScopePlugin(unittest.TestCase):
         plugin = ScopePlugin()
         plugin.process(ast)
 
-        self.assertScopeTree(ast.vint_scope_tree, expected_scope_tree)
+        self.assertScopeTree(ast['vint_scope_tree'], expected_scope_tree)
 
 
     def test_process_with_declaring_var(self):
@@ -435,6 +439,50 @@ class TestScopePlugin(unittest.TestCase):
 
         self.maxDiff = 1024
         self.assertProcessing(Fixtures['DESTRUCTURING_ASSIGNMENT'], expected_scope_tree)
+
+
+    def test_process_with_builtin(self):
+        parser = Parser()
+        ast = parser.parse_file(Fixtures['BUILTIN'])
+
+        plugin = ScopePlugin()
+        plugin.process(ast)
+
+        expected_builtin_flags = {
+            'abs': True,
+            'sin': True,
+            'strlen': True,
+            'g:MyFunction': False,
+        }
+
+        # Keep identifier name that traverser visited
+        identifiers_checking_map = {
+            'abs': False,
+            'sin': False,
+            'strlen': False,
+            'g:MyFunction': False,
+        }
+
+        def test_identifier(node):
+            if NodeType(node['type']) is not NodeType.IDENTIFIER:
+                return
+
+            identifier = node
+
+            # We focus to non-definition identifier
+            if identifier[ScopePlugin.DEFINITION_IDENTIFIER_FLAG_KEY]:
+                return
+
+            identifier_name = identifier['value']
+            identifiers_checking_map[identifier_name] = True
+
+            is_builtin_identifier = identifier[ScopePlugin.BUILTIN_IDENTIFIER_FLAG_KEY]
+            expected_builtin_flag = expected_builtin_flags[identifier_name]
+
+            self.assertEqual(is_builtin_identifier, expected_builtin_flag)
+
+        traverse(ast, on_enter=test_identifier)
+        self.assertTrue(all(identifiers_checking_map.values()))
 
 
 if __name__ == '__main__':

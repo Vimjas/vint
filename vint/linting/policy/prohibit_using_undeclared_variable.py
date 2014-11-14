@@ -67,14 +67,19 @@ class ProhibitUsingUndeclaredVariable(AbstractPolicy):
     def _is_declared_identifier(self, node):
         identifier_name = node['value']
 
-        # Ignore special identifiers such as '...' and 'a:000'
-        if self._is_ignored_identifier(identifier_name):
-            return True
-
         # Ignore definition identifiers.
         # See ScopePlugin documents to understand what is definition identifier.
         is_definition_identifier = node[ScopePlugin.DEFINITION_IDENTIFIER_FLAG_KEY]
         if is_definition_identifier:
+            return True
+
+        # No prefix identifier is already declared if the identifier is built-in.
+        is_builtin_identifier = node[ScopePlugin.BUILTIN_IDENTIFIER_FLAG_KEY]
+        if is_builtin_identifier:
+            return True
+
+        # Ignore special identifiers such as '...' and 'a:000'
+        if self._is_ignored_identifier(identifier_name):
             return True
 
         scope = node[ScopePlugin.SCOPE_KEY]
