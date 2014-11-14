@@ -2,6 +2,7 @@ from enum import Enum
 from vint.ast.plugin.abstract_ast_plugin import AbstractASTPlugin
 from vint.ast.traversing import traverse
 from vint.ast.node_type import NodeType
+from vint.ast.plugin.builtin_identifiers import BuiltinIdentifierMap
 
 
 class DeclarationScope(Enum):
@@ -23,8 +24,8 @@ class ScopeType(Enum):
 class ScopePlugin(AbstractASTPlugin):
     SCOPE_TREE_KEY = 'vint_scope_tree'
     SCOPE_KEY = 'vint_scope'
-    DEFINITION_IDENTIFIER_FLAG_KEY = 'vint_scope_identifier_is_definition'
-
+    DEFINITION_IDENTIFIER_FLAG_KEY = 'VINT:is_definition_identifier'
+    BUILTIN_IDENTIFIER_FLAG_KEY = 'VINT:is_builtin_identifier'
 
     prefix_to_declaration_scope_map = {
         'g:': DeclarationScope.GLOBAL,
@@ -168,12 +169,15 @@ class ScopePlugin(AbstractASTPlugin):
         self._handle_enter_node_have_left_identifier(node)
 
 
-    def _handle_enter_identifier(self, node):
-        node[ScopePlugin.SCOPE_KEY] = self.current_scope
+    def _handle_enter_identifier(self, identifier_node):
+        identifier_node[ScopePlugin.SCOPE_KEY] = self.current_scope
 
         # Make all idenifiers to contain DEFINITION_IDENTIFIER_FLAG.
-        if ScopePlugin.DEFINITION_IDENTIFIER_FLAG_KEY not in node:
-            node[ScopePlugin.DEFINITION_IDENTIFIER_FLAG_KEY] = False
+        if ScopePlugin.DEFINITION_IDENTIFIER_FLAG_KEY not in identifier_node:
+            identifier_node[ScopePlugin.DEFINITION_IDENTIFIER_FLAG_KEY] = False
+
+        identifier = identifier_node['value']
+        identifier_node[ScopePlugin.BUILTIN_IDENTIFIER_FLAG_KEY] = identifier in BuiltinIdentifierMap
 
 
     def _handle_leave(self, node):
