@@ -77,8 +77,5 @@ class TestCLI(unittest.TestCase):
         self.assertRegexpMatches(got_output, expected_output_pattern)
 
 
-print(os.environ)
-print('DRONE' in os.environ)
-
 if __name__ == '__main__':
     unittest.main()
