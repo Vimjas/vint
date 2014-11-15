@@ -63,7 +63,7 @@ class TestCLI(unittest.TestCase):
         self.assertIsInstance(json.loads(got_output), list)
 
 
-    @unittest.skipIf('DRONE' in os.environ, 'Does drone.io not like ANSI color?')
+    @unittest.skip('Does drone.io not like ANSI color?')
     def test_exec_vint_with_color_flag(self):
         invalid_file = str(Path('test', 'fixture', 'cli', 'invalid1.vim'))
         cmd = ['vint', '--color', invalid_file]
@@ -76,6 +76,9 @@ class TestCLI(unittest.TestCase):
         expected_output_pattern = '\\033\['
         self.assertRegexpMatches(got_output, expected_output_pattern)
 
+
+print(os.environ)
+print('DRONE' in os.environ)
 
 if __name__ == '__main__':
     unittest.main()
