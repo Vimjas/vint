@@ -2,7 +2,7 @@ from enum import Enum
 from vint.ast.plugin.abstract_ast_plugin import AbstractASTPlugin
 from vint.ast.traversing import traverse
 from vint.ast.node_type import NodeType
-from vint.ast.plugin.builtin_identifiers import BuiltinIdentifierMap
+from vint.ast.plugin.scope_plugin.builtin_identifiers import BuiltinIdentifierMap
 
 
 class DeclarationScope(Enum):
