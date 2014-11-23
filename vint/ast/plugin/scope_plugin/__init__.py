@@ -1,24 +1,10 @@
-from enum import Enum
 from vint.ast.plugin.abstract_ast_plugin import AbstractASTPlugin
 from vint.ast.traversing import traverse
 from vint.ast.node_type import NodeType
 from vint.ast.plugin.scope_plugin.builtin_identifiers import BuiltinIdentifierMap
+from vint.ast.plugin.scope_plugin.scope_type import ScopeType
+from vint.ast.plugin.scope_plugin.variable_type import VariableType
 
-
-class DeclarationScope(Enum):
-    GLOBAL = 1
-    BUFFER_LOCAL = 2
-    WINDOW_LOCAL = 3
-    TAB_LOCAL = 4
-    SCRIPT_LOCAL = 5
-    FUNCTION_LOCAL = 6
-    PARAMETER = 7
-    BUILTIN = 8
-
-
-class ScopeType(Enum):
-    TOPLEVEL = 1
-    FUNCTION = 2
 
 
 class ScopePlugin(AbstractASTPlugin):
@@ -28,14 +14,14 @@ class ScopePlugin(AbstractASTPlugin):
     BUILTIN_IDENTIFIER_FLAG_KEY = 'VINT:is_builtin_identifier'
 
     prefix_to_declaration_scope_map = {
-        'g:': DeclarationScope.GLOBAL,
-        'b:': DeclarationScope.BUFFER_LOCAL,
-        'w:': DeclarationScope.WINDOW_LOCAL,
-        't:': DeclarationScope.TAB_LOCAL,
-        's:': DeclarationScope.SCRIPT_LOCAL,
-        'l:': DeclarationScope.FUNCTION_LOCAL,
-        'a:': DeclarationScope.PARAMETER,
-        'v:': DeclarationScope.BUILTIN,
+        'g:': VariableType.GLOBAL,
+        'b:': VariableType.BUFFER_LOCAL,
+        'w:': VariableType.WINDOW_LOCAL,
+        't:': VariableType.TAB_LOCAL,
+        's:': VariableType.SCRIPT_LOCAL,
+        'l:': VariableType.FUNCTION_LOCAL,
+        'a:': VariableType.PARAMETER,
+        'v:': VariableType.BUILTIN,
     }
 
 
@@ -271,7 +257,7 @@ class ScopePlugin(AbstractASTPlugin):
 
     @classmethod
     def detect_explicit_scope(cls, identifier_name):
-        """ Returns a DeclarationScope by the specified identifier name.
+        """ Returns a VariableType by the specified identifier name.
         Return None when the variable have no scope-prefix.
         """
 
@@ -281,7 +267,7 @@ class ScopePlugin(AbstractASTPlugin):
         #   :help let-@
         first_char = identifier_name[0]
         if first_char in '&$@':
-            return DeclarationScope.GLOBAL
+            return VariableType.GLOBAL
 
         # See:
         #   :help E738
@@ -301,6 +287,6 @@ class ScopePlugin(AbstractASTPlugin):
         # See :help internal-variables
         # > In a function: local to a function; otherwise: global
         if is_toplevel_context:
-            return DeclarationScope.GLOBAL
+            return VariableType.GLOBAL
         else:
-            return DeclarationScope.FUNCTION_LOCAL
+            return VariableType.FUNCTION_LOCAL
