@@ -3,7 +3,7 @@ from vint.ast.node_type import NodeType
 from vint.linting.level import Level
 from vint.linting.policy.abstract_policy import AbstractPolicy
 from vint.ast.plugin.scope_plugin import ScopePlugin
-from vint.ast.plugin.scope_plugin.variable_type import VariableType
+from vint.ast.plugin.scope_plugin.variable_type import VariableType, detect_variable_type
 from vint.linting.policy_loader import register_policy
 
 
@@ -84,7 +84,7 @@ class ProhibitUsingUndeclaredVariable(AbstractPolicy):
             return True
 
         scope = node[ScopePlugin.SCOPE_KEY]
-        declaration_scope = ScopePlugin.detect_scope(identifier_name, scope)
+        declaration_scope = detect_variable_type(identifier_name, scope)
 
         traceability_map = ProhibitUsingUndeclaredVariable.identifier_tracability_map
         is_traceable_identifier = traceability_map[declaration_scope]

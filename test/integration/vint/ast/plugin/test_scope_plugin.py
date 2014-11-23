@@ -76,39 +76,39 @@ class TestScopePlugin(unittest.TestCase):
             'variables': {
                 'g:explicit_global_var': [{
                     'declaration_scope': VariableType.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'is_implicit_variable_type': False,
                 }],
                 'b:buffer_local_var': [{
                     'declaration_scope': VariableType.BUFFER_LOCAL,
-                    'is_declared_with_implicit_scope': False,
+                    'is_implicit_variable_type': False,
                 }],
                 'w:window_local_var': [{
                     'declaration_scope': VariableType.WINDOW_LOCAL,
-                    'is_declared_with_implicit_scope': False,
+                    'is_implicit_variable_type': False,
                 }],
                 't:tab_local_var': [{
                     'declaration_scope': VariableType.TAB_LOCAL,
-                    'is_declared_with_implicit_scope': False,
+                    'is_implicit_variable_type': False,
                 }],
                 's:script_local_var': [{
                     'declaration_scope': VariableType.SCRIPT_LOCAL,
-                    'is_declared_with_implicit_scope': False,
+                    'is_implicit_variable_type': False,
                 }],
                 'implicit_global_var': [{
                     'declaration_scope': VariableType.GLOBAL,
-                    'is_declared_with_implicit_scope': True,
+                    'is_implicit_variable_type': True,
                 }],
                 '$ENV_VAR': [{
                     'declaration_scope': VariableType.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'is_implicit_variable_type': False,
                 }],
                 '@"': [{
                     'declaration_scope': VariableType.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'is_implicit_variable_type': False,
                 }],
                 '&opt_var': [{
                     'declaration_scope': VariableType.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'is_implicit_variable_type': False,
                 }],
             },
             'child_scopes': {},
@@ -124,27 +124,27 @@ class TestScopePlugin(unittest.TestCase):
             'variables': {
                 'g:ExplicitGlobalFunc': [{
                     'declaration_scope': VariableType.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'is_implicit_variable_type': False,
                 }],
                 'b:BufferLocalFunc': [{
                     'declaration_scope': VariableType.BUFFER_LOCAL,
-                    'is_declared_with_implicit_scope': False,
+                    'is_implicit_variable_type': False,
                 }],
                 'w:WindowLocalFunc': [{
                     'declaration_scope': VariableType.WINDOW_LOCAL,
-                    'is_declared_with_implicit_scope': False,
+                    'is_implicit_variable_type': False,
                 }],
                 't:TabLocalFunc': [{
                     'declaration_scope': VariableType.TAB_LOCAL,
-                    'is_declared_with_implicit_scope': False,
+                    'is_implicit_variable_type': False,
                 }],
                 's:ScriptLocalFunc': [{
                     'declaration_scope': VariableType.SCRIPT_LOCAL,
-                    'is_declared_with_implicit_scope': False,
+                    'is_implicit_variable_type': False,
                 }],
                 'ImplicitGlobalFunc': [{
                     'declaration_scope': VariableType.GLOBAL,
-                    'is_declared_with_implicit_scope': True,
+                    'is_implicit_variable_type': True,
                 }],
             },
             'child_scopes': {
@@ -191,7 +191,7 @@ class TestScopePlugin(unittest.TestCase):
             'variables': {
                 'FuncContext': [{
                     'declaration_scope': VariableType.GLOBAL,
-                    'is_declared_with_implicit_scope': True,
+                    'is_implicit_variable_type': True,
                 }],
             },
             'child_scopes': {
@@ -200,11 +200,11 @@ class TestScopePlugin(unittest.TestCase):
                     'variables': {
                         'l:explicit_func_local_var': [{
                             'declaration_scope': VariableType.FUNCTION_LOCAL,
-                            'is_declared_with_implicit_scope': False,
+                            'is_implicit_variable_type': False,
                         }],
                         'implicit_func_local_var': [{
                             'declaration_scope': VariableType.FUNCTION_LOCAL,
-                            'is_declared_with_implicit_scope': True,
+                            'is_implicit_variable_type': True,
                         }],
                     },
                     'child_scopes': {},
@@ -222,7 +222,7 @@ class TestScopePlugin(unittest.TestCase):
             'variables': {
                 'FuncContext': [{
                     'declaration_scope': VariableType.GLOBAL,
-                    'is_declared_with_implicit_scope': True,
+                    'is_implicit_variable_type': True,
                 }],
             },
             'child_scopes': {
@@ -231,11 +231,11 @@ class TestScopePlugin(unittest.TestCase):
                     'variables': {
                         'l:ExplicitFuncLocalFunc': [{
                             'declaration_scope': VariableType.FUNCTION_LOCAL,
-                            'is_declared_with_implicit_scope': False,
+                            'is_implicit_variable_type': False,
                         }],
                         'ImplicitFuncLocalFunc': [{
                             'declaration_scope': VariableType.FUNCTION_LOCAL,
-                            'is_declared_with_implicit_scope': True,
+                            'is_implicit_variable_type': True,
                         }],
                     },
                     'child_scopes': {
@@ -264,27 +264,27 @@ class TestScopePlugin(unittest.TestCase):
             'variables': {
                 'g:FunctionWithNoParams': [{
                     'declaration_scope': VariableType.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'is_implicit_variable_type': False,
                 }],
                 'g:FunctionWithOneParam': [{
                     'declaration_scope': VariableType.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'is_implicit_variable_type': False,
                 }],
                 'g:FunctionWithTwoParams': [{
                     'declaration_scope': VariableType.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'is_implicit_variable_type': False,
                 }],
                 'g:FunctionWithVarParams': [{
                     'declaration_scope': VariableType.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'is_implicit_variable_type': False,
                 }],
                 'g:FunctionWithParamsAndVarParams': [{
                     'declaration_scope': VariableType.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'is_implicit_variable_type': False,
                 }],
                 'g:FunctionWithRange': [{
                     'declaration_scope': VariableType.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'is_implicit_variable_type': False,
                 }],
             },
             'child_scopes': {
@@ -298,7 +298,7 @@ class TestScopePlugin(unittest.TestCase):
                     'variables': {
                         'a:param1': [{
                             'declaration_scope': VariableType.PARAMETER,
-                            'is_declared_with_implicit_scope': False,
+                            'is_implicit_variable_type': False,
                         }],
                     },
                     'child_scopes': {},
@@ -308,11 +308,11 @@ class TestScopePlugin(unittest.TestCase):
                     'variables': {
                         'a:param1': [{
                             'declaration_scope': VariableType.PARAMETER,
-                            'is_declared_with_implicit_scope': False,
+                            'is_implicit_variable_type': False,
                         }],
                         'a:param2': [{
                             'declaration_scope': VariableType.PARAMETER,
-                            'is_declared_with_implicit_scope': False,
+                            'is_implicit_variable_type': False,
                         }],
                     },
                     'child_scopes': {},
@@ -330,7 +330,7 @@ class TestScopePlugin(unittest.TestCase):
                     'variables': {
                         'a:param1': [{
                             'declaration_scope': VariableType.PARAMETER,
-                            'is_declared_with_implicit_scope': False,
+                            'is_implicit_variable_type': False,
                         }],
                     },
                     'child_scopes': {},
@@ -340,15 +340,15 @@ class TestScopePlugin(unittest.TestCase):
                     'variables': {
                         'a:firstline': [{
                             'declaration_scope': VariableType.PARAMETER,
-                            'is_declared_with_implicit_scope': False,
+                            'is_implicit_variable_type': False,
                         }],
                         'a:lastline': [{
                             'declaration_scope': VariableType.PARAMETER,
-                            'is_declared_with_implicit_scope': False,
+                            'is_implicit_variable_type': False,
                         }],
                         'a:param1': [{
                             'declaration_scope': VariableType.PARAMETER,
-                            'is_declared_with_implicit_scope': False,
+                            'is_implicit_variable_type': False,
                         }],
                     },
                     'child_scopes': {},
@@ -366,7 +366,7 @@ class TestScopePlugin(unittest.TestCase):
             'variables': {
                 'implicit_global_loop_var': [{
                     'declaration_scope': VariableType.GLOBAL,
-                    'is_declared_with_implicit_scope': True,
+                    'is_implicit_variable_type': True,
                 }],
             },
             'child_scopes': {},
@@ -382,19 +382,19 @@ class TestScopePlugin(unittest.TestCase):
             'variables': {
                 'g:dict["Function1"]': [{
                     'declaration_scope': VariableType.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'is_implicit_variable_type': False,
                 }],
                 'g:dict["Function2"]': [{
                     'declaration_scope': VariableType.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'is_implicit_variable_type': False,
                 }],
                 'g:dict["key1"]': [{
                     'declaration_scope': VariableType.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'is_implicit_variable_type': False,
                 }],
                 'g:dict["key2"]': [{
                     'declaration_scope': VariableType.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'is_implicit_variable_type': False,
                 }],
             },
             'child_scopes': {
@@ -421,19 +421,19 @@ class TestScopePlugin(unittest.TestCase):
             'variables': {
                 'g:for_var1': [{
                     'declaration_scope': VariableType.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'is_implicit_variable_type': False,
                 }],
                 'g:for_var2': [{
                     'declaration_scope': VariableType.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'is_implicit_variable_type': False,
                 }],
                 'g:let_var1': [{
                     'declaration_scope': VariableType.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'is_implicit_variable_type': False,
                 }],
                 'g:let_var2': [{
                     'declaration_scope': VariableType.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'is_implicit_variable_type': False,
                 }],
             },
             'child_scopes': {},
