@@ -29,6 +29,8 @@ Fixtures = {
         Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_destructuring_assignment.vim'),
     'BUILTIN':
         Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_builtins.vim'),
+    'COMPOUND_ASSIGNMENT':
+        Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_compound_assignment.vim'),
 }
 
 
@@ -444,6 +446,7 @@ class TestScopePlugin(unittest.TestCase):
 
 
     def test_process_with_builtin(self):
+        # TODO: refactor the test
         parser = Parser()
         ast = parser.parse_file(Fixtures['BUILTIN'])
 
@@ -485,6 +488,19 @@ class TestScopePlugin(unittest.TestCase):
 
         traverse(ast, on_enter=test_identifier)
         self.assertTrue(all(identifiers_checking_map.values()))
+
+
+    def test_process_with_compound_assignment(self):
+        expected_scope_tree = {
+            'type': ScopeType.TOPLEVEL,
+
+            # Compound assignment operator does not declare any variables.
+            'variables': {},
+            'child_scopes': {},
+        }
+
+        self.maxDiff = 1024
+        self.assertProcessing(Fixtures['COMPOUND_ASSIGNMENT'], expected_scope_tree)
 
 
 if __name__ == '__main__':

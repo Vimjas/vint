@@ -6,6 +6,14 @@ from vint.ast.plugin.scope_plugin.scope_type import ScopeType
 from vint.ast.plugin.scope_plugin.variable_type import is_implicit_variable_type, detect_variable_type
 
 
+DeclarationOperatorMap = {
+    '=': True,
+    '.=': False,
+    '+=': False,
+    '-=': False,
+}
+
+
 
 class ScopePlugin(AbstractASTPlugin):
     SCOPE_TREE_KEY = 'vint_scope_tree'
@@ -23,7 +31,7 @@ class ScopePlugin(AbstractASTPlugin):
             NodeType.TOPLEVEL: self._handle_enter_toplevel,
             NodeType.FUNCTION: self._handle_enter_function,
             NodeType.IDENTIFIER: self._handle_enter_identifier,
-            NodeType.LET: self._handle_enter_destructuring_assignment_node,
+            NodeType.LET: self._handle_enter_let_node,
             NodeType.FOR: self._handle_enter_destructuring_assignment_node,
         }
 
@@ -104,6 +112,15 @@ class ScopePlugin(AbstractASTPlugin):
             call IDENTIFIER2()
         """
         identifier[ScopePlugin.DEFINITION_IDENTIFIER_FLAG_KEY] = True
+
+
+    def _handle_enter_let_node(self, node_let):
+        is_declaration_op = DeclarationOperatorMap[node_let['op']]
+
+        if not is_declaration_op:
+            return
+
+        self._handle_enter_destructuring_assignment_node(node_let)
 
 
     def _handle_enter_destructuring_assignment_node(self, node):
