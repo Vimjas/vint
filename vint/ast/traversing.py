@@ -25,8 +25,8 @@ def for_each_curly_values(curly_values, func):
 ChildNodeAccessor = {
     'NODE': call_if_def,
     'LIST': for_each,
-    'CURLYVALUES': for_each_curly_values,
 }
+
 
 ChildType = {
     'LEFT': {
@@ -44,6 +44,10 @@ ChildType = {
     'REST': {
         'accessor': ChildNodeAccessor['NODE'],
         'property_name': 'rest',
+    },
+    'VALUE': {
+        'accessor': ChildNodeAccessor['NODE'],
+        'property_name': 'value',
     },
     'LIST': {
         'accessor': ChildNodeAccessor['LIST'],
@@ -90,9 +94,8 @@ ChildType = {
         'accessor': ChildNodeAccessor['NODE'],
         'property_name': 'endtry',
     },
-
-    'CURLYVALUES': {
-        'accessor': ChildNodeAccessor['CURLYVALUES'],
+    'CURLYPARTS': {
+        'accessor': ChildNodeAccessor['LIST'],
         'property_name': 'value',
     },
 }
@@ -184,9 +187,11 @@ ChildNodeAccessorMap = {
     NodeType.NESTING: [ChildType['LEFT']],
     NodeType.OPTION: [],
     NodeType.IDENTIFIER: [],
-    NodeType.CURLYNAME: [ChildType['CURLYVALUES']],
+    NodeType.CURLYNAME: [ChildType['CURLYPARTS']],
     NodeType.ENV: [],
     NodeType.REG: [],
+    NodeType.CURLYNAMEPART: [],
+    NodeType.CURLYNAMEEXPR: [ChildType['VALUE']],
 }
 
 
