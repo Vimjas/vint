@@ -2,22 +2,23 @@ import re
 from vint.ast.node_type import NodeType
 from vint.linting.level import Level
 from vint.linting.policy.abstract_policy import AbstractPolicy
-from vint.ast.plugin.scope_plugin import ScopePlugin, DeclarationScope
+from vint.ast.plugin.scope_plugin import ScopePlugin
+from vint.ast.plugin.scope_plugin.variable_type import VariableType, detect_variable_type
 from vint.linting.policy_loader import register_policy
 
 
 @register_policy
 class ProhibitUsingUndeclaredVariable(AbstractPolicy):
     identifier_tracability_map = {
-        DeclarationScope.GLOBAL: False,
-        DeclarationScope.WINDOW_LOCAL: False,
-        DeclarationScope.BUFFER_LOCAL: False,
-        DeclarationScope.TAB_LOCAL: False,
-        DeclarationScope.BUILTIN: False,
+        VariableType.GLOBAL: False,
+        VariableType.WINDOW_LOCAL: False,
+        VariableType.BUFFER_LOCAL: False,
+        VariableType.TAB_LOCAL: False,
+        VariableType.BUILTIN: False,
 
-        DeclarationScope.SCRIPT_LOCAL: True,
-        DeclarationScope.FUNCTION_LOCAL: True,
-        DeclarationScope.PARAMETER: True,
+        VariableType.SCRIPT_LOCAL: True,
+        VariableType.FUNCTION_LOCAL: True,
+        VariableType.PARAMETER: True,
     }
 
 
@@ -83,7 +84,7 @@ class ProhibitUsingUndeclaredVariable(AbstractPolicy):
             return True
 
         scope = node[ScopePlugin.SCOPE_KEY]
-        declaration_scope = ScopePlugin.detect_scope(identifier_name, scope)
+        declaration_scope = detect_variable_type(identifier_name, scope)
 
         traceability_map = ProhibitUsingUndeclaredVariable.identifier_tracability_map
         is_traceable_identifier = traceability_map[declaration_scope]

@@ -1,5 +1,5 @@
-let i = 1
-while i < 5
-  echo "count is" i
-  let i += 1
+let num = 1
+while num < 5
+  echo "count is" num
+  let n{'u'}m += 1
 endwhile

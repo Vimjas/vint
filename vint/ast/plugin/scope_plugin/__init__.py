@@ -1,24 +1,18 @@
-from enum import Enum
 from vint.ast.plugin.abstract_ast_plugin import AbstractASTPlugin
 from vint.ast.traversing import traverse
 from vint.ast.node_type import NodeType
-from vint.ast.plugin.builtin_identifiers import BuiltinIdentifierMap
+from vint.ast.plugin.scope_plugin.builtin_identifiers import BuiltinIdentifierMap
+from vint.ast.plugin.scope_plugin.scope_type import ScopeType
+from vint.ast.plugin.scope_plugin.variable_type import is_implicit_variable_type, detect_variable_type
 
 
-class DeclarationScope(Enum):
-    GLOBAL = 1
-    BUFFER_LOCAL = 2
-    WINDOW_LOCAL = 3
-    TAB_LOCAL = 4
-    SCRIPT_LOCAL = 5
-    FUNCTION_LOCAL = 6
-    PARAMETER = 7
-    BUILTIN = 8
+DeclarationOperatorMap = {
+    '=': True,
+    '.=': False,
+    '+=': False,
+    '-=': False,
+}
 
-
-class ScopeType(Enum):
-    TOPLEVEL = 1
-    FUNCTION = 2
 
 
 class ScopePlugin(AbstractASTPlugin):
@@ -26,17 +20,6 @@ class ScopePlugin(AbstractASTPlugin):
     SCOPE_KEY = 'vint_scope'
     DEFINITION_IDENTIFIER_FLAG_KEY = 'VINT:is_definition_identifier'
     BUILTIN_IDENTIFIER_FLAG_KEY = 'VINT:is_builtin_identifier'
-
-    prefix_to_declaration_scope_map = {
-        'g:': DeclarationScope.GLOBAL,
-        'b:': DeclarationScope.BUFFER_LOCAL,
-        'w:': DeclarationScope.WINDOW_LOCAL,
-        't:': DeclarationScope.TAB_LOCAL,
-        's:': DeclarationScope.SCRIPT_LOCAL,
-        'l:': DeclarationScope.FUNCTION_LOCAL,
-        'a:': DeclarationScope.PARAMETER,
-        'v:': DeclarationScope.BUILTIN,
-    }
 
 
     class IdentifierNormalizationError(Exception):
@@ -48,7 +31,7 @@ class ScopePlugin(AbstractASTPlugin):
             NodeType.TOPLEVEL: self._handle_enter_toplevel,
             NodeType.FUNCTION: self._handle_enter_function,
             NodeType.IDENTIFIER: self._handle_enter_identifier,
-            NodeType.LET: self._handle_enter_destructuring_assignment_node,
+            NodeType.LET: self._handle_enter_let_node,
             NodeType.FOR: self._handle_enter_destructuring_assignment_node,
         }
 
@@ -129,6 +112,15 @@ class ScopePlugin(AbstractASTPlugin):
             call IDENTIFIER2()
         """
         identifier[ScopePlugin.DEFINITION_IDENTIFIER_FLAG_KEY] = True
+
+
+    def _handle_enter_let_node(self, node_let):
+        is_declaration_op = DeclarationOperatorMap[node_let['op']]
+
+        if not is_declaration_op:
+            return
+
+        self._handle_enter_destructuring_assignment_node(node_let)
 
 
     def _handle_enter_destructuring_assignment_node(self, node):
@@ -222,9 +214,9 @@ class ScopePlugin(AbstractASTPlugin):
 
         variable = {
             'declaration_scope':
-                ScopePlugin.detect_scope(identifier_name, self.current_scope),
-            'is_declared_with_implicit_scope':
-                ScopePlugin.is_declared_with_implicit_scope(identifier_name),
+                detect_variable_type(identifier_name, self.current_scope),
+            'is_implicit_variable_type':
+                is_implicit_variable_type(identifier_name),
         }
 
         if identifier_name in variables_map:
@@ -253,54 +245,3 @@ class ScopePlugin(AbstractASTPlugin):
             return node['value'].strip('"\'')
 
         raise ScopePlugin.IdentifierNormalizationError()
-
-
-    @classmethod
-    def is_declared_with_implicit_scope(cls, identifier_name):
-        # No declaration scope means implicit declaration.
-        return ScopePlugin.detect_explicit_scope(identifier_name) is None
-
-
-    @classmethod
-    def detect_scope(cls, identifier_name, scope):
-        if ScopePlugin.is_declared_with_implicit_scope(identifier_name):
-            return ScopePlugin.detect_implicit_scope(identifier_name, scope)
-        else:
-            return ScopePlugin.detect_explicit_scope(identifier_name)
-
-
-    @classmethod
-    def detect_explicit_scope(cls, identifier_name):
-        """ Returns a DeclarationScope by the specified identifier name.
-        Return None when the variable have no scope-prefix.
-        """
-
-        # See:
-        #   :help let-&
-        #   :help let-$
-        #   :help let-@
-        first_char = identifier_name[0]
-        if first_char in '&$@':
-            return DeclarationScope.GLOBAL
-
-        # See:
-        #   :help E738
-        prefix = identifier_name[0:2]
-        if prefix in ScopePlugin.prefix_to_declaration_scope_map:
-            return ScopePlugin.prefix_to_declaration_scope_map[prefix]
-
-        # It is GLOBAL or FUNCTION_LOCAL, but we cannot determine without the
-        # parent scope.
-        return None
-
-
-    @classmethod
-    def detect_implicit_scope(cls, identifier_name, scope):
-        is_toplevel_context = scope['type'] is ScopeType.TOPLEVEL
-
-        # See :help internal-variables
-        # > In a function: local to a function; otherwise: global
-        if is_toplevel_context:
-            return DeclarationScope.GLOBAL
-        else:
-            return DeclarationScope.FUNCTION_LOCAL

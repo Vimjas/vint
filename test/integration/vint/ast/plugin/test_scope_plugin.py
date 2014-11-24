@@ -1,7 +1,9 @@
 import unittest
 from compat.itertools import zip_longest
 from pathlib import Path
-from vint.ast.plugin.scope_plugin import ScopePlugin, ScopeType, DeclarationScope
+from vint.ast.plugin.scope_plugin import ScopePlugin
+from vint.ast.plugin.scope_plugin.scope_type import ScopeType
+from vint.ast.plugin.scope_plugin.variable_type import VariableType
 from vint.ast.traversing import traverse
 from vint.ast.parsing import Parser
 from vint.ast.node_type import NodeType
@@ -27,6 +29,8 @@ Fixtures = {
         Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_destructuring_assignment.vim'),
     'BUILTIN':
         Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_builtins.vim'),
+    'COMPOUND_ASSIGNMENT':
+        Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_compound_assignment.vim'),
 }
 
 
@@ -73,40 +77,40 @@ class TestScopePlugin(unittest.TestCase):
             'type': ScopeType.TOPLEVEL,
             'variables': {
                 'g:explicit_global_var': [{
-                    'declaration_scope': DeclarationScope.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'declaration_scope': VariableType.GLOBAL,
+                    'is_implicit_variable_type': False,
                 }],
                 'b:buffer_local_var': [{
-                    'declaration_scope': DeclarationScope.BUFFER_LOCAL,
-                    'is_declared_with_implicit_scope': False,
+                    'declaration_scope': VariableType.BUFFER_LOCAL,
+                    'is_implicit_variable_type': False,
                 }],
                 'w:window_local_var': [{
-                    'declaration_scope': DeclarationScope.WINDOW_LOCAL,
-                    'is_declared_with_implicit_scope': False,
+                    'declaration_scope': VariableType.WINDOW_LOCAL,
+                    'is_implicit_variable_type': False,
                 }],
                 't:tab_local_var': [{
-                    'declaration_scope': DeclarationScope.TAB_LOCAL,
-                    'is_declared_with_implicit_scope': False,
+                    'declaration_scope': VariableType.TAB_LOCAL,
+                    'is_implicit_variable_type': False,
                 }],
                 's:script_local_var': [{
-                    'declaration_scope': DeclarationScope.SCRIPT_LOCAL,
-                    'is_declared_with_implicit_scope': False,
+                    'declaration_scope': VariableType.SCRIPT_LOCAL,
+                    'is_implicit_variable_type': False,
                 }],
                 'implicit_global_var': [{
-                    'declaration_scope': DeclarationScope.GLOBAL,
-                    'is_declared_with_implicit_scope': True,
+                    'declaration_scope': VariableType.GLOBAL,
+                    'is_implicit_variable_type': True,
                 }],
                 '$ENV_VAR': [{
-                    'declaration_scope': DeclarationScope.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'declaration_scope': VariableType.GLOBAL,
+                    'is_implicit_variable_type': False,
                 }],
                 '@"': [{
-                    'declaration_scope': DeclarationScope.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'declaration_scope': VariableType.GLOBAL,
+                    'is_implicit_variable_type': False,
                 }],
                 '&opt_var': [{
-                    'declaration_scope': DeclarationScope.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'declaration_scope': VariableType.GLOBAL,
+                    'is_implicit_variable_type': False,
                 }],
             },
             'child_scopes': {},
@@ -121,28 +125,28 @@ class TestScopePlugin(unittest.TestCase):
             'type': ScopeType.TOPLEVEL,
             'variables': {
                 'g:ExplicitGlobalFunc': [{
-                    'declaration_scope': DeclarationScope.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'declaration_scope': VariableType.GLOBAL,
+                    'is_implicit_variable_type': False,
                 }],
                 'b:BufferLocalFunc': [{
-                    'declaration_scope': DeclarationScope.BUFFER_LOCAL,
-                    'is_declared_with_implicit_scope': False,
+                    'declaration_scope': VariableType.BUFFER_LOCAL,
+                    'is_implicit_variable_type': False,
                 }],
                 'w:WindowLocalFunc': [{
-                    'declaration_scope': DeclarationScope.WINDOW_LOCAL,
-                    'is_declared_with_implicit_scope': False,
+                    'declaration_scope': VariableType.WINDOW_LOCAL,
+                    'is_implicit_variable_type': False,
                 }],
                 't:TabLocalFunc': [{
-                    'declaration_scope': DeclarationScope.TAB_LOCAL,
-                    'is_declared_with_implicit_scope': False,
+                    'declaration_scope': VariableType.TAB_LOCAL,
+                    'is_implicit_variable_type': False,
                 }],
                 's:ScriptLocalFunc': [{
-                    'declaration_scope': DeclarationScope.SCRIPT_LOCAL,
-                    'is_declared_with_implicit_scope': False,
+                    'declaration_scope': VariableType.SCRIPT_LOCAL,
+                    'is_implicit_variable_type': False,
                 }],
                 'ImplicitGlobalFunc': [{
-                    'declaration_scope': DeclarationScope.GLOBAL,
-                    'is_declared_with_implicit_scope': True,
+                    'declaration_scope': VariableType.GLOBAL,
+                    'is_implicit_variable_type': True,
                 }],
             },
             'child_scopes': {
@@ -188,8 +192,8 @@ class TestScopePlugin(unittest.TestCase):
             'type': ScopeType.TOPLEVEL,
             'variables': {
                 'FuncContext': [{
-                    'declaration_scope': DeclarationScope.GLOBAL,
-                    'is_declared_with_implicit_scope': True,
+                    'declaration_scope': VariableType.GLOBAL,
+                    'is_implicit_variable_type': True,
                 }],
             },
             'child_scopes': {
@@ -197,12 +201,12 @@ class TestScopePlugin(unittest.TestCase):
                     'type': ScopeType.FUNCTION,
                     'variables': {
                         'l:explicit_func_local_var': [{
-                            'declaration_scope': DeclarationScope.FUNCTION_LOCAL,
-                            'is_declared_with_implicit_scope': False,
+                            'declaration_scope': VariableType.FUNCTION_LOCAL,
+                            'is_implicit_variable_type': False,
                         }],
                         'implicit_func_local_var': [{
-                            'declaration_scope': DeclarationScope.FUNCTION_LOCAL,
-                            'is_declared_with_implicit_scope': True,
+                            'declaration_scope': VariableType.FUNCTION_LOCAL,
+                            'is_implicit_variable_type': True,
                         }],
                     },
                     'child_scopes': {},
@@ -219,8 +223,8 @@ class TestScopePlugin(unittest.TestCase):
             'type': ScopeType.TOPLEVEL,
             'variables': {
                 'FuncContext': [{
-                    'declaration_scope': DeclarationScope.GLOBAL,
-                    'is_declared_with_implicit_scope': True,
+                    'declaration_scope': VariableType.GLOBAL,
+                    'is_implicit_variable_type': True,
                 }],
             },
             'child_scopes': {
@@ -228,12 +232,12 @@ class TestScopePlugin(unittest.TestCase):
                     'type': ScopeType.FUNCTION,
                     'variables': {
                         'l:ExplicitFuncLocalFunc': [{
-                            'declaration_scope': DeclarationScope.FUNCTION_LOCAL,
-                            'is_declared_with_implicit_scope': False,
+                            'declaration_scope': VariableType.FUNCTION_LOCAL,
+                            'is_implicit_variable_type': False,
                         }],
                         'ImplicitFuncLocalFunc': [{
-                            'declaration_scope': DeclarationScope.FUNCTION_LOCAL,
-                            'is_declared_with_implicit_scope': True,
+                            'declaration_scope': VariableType.FUNCTION_LOCAL,
+                            'is_implicit_variable_type': True,
                         }],
                     },
                     'child_scopes': {
@@ -261,28 +265,28 @@ class TestScopePlugin(unittest.TestCase):
             'type': ScopeType.TOPLEVEL,
             'variables': {
                 'g:FunctionWithNoParams': [{
-                    'declaration_scope': DeclarationScope.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'declaration_scope': VariableType.GLOBAL,
+                    'is_implicit_variable_type': False,
                 }],
                 'g:FunctionWithOneParam': [{
-                    'declaration_scope': DeclarationScope.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'declaration_scope': VariableType.GLOBAL,
+                    'is_implicit_variable_type': False,
                 }],
                 'g:FunctionWithTwoParams': [{
-                    'declaration_scope': DeclarationScope.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'declaration_scope': VariableType.GLOBAL,
+                    'is_implicit_variable_type': False,
                 }],
                 'g:FunctionWithVarParams': [{
-                    'declaration_scope': DeclarationScope.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'declaration_scope': VariableType.GLOBAL,
+                    'is_implicit_variable_type': False,
                 }],
                 'g:FunctionWithParamsAndVarParams': [{
-                    'declaration_scope': DeclarationScope.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'declaration_scope': VariableType.GLOBAL,
+                    'is_implicit_variable_type': False,
                 }],
                 'g:FunctionWithRange': [{
-                    'declaration_scope': DeclarationScope.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'declaration_scope': VariableType.GLOBAL,
+                    'is_implicit_variable_type': False,
                 }],
             },
             'child_scopes': {
@@ -295,8 +299,8 @@ class TestScopePlugin(unittest.TestCase):
                     'type': ScopeType.FUNCTION,
                     'variables': {
                         'a:param1': [{
-                            'declaration_scope': DeclarationScope.PARAMETER,
-                            'is_declared_with_implicit_scope': False,
+                            'declaration_scope': VariableType.PARAMETER,
+                            'is_implicit_variable_type': False,
                         }],
                     },
                     'child_scopes': {},
@@ -305,12 +309,12 @@ class TestScopePlugin(unittest.TestCase):
                     'type': ScopeType.FUNCTION,
                     'variables': {
                         'a:param1': [{
-                            'declaration_scope': DeclarationScope.PARAMETER,
-                            'is_declared_with_implicit_scope': False,
+                            'declaration_scope': VariableType.PARAMETER,
+                            'is_implicit_variable_type': False,
                         }],
                         'a:param2': [{
-                            'declaration_scope': DeclarationScope.PARAMETER,
-                            'is_declared_with_implicit_scope': False,
+                            'declaration_scope': VariableType.PARAMETER,
+                            'is_implicit_variable_type': False,
                         }],
                     },
                     'child_scopes': {},
@@ -327,8 +331,8 @@ class TestScopePlugin(unittest.TestCase):
                     'type': ScopeType.FUNCTION,
                     'variables': {
                         'a:param1': [{
-                            'declaration_scope': DeclarationScope.PARAMETER,
-                            'is_declared_with_implicit_scope': False,
+                            'declaration_scope': VariableType.PARAMETER,
+                            'is_implicit_variable_type': False,
                         }],
                     },
                     'child_scopes': {},
@@ -337,16 +341,16 @@ class TestScopePlugin(unittest.TestCase):
                     'type': ScopeType.FUNCTION,
                     'variables': {
                         'a:firstline': [{
-                            'declaration_scope': DeclarationScope.PARAMETER,
-                            'is_declared_with_implicit_scope': False,
+                            'declaration_scope': VariableType.PARAMETER,
+                            'is_implicit_variable_type': False,
                         }],
                         'a:lastline': [{
-                            'declaration_scope': DeclarationScope.PARAMETER,
-                            'is_declared_with_implicit_scope': False,
+                            'declaration_scope': VariableType.PARAMETER,
+                            'is_implicit_variable_type': False,
                         }],
                         'a:param1': [{
-                            'declaration_scope': DeclarationScope.PARAMETER,
-                            'is_declared_with_implicit_scope': False,
+                            'declaration_scope': VariableType.PARAMETER,
+                            'is_implicit_variable_type': False,
                         }],
                     },
                     'child_scopes': {},
@@ -363,8 +367,8 @@ class TestScopePlugin(unittest.TestCase):
             'type': ScopeType.TOPLEVEL,
             'variables': {
                 'implicit_global_loop_var': [{
-                    'declaration_scope': DeclarationScope.GLOBAL,
-                    'is_declared_with_implicit_scope': True,
+                    'declaration_scope': VariableType.GLOBAL,
+                    'is_implicit_variable_type': True,
                 }],
             },
             'child_scopes': {},
@@ -379,20 +383,20 @@ class TestScopePlugin(unittest.TestCase):
             'type': ScopeType.TOPLEVEL,
             'variables': {
                 'g:dict["Function1"]': [{
-                    'declaration_scope': DeclarationScope.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'declaration_scope': VariableType.GLOBAL,
+                    'is_implicit_variable_type': False,
                 }],
                 'g:dict["Function2"]': [{
-                    'declaration_scope': DeclarationScope.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'declaration_scope': VariableType.GLOBAL,
+                    'is_implicit_variable_type': False,
                 }],
                 'g:dict["key1"]': [{
-                    'declaration_scope': DeclarationScope.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'declaration_scope': VariableType.GLOBAL,
+                    'is_implicit_variable_type': False,
                 }],
                 'g:dict["key2"]': [{
-                    'declaration_scope': DeclarationScope.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'declaration_scope': VariableType.GLOBAL,
+                    'is_implicit_variable_type': False,
                 }],
             },
             'child_scopes': {
@@ -418,20 +422,20 @@ class TestScopePlugin(unittest.TestCase):
             'type': ScopeType.TOPLEVEL,
             'variables': {
                 'g:for_var1': [{
-                    'declaration_scope': DeclarationScope.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'declaration_scope': VariableType.GLOBAL,
+                    'is_implicit_variable_type': False,
                 }],
                 'g:for_var2': [{
-                    'declaration_scope': DeclarationScope.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'declaration_scope': VariableType.GLOBAL,
+                    'is_implicit_variable_type': False,
                 }],
                 'g:let_var1': [{
-                    'declaration_scope': DeclarationScope.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'declaration_scope': VariableType.GLOBAL,
+                    'is_implicit_variable_type': False,
                 }],
                 'g:let_var2': [{
-                    'declaration_scope': DeclarationScope.GLOBAL,
-                    'is_declared_with_implicit_scope': False,
+                    'declaration_scope': VariableType.GLOBAL,
+                    'is_implicit_variable_type': False,
                 }],
             },
             'child_scopes': {},
@@ -442,6 +446,7 @@ class TestScopePlugin(unittest.TestCase):
 
 
     def test_process_with_builtin(self):
+        # TODO: refactor the test
         parser = Parser()
         ast = parser.parse_file(Fixtures['BUILTIN'])
 
@@ -483,6 +488,19 @@ class TestScopePlugin(unittest.TestCase):
 
         traverse(ast, on_enter=test_identifier)
         self.assertTrue(all(identifiers_checking_map.values()))
+
+
+    def test_process_with_compound_assignment(self):
+        expected_scope_tree = {
+            'type': ScopeType.TOPLEVEL,
+
+            # Compound assignment operator does not declare any variables.
+            'variables': {},
+            'child_scopes': {},
+        }
+
+        self.maxDiff = 1024
+        self.assertProcessing(Fixtures['COMPOUND_ASSIGNMENT'], expected_scope_tree)
 
 
 if __name__ == '__main__':
