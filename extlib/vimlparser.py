@@ -12,13 +12,11 @@ def main():
     for line in c.compile(p.parse(r)):
         print(line)
 
-
 class VimLParserException(Exception):
     pass
 
-
 class AttributeDict(dict):
-    __getattribute__ = dict.__getitem__
+    __getattr__ = dict.__getitem__
     __setattr__ = dict.__setitem__
     __delattr__ = dict.__delitem__
 
@@ -269,6 +267,8 @@ NODE_IDENTIFIER = 86
 NODE_CURLYNAME = 87
 NODE_ENV = 88
 NODE_REG = 89
+NODE_CURLYNAMEPART = 90
+NODE_CURLYNAMEEXPR = 91
 TOKEN_EOF = 1
 TOKEN_EOL = 2
 TOKEN_SPACE = 3
@@ -512,6 +512,8 @@ def ExArg():
 # CURLYNAME .value
 # ENV .value
 # REG .value
+# CURLYNAMEPART .value
+# CURLYNAMEEXPR .value
 def Node(type):
     return AttributeDict({"type":type})
 
@@ -1181,11 +1183,13 @@ class VimLParser:
                     varnode.pos = token.pos
                     varnode.value = token.value
                     viml_add(node.rlist, varnode)
-                    # XXX: Vim doesn't skip white space before comma.  F(a ,b) => E475
-                    if iswhite(self.reader.p(0)):
-                        raise VimLParserException(Err(viml_printf("unexpected token: %s", self.reader.p(0)), self.reader.getpos()))
+                    pc = self.reader.p(0)
+                    ppos = self.reader.getpos()
                     token = tokenizer.get()
                     if token.type == TOKEN_COMMA:
+                        # XXX: Vim doesn't skip white space before comma.  F(a ,b) => E475
+                        if iswhite(pc):
+                            raise VimLParserException(Err("E475: Invalid argument: White space is not allowed before comma", ppos))
                         # XXX: Vim allows last comma.  F(a, b, ) => OK
                         if tokenizer.peek().type == TOKEN_PCLOSE:
                             tokenizer.get()
@@ -2499,38 +2503,59 @@ class ExprParser:
         return node
 
     def parse_identifier(self):
-        id = []
         self.reader.skip_white()
         npos = self.reader.getpos()
+        curly_parts = self.parse_curly_parts()
+        if viml_len(curly_parts) == 1 and curly_parts[0].type == NODE_CURLYNAMEPART:
+            node = Node(NODE_IDENTIFIER)
+            node.pos = npos
+            node.value = curly_parts[0].value
+        else:
+            node = Node(NODE_CURLYNAME)
+            node.pos = npos
+            node.value = curly_parts
+        return node
+
+    def parse_curly_parts(self):
+        curly_parts = []
         c = self.reader.peek()
+        pos = self.reader.getpos()
         if c == "<" and viml_equalci(self.reader.peekn(5), "<SID>"):
             name = self.reader.getn(5)
-            viml_add(id, AttributeDict({"curly":0, "value":name}))
+            node = Node(NODE_CURLYNAMEPART)
+            node.curly = 0
+            # Keep backword compatibility for the curly attribute
+            node.pos = pos
+            node.value = name
+            viml_add(curly_parts, node)
         while 1:
             c = self.reader.peek()
             if isnamec(c):
+                pos = self.reader.getpos()
                 name = self.reader.read_name()
-                viml_add(id, AttributeDict({"curly":0, "value":name}))
+                node = Node(NODE_CURLYNAMEPART)
+                node.curly = 0
+                # Keep backword compatibility for the curly attribute
+                node.pos = pos
+                node.value = name
+                viml_add(curly_parts, node)
             elif c == "{":
                 self.reader.get()
-                node = self.parse_expr1()
+                pos = self.reader.getpos()
+                node = Node(NODE_CURLYNAMEEXPR)
+                node.curly = 1
+                # Keep backword compatibility for the curly attribute
+                node.pos = pos
+                node.value = self.parse_expr1()
+                viml_add(curly_parts, node)
                 self.reader.skip_white()
                 c = self.reader.p(0)
                 if c != "}":
                     raise VimLParserException(Err(viml_printf("unexpected token: %s", c), self.reader.getpos()))
                 self.reader.seek_cur(1)
-                viml_add(id, AttributeDict({"curly":1, "value":node}))
             else:
                 break
-        if viml_len(id) == 1 and id[0].curly == 0:
-            node = Node(NODE_IDENTIFIER)
-            node.pos = npos
-            node.value = id[0].value
-        else:
-            node = Node(NODE_CURLYNAME)
-            node.pos = npos
-            node.value = id
-        return node
+        return curly_parts
 
 class LvalueParser(ExprParser):
     def parse(self):
@@ -2984,6 +3009,10 @@ class Compiler:
             return self.compile_env(node)
         elif node.type == NODE_REG:
             return self.compile_reg(node)
+        elif node.type == NODE_CURLYNAMEPART:
+            return self.compile_curlynamepart(node)
+        elif node.type == NODE_CURLYNAMEEXPR:
+            return self.compile_curlynameexpr(node)
         else:
             raise VimLParserException(viml_printf("Compiler: unknown node: %s", viml_string(node)))
 
@@ -3323,19 +3352,19 @@ class Compiler:
         return node.value
 
     def compile_curlyname(self, node):
-        name = ""
-        for x in node.value:
-            if x.curly:
-                name += "{" + self.compile(x.value) + "}"
-            else:
-                name += x.value
-        return name
+        return viml_join([self.compile(vval) for vval in node.value], "")
 
     def compile_env(self, node):
         return node.value
 
     def compile_reg(self, node):
         return node.value
+
+    def compile_curlynamepart(self, node):
+        return node.value
+
+    def compile_curlynameexpr(self, node):
+        return "{" + self.compile(node.value) + "}"
 
 # TODO: under construction
 class RegexpParser:

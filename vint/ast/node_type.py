@@ -92,3 +92,5 @@ class NodeType(Enum):
     CURLYNAME = 87
     ENV = 88
     REG = 89
+    CURLYNAMEPART = 90
+    CURLYNAMEEXPR = 91
