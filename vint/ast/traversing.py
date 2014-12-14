@@ -1,5 +1,6 @@
 from vint.ast.node_type import NodeType
 
+SKIP_CHILDREN = 'SKIP_CHILDREN'
 
 ChildNodeAccessor = {
     'NODE': lambda node, func: call_if_def(func, node),
@@ -197,14 +198,17 @@ def traverse(node, on_enter=None, on_leave=None):
         raise UnknownNodeTypeException(node_type)
 
     if on_enter:
-        on_enter(node)
+        should_traverse_children = on_enter(node) is not SKIP_CHILDREN
+    else:
+        should_traverse_children = True
 
-    for property_accessor in ChildNodeAccessorMap[node_type]:
-        accessor_func = property_accessor['accessor']
-        prop_name = property_accessor['property_name']
+    if should_traverse_children:
+        for property_accessor in ChildNodeAccessorMap[node_type]:
+            accessor_func = property_accessor['accessor']
+            prop_name = property_accessor['property_name']
 
-        accessor_func(node[prop_name],
-                      lambda child_node: traverse(child_node, on_enter, on_leave))
+            accessor_func(node[prop_name],
+                          lambda child_node: traverse(child_node, on_enter, on_leave))
 
     if on_leave:
         on_leave(node)
