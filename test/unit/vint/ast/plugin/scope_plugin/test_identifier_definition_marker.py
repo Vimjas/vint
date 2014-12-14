@@ -152,6 +152,7 @@ class TestIdentifierDefinitionMarker(unittest.TestCase):
             '$ENV_VAR': self.create_id_attr(is_definition=True),
             '@"': self.create_id_attr(is_definition=True),
             '&opt_var': self.create_id_attr(is_definition=True),
+            'v:count': self.create_id_attr(is_definition=True),
         }
 
         marker.process(ast)
