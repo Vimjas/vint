@@ -7,3 +7,4 @@ let implicit_global_var = 106
 let $ENV_VAR = 107
 let @" = 108
 let &opt_var = 109
+let v:count = 110

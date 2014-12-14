@@ -13,6 +13,6 @@ endfunction
 function! g:FunctionWithParamsAndVarParams(param_var1, ...)
 endfunction
 
-function! g:FunctionWithRange(param1) range
+function! g:FunctionWithRange(param) range
     " a:firstline and a:lastline is declared implicitly.
 endfunction
