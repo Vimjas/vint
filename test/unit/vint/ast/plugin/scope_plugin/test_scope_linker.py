@@ -50,9 +50,9 @@ class TestScopeLinker(unittest.TestCase):
 
     def test_process_with_declaring_func(self):
         ast = self.create_ast(Fixtures.DECLARING_FUNC)
-        attacher = ScopeLinker()
+        linker = ScopeLinker()
 
-        attacher.process(ast)
+        linker.process(ast)
 
         expected_scope_tree = self.create_scope(
             ScopeVisibility.GLOBAL_LIKE,
@@ -123,9 +123,9 @@ class TestScopeLinker(unittest.TestCase):
 
     def test_process_with_declaring_func_in_func(self):
         ast = self.create_ast(Fixtures.DECLARING_FUNC_IN_FUNC)
-        attacher = ScopeLinker()
+        linker = ScopeLinker()
 
-        attacher.process(ast)
+        linker.process(ast)
 
         expected_scope_tree = self.create_scope(
             ScopeVisibility.GLOBAL_LIKE,
@@ -172,9 +172,9 @@ class TestScopeLinker(unittest.TestCase):
 
     def test_process_with_declaring_var(self):
         ast = self.create_ast(Fixtures.DECLARING_VAR)
-        attacher = ScopeLinker()
+        linker = ScopeLinker()
 
-        attacher.process(ast)
+        linker.process(ast)
 
         expected_scope_tree = self.create_scope(
             ScopeVisibility.GLOBAL_LIKE,
@@ -205,9 +205,9 @@ class TestScopeLinker(unittest.TestCase):
 
     def test_process_with_declaring_var_in_func(self):
         ast = self.create_ast(Fixtures.DECLARING_VAR_IN_FUNC)
-        attacher = ScopeLinker()
+        linker = ScopeLinker()
 
-        attacher.process(ast)
+        linker.process(ast)
 
         expected_scope_tree = self.create_scope(
             ScopeVisibility.GLOBAL_LIKE,
@@ -239,9 +239,9 @@ class TestScopeLinker(unittest.TestCase):
 
     def test_process_with_declaring_with_dict_key(self):
         ast = self.create_ast(Fixtures.DICT_KEY)
-        attacher = ScopeLinker()
+        linker = ScopeLinker()
 
-        attacher.process(ast)
+        linker.process(ast)
 
         expected_scope_tree = self.create_scope(
             ScopeVisibility.GLOBAL_LIKE,
@@ -280,9 +280,9 @@ class TestScopeLinker(unittest.TestCase):
 
     def test_process_with_destructuring_assignment(self):
         ast = self.create_ast(Fixtures.DESTRUCTURING_ASSIGNMENT)
-        attacher = ScopeLinker()
+        linker = ScopeLinker()
 
-        attacher.process(ast)
+        linker.process(ast)
 
         expected_scope_tree = self.create_scope(
             ScopeVisibility.GLOBAL_LIKE,
@@ -304,9 +304,9 @@ class TestScopeLinker(unittest.TestCase):
 
     def test_process_with_func_param(self):
         ast = self.create_ast(Fixtures.FUNC_PARAM)
-        attacher = ScopeLinker()
+        linker = ScopeLinker()
 
-        attacher.process(ast)
+        linker.process(ast)
 
         expected_scope_tree = self.create_scope(
             ScopeVisibility.GLOBAL_LIKE,
@@ -421,9 +421,9 @@ class TestScopeLinker(unittest.TestCase):
 
     def test_process_with_func_call(self):
         ast = self.create_ast(Fixtures.CALLING_FUNC)
-        attacher = ScopeLinker()
+        linker = ScopeLinker()
 
-        attacher.process(ast)
+        linker.process(ast)
 
         expected_scope_tree = self.create_scope(
             ScopeVisibility.GLOBAL_LIKE,
@@ -439,9 +439,9 @@ class TestScopeLinker(unittest.TestCase):
 
     def test_process_with_loop_var(self):
         ast = self.create_ast(Fixtures.LOOP_VAR)
-        attacher = ScopeLinker()
+        linker = ScopeLinker()
 
-        attacher.process(ast)
+        linker.process(ast)
 
         expected_scope_tree = self.create_scope(
             ScopeVisibility.GLOBAL_LIKE,
