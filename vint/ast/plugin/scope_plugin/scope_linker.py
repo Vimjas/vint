@@ -111,7 +111,7 @@ class ScopeLinker(object):
 
         def _add_parameter(self, objective_scope, node):
             variable_name = ScopeDetector.normalize_parameter_name(node)
-            variable = self._create_variable()
+            variable = self._create_variable(node)
 
             self._add_variable_by_name(objective_scope, variable_name, variable)
 
@@ -127,7 +127,8 @@ class ScopeLinker(object):
                 return
 
             variable_name = ScopeDetector.normalize_variable_name(node, current_scope)
-            variable = self._create_variable(is_implicit=is_implicit)
+            variable = self._create_variable(node,
+                                             is_implicit=is_implicit)
 
             self._add_variable_by_name(objective_scope, variable_name, variable)
 
@@ -136,7 +137,9 @@ class ScopeLinker(object):
             current_scope = self.get_current_scope()
 
             variable_name = ScopeDetector.normalize_variable_name(node, current_scope)
-            variable = self._create_variable(is_implicit=is_implicit, is_builtin=True)
+            variable = self._create_variable(node,
+                                             is_implicit=is_implicit,
+                                             is_builtin=True)
 
             self._add_variable_by_name(self.get_global_scope(), variable_name, variable)
             return
@@ -149,8 +152,9 @@ class ScopeLinker(object):
             objective_scope['variables'][variable_name] = same_name_variables
 
 
-        def _create_variable(self, is_implicit=False, is_builtin=False):
+        def _create_variable(self, node, is_implicit=False, is_builtin=False):
             return {
+                'node': node,
                 'is_implicit': is_implicit,
                 'is_builtin': is_builtin,
             }
