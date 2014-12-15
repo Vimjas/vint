@@ -39,7 +39,7 @@ class IdentifierDefinitionMarker(object):
     def __init__(self):
         self.log = []
 
-    def process(self, ast):
+    def attach_identifier_attributes(self, ast):
         traverse(ast, on_enter=self._enter_handler)
         return ast
 

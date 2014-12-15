@@ -76,7 +76,7 @@ class TestIdentifierDefinitionMarker(unittest.TestCase):
         return 'Some identifier like node was not visited: ' + ', '.join(unvisited_id_names)
 
 
-    def test_process_with_declaring_func(self):
+    def test_attach_identifier_attributes_with_declaring_func(self):
         ast = self.create_ast(Fixtures['DECLARING_FUNC'])
         marker = IdentifierDefinitionMarker()
 
@@ -89,12 +89,12 @@ class TestIdentifierDefinitionMarker(unittest.TestCase):
             'ImplicitGlobalFunc': self.create_id_attr(is_definition=True),
         }
 
-        marker.process(ast)
+        attached_ast = marker.attach_identifier_attributes(ast)
 
-        self.assertAttributesInIdentifiers(ast, expected_id_attr_map)
+        self.assertAttributesInIdentifiers(attached_ast, expected_id_attr_map)
 
 
-    def test_process_with_calling_func(self):
+    def test_attach_identifier_attributes_with_calling_func(self):
         ast = self.create_ast(Fixtures['CALLING_FUNC'])
         marker = IdentifierDefinitionMarker()
 
@@ -117,12 +117,12 @@ class TestIdentifierDefinitionMarker(unittest.TestCase):
                 self.create_id_attr(is_definition=False),
         }
 
-        marker.process(ast)
+        attached_ast = marker.attach_identifier_attributes(ast)
 
-        self.assertAttributesInIdentifiers(ast, expected_id_attr_map)
+        self.assertAttributesInIdentifiers(attached_ast, expected_id_attr_map)
 
 
-    def test_process_with_declaring_func_in_func(self):
+    def test_attach_identifier_attributes_with_declaring_func_in_func(self):
         ast = self.create_ast(Fixtures['DECLARING_FUNC_IN_FUNC'])
         marker = IdentifierDefinitionMarker()
 
@@ -133,12 +133,12 @@ class TestIdentifierDefinitionMarker(unittest.TestCase):
                 self.create_id_attr(is_definition=True),
         }
 
-        marker.process(ast)
+        attached_ast = marker.attach_identifier_attributes(ast)
 
-        self.assertAttributesInIdentifiers(ast, expected_id_attr_map)
+        self.assertAttributesInIdentifiers(attached_ast, expected_id_attr_map)
 
 
-    def test_process_with_declaring_var(self):
+    def test_attach_identifier_attributes_with_declaring_var(self):
         ast = self.create_ast(Fixtures['DECLARING_VAR'])
         marker = IdentifierDefinitionMarker()
 
@@ -155,12 +155,12 @@ class TestIdentifierDefinitionMarker(unittest.TestCase):
             'v:count': self.create_id_attr(is_definition=True),
         }
 
-        marker.process(ast)
+        attached_ast = marker.attach_identifier_attributes(ast)
 
-        self.assertAttributesInIdentifiers(ast, expected_id_attr_map)
+        self.assertAttributesInIdentifiers(attached_ast, expected_id_attr_map)
 
 
-    def test_process_with_declaring_var_in_func(self):
+    def test_attach_identifier_attributes_with_declaring_var_in_func(self):
         ast = self.create_ast(Fixtures['DECLARING_VAR_IN_FUNC'])
         marker = IdentifierDefinitionMarker()
 
@@ -170,12 +170,12 @@ class TestIdentifierDefinitionMarker(unittest.TestCase):
             'implicit_func_local_var': self.create_id_attr(is_definition=True),
         }
 
-        marker.process(ast)
+        attached_ast = marker.attach_identifier_attributes(ast)
 
-        self.assertAttributesInIdentifiers(ast, expected_id_attr_map)
+        self.assertAttributesInIdentifiers(attached_ast, expected_id_attr_map)
 
 
-    def test_process_with_declaring_with_dict_key(self):
+    def test_attach_identifier_attributes_with_declaring_with_dict_key(self):
         ast = self.create_ast(Fixtures['DICT_KEY'])
         marker = IdentifierDefinitionMarker()
 
@@ -187,12 +187,12 @@ class TestIdentifierDefinitionMarker(unittest.TestCase):
             "'key2'": self.create_id_attr(is_definition=True, is_member_of_subscript=True),
         }
 
-        marker.process(ast)
+        attached_ast = marker.attach_identifier_attributes(ast)
 
-        self.assertAttributesInIdentifiers(ast, expected_id_attr_map)
+        self.assertAttributesInIdentifiers(attached_ast, expected_id_attr_map)
 
 
-    def test_process_with_destructuring_assignment(self):
+    def test_attach_identifier_attributes_with_destructuring_assignment(self):
         ast = self.create_ast(Fixtures['DESTRUCTURING_ASSIGNMENT'])
         marker = IdentifierDefinitionMarker()
 
@@ -206,12 +206,12 @@ class TestIdentifierDefinitionMarker(unittest.TestCase):
             'g:index_end': self.create_id_attr(is_definition=False, is_member_of_subscript=True, is_dynamic=True),
         }
 
-        marker.process(ast)
+        attached_ast = marker.attach_identifier_attributes(ast)
 
-        self.assertAttributesInIdentifiers(ast, expected_id_attr_map)
+        self.assertAttributesInIdentifiers(attached_ast, expected_id_attr_map)
 
 
-    def test_process_with_func_param(self):
+    def test_attach_identifier_attributes_with_func_param(self):
         ast = self.create_ast(Fixtures['FUNC_PARAM'])
         marker = IdentifierDefinitionMarker()
 
@@ -229,12 +229,12 @@ class TestIdentifierDefinitionMarker(unittest.TestCase):
             '...': self.create_id_attr(is_definition=True),
         }
 
-        marker.process(ast)
+        attached_ast = marker.attach_identifier_attributes(ast)
 
-        self.assertAttributesInIdentifiers(ast, expected_id_attr_map)
+        self.assertAttributesInIdentifiers(attached_ast, expected_id_attr_map)
 
 
-    def test_process_with_loop_var(self):
+    def test_attach_identifier_attributes_with_loop_var(self):
         ast = self.create_ast(Fixtures['LOOP_VAR'])
         marker = IdentifierDefinitionMarker()
 
@@ -243,9 +243,9 @@ class TestIdentifierDefinitionMarker(unittest.TestCase):
             'g:array': self.create_id_attr(is_definition=False),
         }
 
-        marker.process(ast)
+        attached_ast = marker.attach_identifier_attributes(ast)
 
-        self.assertAttributesInIdentifiers(ast, expected_id_attr_map)
+        self.assertAttributesInIdentifiers(attached_ast, expected_id_attr_map)
 
 
 
