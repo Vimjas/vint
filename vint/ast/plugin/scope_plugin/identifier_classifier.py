@@ -6,6 +6,9 @@ IDENTIFIER_ATTRIBUTE = 'VINT:identifier_attribute'
 IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG = 'is_definition'
 IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG = 'is_dynamic'
 IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG = 'is_member_of_subscript'
+REFERENCING_IDENTIFIERS = 'VINT:referencing_identifiers'
+DECLARING_IDENTIFIERS = 'VINT:declaring_identifiers'
+
 
 DeclarativeNodeTypes = {
     NodeType.LET: True,
@@ -36,12 +39,38 @@ AnalyzableSubScriptChildNodeTypes = {
 
 
 class IdentifierClassifier(object):
-    def __init__(self):
-        self.log = []
+    class IdentifierCollector(object):
+        def collect_identifiers(self, ast):
+            self.static_referencing_identifiers = []
+            self.static_declaring_identifiers = []
+
+            # TODO: Make more performance efficiency.
+            traverse(ast, on_enter=self._enter_handler)
+
+            return {
+                'static_declaring_identifiers': self.static_declaring_identifiers,
+                'static_referencing_identifiers': self.static_referencing_identifiers,
+            }
+
+
+        def _enter_handler(self, node):
+            is_identifier_like_node = IDENTIFIER_ATTRIBUTE in node
+
+            if not is_identifier_like_node:
+                return
+
+            id_attr = node[IDENTIFIER_ATTRIBUTE]
+            if id_attr[IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG] or \
+                    id_attr[IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG]:
+                return
+
+            if id_attr[IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG]:
+                self.static_declaring_identifiers.append(node)
+            else:
+                self.static_referencing_identifiers.append(node)
 
 
     def attach_identifier_attributes(self, ast):
-        # TODO: Collect analyzable declaring/referencing identifiers.
         traverse(ast, on_enter=self._enter_handler)
         return ast
 

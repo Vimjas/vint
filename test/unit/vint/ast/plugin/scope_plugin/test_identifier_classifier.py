@@ -84,7 +84,7 @@ class TestIdentifierClassifier(unittest.TestCase):
 
     def test_attach_identifier_attributes_with_declaring_func(self):
         ast = self.create_ast(Fixtures['DECLARING_FUNC'])
-        marker = IdentifierClassifier()
+        id_classifier = IdentifierClassifier()
 
         expected_id_attr_map = {
             'g:ExplicitGlobalFunc': self.create_id_attr(is_definition=True),
@@ -95,14 +95,14 @@ class TestIdentifierClassifier(unittest.TestCase):
             'ImplicitGlobalFunc': self.create_id_attr(is_definition=True),
         }
 
-        attached_ast = marker.attach_identifier_attributes(ast)
+        attached_ast = id_classifier.attach_identifier_attributes(ast)
 
         self.assertAttributesInIdentifiers(attached_ast, expected_id_attr_map)
 
 
     def test_attach_identifier_attributes_with_calling_func(self):
         ast = self.create_ast(Fixtures['CALLING_FUNC'])
-        marker = IdentifierClassifier()
+        id_classifier = IdentifierClassifier()
 
         expected_id_attr_map = {
             'FunctionCall':
@@ -123,14 +123,14 @@ class TestIdentifierClassifier(unittest.TestCase):
                 self.create_id_attr(is_definition=False),
         }
 
-        attached_ast = marker.attach_identifier_attributes(ast)
+        attached_ast = id_classifier.attach_identifier_attributes(ast)
 
         self.assertAttributesInIdentifiers(attached_ast, expected_id_attr_map)
 
 
     def test_attach_identifier_attributes_with_declaring_func_in_func(self):
         ast = self.create_ast(Fixtures['DECLARING_FUNC_IN_FUNC'])
-        marker = IdentifierClassifier()
+        id_classifier = IdentifierClassifier()
 
         expected_id_attr_map = {
             'FuncContext': self.create_id_attr(is_definition=True),
@@ -139,14 +139,14 @@ class TestIdentifierClassifier(unittest.TestCase):
                 self.create_id_attr(is_definition=True),
         }
 
-        attached_ast = marker.attach_identifier_attributes(ast)
+        attached_ast = id_classifier.attach_identifier_attributes(ast)
 
         self.assertAttributesInIdentifiers(attached_ast, expected_id_attr_map)
 
 
     def test_attach_identifier_attributes_with_declaring_var(self):
         ast = self.create_ast(Fixtures['DECLARING_VAR'])
-        marker = IdentifierClassifier()
+        id_classifier = IdentifierClassifier()
 
         expected_id_attr_map = {
             'g:explicit_global_var': self.create_id_attr(is_definition=True),
@@ -161,14 +161,14 @@ class TestIdentifierClassifier(unittest.TestCase):
             'v:count': self.create_id_attr(is_definition=True),
         }
 
-        attached_ast = marker.attach_identifier_attributes(ast)
+        attached_ast = id_classifier.attach_identifier_attributes(ast)
 
         self.assertAttributesInIdentifiers(attached_ast, expected_id_attr_map)
 
 
     def test_attach_identifier_attributes_with_declaring_var_in_func(self):
         ast = self.create_ast(Fixtures['DECLARING_VAR_IN_FUNC'])
-        marker = IdentifierClassifier()
+        id_classifier = IdentifierClassifier()
 
         expected_id_attr_map = {
             'FuncContext': self.create_id_attr(is_definition=True),
@@ -176,14 +176,14 @@ class TestIdentifierClassifier(unittest.TestCase):
             'implicit_func_local_var': self.create_id_attr(is_definition=True),
         }
 
-        attached_ast = marker.attach_identifier_attributes(ast)
+        attached_ast = id_classifier.attach_identifier_attributes(ast)
 
         self.assertAttributesInIdentifiers(attached_ast, expected_id_attr_map)
 
 
     def test_attach_identifier_attributes_with_declaring_with_dict_key(self):
         ast = self.create_ast(Fixtures['DICT_KEY'])
-        marker = IdentifierClassifier()
+        id_classifier = IdentifierClassifier()
 
         expected_id_attr_map = {
             'g:dict': self.create_id_attr(is_definition=False),
@@ -193,14 +193,14 @@ class TestIdentifierClassifier(unittest.TestCase):
             "'key2'": self.create_id_attr(is_definition=True, is_member_of_subscript=True),
         }
 
-        attached_ast = marker.attach_identifier_attributes(ast)
+        attached_ast = id_classifier.attach_identifier_attributes(ast)
 
         self.assertAttributesInIdentifiers(attached_ast, expected_id_attr_map)
 
 
     def test_attach_identifier_attributes_with_destructuring_assignment(self):
         ast = self.create_ast(Fixtures['DESTRUCTURING_ASSIGNMENT'])
-        marker = IdentifierClassifier()
+        id_classifier = IdentifierClassifier()
 
         expected_id_attr_map = {
             'g:for_var1': self.create_id_attr(is_definition=True),
@@ -212,14 +212,14 @@ class TestIdentifierClassifier(unittest.TestCase):
             'g:index_end': self.create_id_attr(is_definition=False, is_member_of_subscript=True, is_dynamic=True),
         }
 
-        attached_ast = marker.attach_identifier_attributes(ast)
+        attached_ast = id_classifier.attach_identifier_attributes(ast)
 
         self.assertAttributesInIdentifiers(attached_ast, expected_id_attr_map)
 
 
     def test_attach_identifier_attributes_with_func_param(self):
         ast = self.create_ast(Fixtures['FUNC_PARAM'])
-        marker = IdentifierClassifier()
+        id_classifier = IdentifierClassifier()
 
         expected_id_attr_map = {
             'g:FunctionWithNoParams': self.create_id_attr(is_definition=True),
@@ -235,21 +235,21 @@ class TestIdentifierClassifier(unittest.TestCase):
             '...': self.create_id_attr(is_definition=True),
         }
 
-        attached_ast = marker.attach_identifier_attributes(ast)
+        attached_ast = id_classifier.attach_identifier_attributes(ast)
 
         self.assertAttributesInIdentifiers(attached_ast, expected_id_attr_map)
 
 
     def test_attach_identifier_attributes_with_loop_var(self):
         ast = self.create_ast(Fixtures['LOOP_VAR'])
-        marker = IdentifierClassifier()
+        id_classifier = IdentifierClassifier()
 
         expected_id_attr_map = {
             'implicit_global_loop_var': self.create_id_attr(is_definition=True),
             'g:array': self.create_id_attr(is_definition=False),
         }
 
-        attached_ast = marker.attach_identifier_attributes(ast)
+        attached_ast = id_classifier.attach_identifier_attributes(ast)
 
         self.assertAttributesInIdentifiers(attached_ast, expected_id_attr_map)
 
