@@ -4,7 +4,13 @@ from pathlib import Path
 from vint.ast.parsing import Parser
 from vint.ast.traversing import traverse
 from vint.ast.node_type import NodeType
-from vint.ast.plugin.scope_plugin.identifier_definition_marker import IdentifierDefinitionMarker, IDENTIFIER_ATTRIBUTE, IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG, IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG, IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG
+from vint.ast.plugin.scope_plugin.identifier_classifier import (
+    IdentifierClassifier,
+    IDENTIFIER_ATTRIBUTE,
+    IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG,
+    IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG,
+    IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG
+)
 
 
 FIXTURE_BASE_PATH = Path('test', 'fixture', 'ast', 'scope_plugin')
@@ -33,7 +39,7 @@ Fixtures = {
 }
 
 
-class TestIdentifierDefinitionMarker(unittest.TestCase):
+class TestIdentifierClassifier(unittest.TestCase):
     def create_ast(self, file_path):
         parser = Parser()
         ast = parser.parse_file(file_path)
@@ -78,7 +84,7 @@ class TestIdentifierDefinitionMarker(unittest.TestCase):
 
     def test_attach_identifier_attributes_with_declaring_func(self):
         ast = self.create_ast(Fixtures['DECLARING_FUNC'])
-        marker = IdentifierDefinitionMarker()
+        marker = IdentifierClassifier()
 
         expected_id_attr_map = {
             'g:ExplicitGlobalFunc': self.create_id_attr(is_definition=True),
@@ -96,7 +102,7 @@ class TestIdentifierDefinitionMarker(unittest.TestCase):
 
     def test_attach_identifier_attributes_with_calling_func(self):
         ast = self.create_ast(Fixtures['CALLING_FUNC'])
-        marker = IdentifierDefinitionMarker()
+        marker = IdentifierClassifier()
 
         expected_id_attr_map = {
             'FunctionCall':
@@ -124,7 +130,7 @@ class TestIdentifierDefinitionMarker(unittest.TestCase):
 
     def test_attach_identifier_attributes_with_declaring_func_in_func(self):
         ast = self.create_ast(Fixtures['DECLARING_FUNC_IN_FUNC'])
-        marker = IdentifierDefinitionMarker()
+        marker = IdentifierClassifier()
 
         expected_id_attr_map = {
             'FuncContext': self.create_id_attr(is_definition=True),
@@ -140,7 +146,7 @@ class TestIdentifierDefinitionMarker(unittest.TestCase):
 
     def test_attach_identifier_attributes_with_declaring_var(self):
         ast = self.create_ast(Fixtures['DECLARING_VAR'])
-        marker = IdentifierDefinitionMarker()
+        marker = IdentifierClassifier()
 
         expected_id_attr_map = {
             'g:explicit_global_var': self.create_id_attr(is_definition=True),
@@ -162,7 +168,7 @@ class TestIdentifierDefinitionMarker(unittest.TestCase):
 
     def test_attach_identifier_attributes_with_declaring_var_in_func(self):
         ast = self.create_ast(Fixtures['DECLARING_VAR_IN_FUNC'])
-        marker = IdentifierDefinitionMarker()
+        marker = IdentifierClassifier()
 
         expected_id_attr_map = {
             'FuncContext': self.create_id_attr(is_definition=True),
@@ -177,7 +183,7 @@ class TestIdentifierDefinitionMarker(unittest.TestCase):
 
     def test_attach_identifier_attributes_with_declaring_with_dict_key(self):
         ast = self.create_ast(Fixtures['DICT_KEY'])
-        marker = IdentifierDefinitionMarker()
+        marker = IdentifierClassifier()
 
         expected_id_attr_map = {
             'g:dict': self.create_id_attr(is_definition=False),
@@ -194,7 +200,7 @@ class TestIdentifierDefinitionMarker(unittest.TestCase):
 
     def test_attach_identifier_attributes_with_destructuring_assignment(self):
         ast = self.create_ast(Fixtures['DESTRUCTURING_ASSIGNMENT'])
-        marker = IdentifierDefinitionMarker()
+        marker = IdentifierClassifier()
 
         expected_id_attr_map = {
             'g:for_var1': self.create_id_attr(is_definition=True),
@@ -213,7 +219,7 @@ class TestIdentifierDefinitionMarker(unittest.TestCase):
 
     def test_attach_identifier_attributes_with_func_param(self):
         ast = self.create_ast(Fixtures['FUNC_PARAM'])
-        marker = IdentifierDefinitionMarker()
+        marker = IdentifierClassifier()
 
         expected_id_attr_map = {
             'g:FunctionWithNoParams': self.create_id_attr(is_definition=True),
@@ -236,7 +242,7 @@ class TestIdentifierDefinitionMarker(unittest.TestCase):
 
     def test_attach_identifier_attributes_with_loop_var(self):
         ast = self.create_ast(Fixtures['LOOP_VAR'])
-        marker = IdentifierDefinitionMarker()
+        marker = IdentifierClassifier()
 
         expected_id_attr_map = {
             'implicit_global_loop_var': self.create_id_attr(is_definition=True),

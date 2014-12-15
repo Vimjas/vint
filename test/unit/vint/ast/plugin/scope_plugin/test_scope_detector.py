@@ -1,7 +1,7 @@
 import pytest
 from vint.ast.node_type import NodeType
 from vint.ast.plugin.scope_plugin.scope_detector import ScopeDetector, ScopeVisibility as Vis
-from vint.ast.plugin.scope_plugin.identifier_definition_marker import (
+from vint.ast.plugin.scope_plugin.identifier_classifier import (
     IDENTIFIER_ATTRIBUTE,
     IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG,
     IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG,

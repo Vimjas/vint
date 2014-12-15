@@ -35,11 +35,13 @@ AnalyzableSubScriptChildNodeTypes = {
 }
 
 
-class IdentifierDefinitionMarker(object):
+class IdentifierClassifier(object):
     def __init__(self):
         self.log = []
 
+
     def attach_identifier_attributes(self, ast):
+        # TODO: Collect analyzable declaring/referencing identifiers.
         traverse(ast, on_enter=self._enter_handler)
         return ast
 

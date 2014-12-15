@@ -4,7 +4,7 @@ from pathlib import Path
 
 from vint.ast.parsing import Parser
 from vint.ast.plugin.scope_plugin.scope_attacher import ScopeAttacher, ScopeVisibility, SCOPE_TREE
-from vint.ast.plugin.scope_plugin.identifier_definition_marker import IdentifierDefinitionMarker
+from vint.ast.plugin.scope_plugin.identifier_classifier import IdentifierClassifier
 
 
 FIXTURE_BASE_PATH = Path('test', 'fixture', 'ast', 'scope_plugin')
@@ -24,9 +24,13 @@ class Fixtures(enum.Enum):
 
 class TestScopeAttacher(unittest.TestCase):
     def create_ast(self, file_path):
-        parser = Parser([IdentifierDefinitionMarker()])
+        parser = Parser()
         ast = parser.parse_file(file_path.value)
-        return ast
+
+        id_classifier = IdentifierClassifier()
+        attached_ast = id_classifier.attach_identifier_attributes(ast)
+
+        return attached_ast
 
 
     def create_variable(self, is_implicit=False, is_builtin=False):
