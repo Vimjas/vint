@@ -17,7 +17,7 @@ DeclarativeNodeTypes = {
 
 
 
-class ScopeAttacher(object):
+class ScopeLinker(object):
     class ScopeStore(object):
         def __init__(self):
             global_scope = self._create_scope(ScopeVisibility.GLOBAL_LIKE)
@@ -166,7 +166,7 @@ class ScopeAttacher(object):
 
     def process(self, ast):
         # TODO: add parent_scope
-        self.scope_store = ScopeAttacher.ScopeStore()
+        self.scope_store = ScopeLinker.ScopeStore()
 
         # We are already in script local scope.
         self.scope_store.enter_new_scope(ScopeVisibility.SCRIPT_LOCAL)

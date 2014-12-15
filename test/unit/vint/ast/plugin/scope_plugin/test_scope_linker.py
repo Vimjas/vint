@@ -3,7 +3,7 @@ import enum
 from pathlib import Path
 
 from vint.ast.parsing import Parser
-from vint.ast.plugin.scope_plugin.scope_attacher import ScopeAttacher, ScopeVisibility, SCOPE_TREE
+from vint.ast.plugin.scope_plugin.scope_linker import ScopeLinker, ScopeVisibility, SCOPE_TREE
 from vint.ast.plugin.scope_plugin.identifier_classifier import IdentifierClassifier
 
 
@@ -22,7 +22,7 @@ class Fixtures(enum.Enum):
     DESTRUCTURING_ASSIGNMENT = Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_destructuring_assignment.vim')
 
 
-class TestScopeAttacher(unittest.TestCase):
+class TestScopeLinker(unittest.TestCase):
     def create_ast(self, file_path):
         parser = Parser()
         ast = parser.parse_file(file_path.value)
@@ -50,7 +50,7 @@ class TestScopeAttacher(unittest.TestCase):
 
     def test_process_with_declaring_func(self):
         ast = self.create_ast(Fixtures.DECLARING_FUNC)
-        attacher = ScopeAttacher()
+        attacher = ScopeLinker()
 
         attacher.process(ast)
 
@@ -123,7 +123,7 @@ class TestScopeAttacher(unittest.TestCase):
 
     def test_process_with_declaring_func_in_func(self):
         ast = self.create_ast(Fixtures.DECLARING_FUNC_IN_FUNC)
-        attacher = ScopeAttacher()
+        attacher = ScopeLinker()
 
         attacher.process(ast)
 
@@ -172,7 +172,7 @@ class TestScopeAttacher(unittest.TestCase):
 
     def test_process_with_declaring_var(self):
         ast = self.create_ast(Fixtures.DECLARING_VAR)
-        attacher = ScopeAttacher()
+        attacher = ScopeLinker()
 
         attacher.process(ast)
 
@@ -205,7 +205,7 @@ class TestScopeAttacher(unittest.TestCase):
 
     def test_process_with_declaring_var_in_func(self):
         ast = self.create_ast(Fixtures.DECLARING_VAR_IN_FUNC)
-        attacher = ScopeAttacher()
+        attacher = ScopeLinker()
 
         attacher.process(ast)
 
@@ -239,7 +239,7 @@ class TestScopeAttacher(unittest.TestCase):
 
     def test_process_with_declaring_with_dict_key(self):
         ast = self.create_ast(Fixtures.DICT_KEY)
-        attacher = ScopeAttacher()
+        attacher = ScopeLinker()
 
         attacher.process(ast)
 
@@ -280,7 +280,7 @@ class TestScopeAttacher(unittest.TestCase):
 
     def test_process_with_destructuring_assignment(self):
         ast = self.create_ast(Fixtures.DESTRUCTURING_ASSIGNMENT)
-        attacher = ScopeAttacher()
+        attacher = ScopeLinker()
 
         attacher.process(ast)
 
@@ -304,7 +304,7 @@ class TestScopeAttacher(unittest.TestCase):
 
     def test_process_with_func_param(self):
         ast = self.create_ast(Fixtures.FUNC_PARAM)
-        attacher = ScopeAttacher()
+        attacher = ScopeLinker()
 
         attacher.process(ast)
 
@@ -421,7 +421,7 @@ class TestScopeAttacher(unittest.TestCase):
 
     def test_process_with_func_call(self):
         ast = self.create_ast(Fixtures.CALLING_FUNC)
-        attacher = ScopeAttacher()
+        attacher = ScopeLinker()
 
         attacher.process(ast)
 
@@ -439,7 +439,7 @@ class TestScopeAttacher(unittest.TestCase):
 
     def test_process_with_loop_var(self):
         ast = self.create_ast(Fixtures.LOOP_VAR)
-        attacher = ScopeAttacher()
+        attacher = ScopeLinker()
 
         attacher.process(ast)
 
