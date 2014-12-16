@@ -30,3 +30,6 @@ policies:
 
   ProhibitAbbreviationOption:
     enabled: yes
+
+  ProhibitAutocmdWithNoGroup:
+    enabled: yes
