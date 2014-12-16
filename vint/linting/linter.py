@@ -60,7 +60,6 @@ class Linter(object):
 
     def _create_parse_error(self, path, err_message):
         parser_error = self._parse_vimlparser_error(err_message)
-
         return {
             'name': 'SyntaxError',
             'level': Level.ERROR,
@@ -74,13 +73,31 @@ class Linter(object):
         }
 
 
+    def _create_unicode_error(self, path, err_message):
+        return {
+            'name': 'UnicodeDecodeError',
+            'level': Level.ERROR,
+            'description': err_message,
+            'reference': 'ynkdir/vim-vimlparser',
+            'position': {
+                'line': 0,
+                'column': 0,
+                'path': Path(path),
+            },
+        }
+
+
     def lint_file(self, path):
-        """ Lint the file and return the violations found. """
         try:
             root_ast = self._parser.parse_file(path)
         except VimLParserException as exception:
             parse_error = self._create_parse_error(path, str(exception))
             return [parse_error]
+        except UnicodeDecodeError as exception:
+            # TODO: Is this a good way? I think a vint error is better.
+            unicode_decode_error = self._create_unicode_error(path, str(exception))
+            return [unicode_decode_error]
+
 
         self._violations = []
         self._update_listeners_map()
