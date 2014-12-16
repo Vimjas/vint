@@ -24,3 +24,6 @@ policies:
 
   ProhibitMissingScriptEncoding:
     enabled: yes
+
+  ProhibitEncodingOptionAfterScriptEncoding:
+    enabled: yes
