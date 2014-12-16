@@ -12,6 +12,7 @@ from vint.linting.config.config_project_source import ConfigProjectSource
 from vint.linting.policy_set import PolicySet
 from vint.linting.formatter.formatter import Formatter
 from vint.linting.formatter.json_formatter import JSONFormatter
+from vint.linting.formatter.statistic_formatter import StatisticFormatter
 
 
 def main():
@@ -63,6 +64,7 @@ def _build_argparser():
     parser.add_argument('-m', '--max-violations', type=int, help='limit max violations count')
     parser.add_argument('-c', '--color', action='store_true', help='colorize output when possible')
     parser.add_argument('-j', '--json', action='store_true', help='output json style')
+    parser.add_argument('-t', '--stat', action='store_true', help='output statistic info')
     parser.add_argument('files', nargs='*', help='file or directory path to lint')
 
     return parser
@@ -114,6 +116,8 @@ def _get_formatter(config_dict):
     cmdargs = config_dict['cmdargs']
     if 'json' in cmdargs and cmdargs['json']:
         return JSONFormatter(config_dict)
+    elif 'stat' in cmdargs and cmdargs['stat']:
+        return StatisticFormatter(config_dict)
     else:
         return Formatter(config_dict)
 
