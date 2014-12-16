@@ -21,3 +21,6 @@ policies:
 
   ProhibitUsingUndeclaredVariable:
     enabled: yes
+
+  ProhibitMissingScriptEncoding:
+    enabled: yes
