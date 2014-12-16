@@ -27,3 +27,6 @@ policies:
 
   ProhibitEncodingOptionAfterScriptEncoding:
     enabled: yes
+
+  ProhibitAbbreviationOption:
+    enabled: yes

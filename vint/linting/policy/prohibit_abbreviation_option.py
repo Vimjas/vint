@@ -36,6 +36,11 @@ class ProhibitAbbreviationOption(AbstractPolicy):
         if node_type is NodeType.EXCMD:
             cmd_str = node['str']
             matched = re.match(r':*set?\s+([a-z]+)', cmd_str)
+            is_set_cmd = bool(matched)
+
+            if not is_set_cmd:
+                return True
+
             option_name = matched.group(1)
             return option_name not in AbbreviationsIncludingInvertPrefix
         else:
