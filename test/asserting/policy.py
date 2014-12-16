@@ -1,5 +1,6 @@
 import unittest
 from pathlib import Path
+from pprint import pprint
 from compat.itertools import zip_longest
 from vint.linting.linter import Linter
 
@@ -52,8 +53,7 @@ class PolicyAssertion(unittest.TestCase):
         linter = Linter(policy_set, config.get_config_dict())
         violations = linter.lint_file(path)
 
-        self.assertEqual(len(violations), len(expected_violations),
-                         'Expected number of violations found')
+        assert len(violations) == len(expected_violations)
 
         for violation, expected_violation in zip_longest(violations, expected_violations):
             self.assertViolation(violation, expected_violation)
@@ -62,6 +62,8 @@ class PolicyAssertion(unittest.TestCase):
     def assertViolation(self, actual_violation, expected_violation):
         self.assertIsNot(actual_violation, None)
         self.assertIsNot(expected_violation, None)
+
+        pprint(actual_violation)
 
         self.assertEqual(actual_violation['name'], expected_violation['name'],
                          'Expected violation name was returned')

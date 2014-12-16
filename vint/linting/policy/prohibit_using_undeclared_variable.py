@@ -6,7 +6,7 @@ from vint.ast.plugin.scope_plugin import ScopePlugin, DeclarationScope
 from vint.linting.policy_loader import register_policy
 
 
-@register_policy
+# @register_policy
 class ProhibitUsingUndeclaredVariable(AbstractPolicy):
     identifier_tracability_map = {
         DeclarationScope.GLOBAL: False,

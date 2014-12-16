@@ -19,5 +19,20 @@ policies:
   ProhibitUnnecessaryDoubleQuote:
     enabled: yes
 
-  ProhibitUsingUndeclaredVariable:
+  # ProhibitUsingUndeclaredVariable:
+  #   enabled: no
+
+  ProhibitMissingScriptEncoding:
+    enabled: yes
+
+  ProhibitEncodingOptionAfterScriptEncoding:
+    enabled: yes
+
+  ProhibitAbbreviationOption:
+    enabled: yes
+
+  ProhibitAutocmdWithNoGroup:
+    enabled: yes
+
+  ProhibitSetNoCompatible:
     enabled: yes
