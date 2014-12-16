@@ -33,3 +33,6 @@ policies:
 
   ProhibitAutocmdWithNoGroup:
     enabled: yes
+
+  ProhibitSetNoCompatible:
+    enabled: yes
