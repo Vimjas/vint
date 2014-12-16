@@ -19,8 +19,8 @@ policies:
   ProhibitUnnecessaryDoubleQuote:
     enabled: yes
 
-  ProhibitUsingUndeclaredVariable:
-    enabled: yes
+  # ProhibitUsingUndeclaredVariable:
+  #   enabled: no
 
   ProhibitMissingScriptEncoding:
     enabled: yes

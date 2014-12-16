@@ -3,7 +3,7 @@ from pathlib import Path
 from vint.ast.parsing import Parser
 from vint.ast.traversing import traverse
 from vint.ast.node_type import NodeType
-from vint.ast.plugin.scope_plugin import ScopePlugin
+# from vint.ast.plugin.scope_plugin import ScopePlugin
 from vint.linting.config.config_container import ConfigContainer
 from vint.linting.config.config_dict_source import ConfigDictSource
 from vint.linting.config.config_comment_source import ConfigCommentSource
@@ -38,9 +38,9 @@ class Linter(object):
 
 
     def build_parser(self):
-        plugins = [ScopePlugin()]
+        # plugins = [ScopePlugin()]
 
-        parser = Parser(plugins)
+        parser = Parser()
         return parser
 
 
