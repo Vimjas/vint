@@ -1,4 +1,5 @@
 from vint.ast.node_type import NodeType
+from pprint import pprint
 
 SKIP_CHILDREN = 'SKIP_CHILDREN'
 
@@ -176,7 +177,7 @@ class UnknownNodeTypeException(BaseException):
 def for_each(func, nodes):
     """ Calls func for each the specified nodes. """
     for node in nodes:
-        func(node)
+        call_if_def(func, node)
 
 
 def call_if_def(func, node):
