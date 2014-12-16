@@ -27,7 +27,10 @@ class ProhibitAutocmdWithNoGroup(AbstractPolicy):
         autocmd family should be called with any groups.
         """
 
-        is_autocmd = node['ea']['cmd']['name'] == 'autocmd'
+        # noed.ea.cmd is empty when line jump command such as 1
+        cmd_name = node['ea']['cmd'].get('name', None)
+
+        is_autocmd = cmd_name == 'autocmd'
         if is_autocmd and not self.is_inside_of_augroup:
             matched = re.match(r'au(?:tocmd)?!?\s+(\S+)', node['str'])
 
@@ -38,7 +41,7 @@ class ProhibitAutocmdWithNoGroup(AbstractPolicy):
             has_no_group = matched.group(1) in AutoCmdEvents
             return not has_no_group
 
-        is_augroup = node['ea']['cmd']['name'] == 'augroup'
+        is_augroup = cmd_name == 'augroup'
         if is_augroup:
             matched = re.match(r'aug(?:roup)?\s+END', node['str'])
             is_augroup_end = bool(matched)
