@@ -17,6 +17,9 @@ class Parser(object):
         parser = extlib.vimlparser.VimLParser()
         ast = parser.parse(reader)
 
+        # TOPLEVEL does not have a pos, but we need pos for all nodes
+        ast['pos'] = {'col': 1, 'i': 0, 'lnum': 1}
+
         for plugin in self.plugins:
             plugin.process(ast)
 
