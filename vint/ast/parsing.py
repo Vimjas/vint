@@ -28,5 +28,5 @@ class Parser(object):
 
     def parse_file(self, file_path):
         """ Parse vim script file and return the AST. """
-        with file_path.open() as f:
+        with file_path.open('rb') as f:
             return self.parse(f.read())
