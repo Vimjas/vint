@@ -1,19 +1,39 @@
 import unittest
-import os
 from pathlib import Path
 import json
 import subprocess
 
 
 class TestCLI(unittest.TestCase):
+    def assertReturnedStdoutEqual(self, expected_stdout, cmd):
+        got_stdout = '(no stdout)'
+
+        try:
+            got_stdout = subprocess.check_output(cmd, universal_newlines=True)
+        except subprocess.CalledProcessError as err:
+            print('Got stderr: `{err_message}'.format(err_message=err.output))
+        finally:
+            print('Got stdout: `{stdout}`'.format(stdout=got_stdout))
+
+        self.assertEqual(expected_stdout, got_stdout)
+
+
     def test_exec_vint_with_valid_file_on_project_root(self):
         valid_file = str(Path('test', 'fixture', 'cli', 'valid1.vim'))
         cmd = ['vint', valid_file]
 
-        got_output = subprocess.check_output(cmd, universal_newlines=True)
+        expected_output = ''
+
+        self.assertReturnedStdoutEqual(expected_output, cmd)
+
+
+    def test_exec_vint_with_valid_file_encoded_cp932_on_project_root(self):
+        valid_file = str(Path('test', 'fixture', 'cli', 'valid-cp932.vim'))
+        cmd = ['vint', valid_file]
 
         expected_output = ''
-        self.assertEqual(got_output, expected_output)
+
+        self.assertReturnedStdoutEqual(expected_output, cmd)
 
 
     def test_exec_vint_with_invalid_file_on_project_root(self):
