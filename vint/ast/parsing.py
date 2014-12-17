@@ -2,6 +2,16 @@ import extlib.vimlparser
 import chardet
 
 
+class EncodingDetectionError(Exception):
+    def __init__(self, file_path):
+        self.file_path = file_path
+
+
+    def __str__(self):
+        return 'Cannot detect encoding (binary file?): {file_path}'.format(
+            file_path=str(self.file_path))
+
+
 class Parser(object):
     def __init__(self, plugins=None):
         """ Initialize Parser with the specified plugins.
@@ -33,6 +43,10 @@ class Parser(object):
             bytes_seq = f.read()
             encoding_hint = chardet.detect(bytes_seq)
 
-            utf8str = bytes_seq.decode(encoding_hint['encoding'])
+            encoding = encoding_hint['encoding']
+            if not encoding:
+                # Falsey means we cannot detect the encoding of the file.
+                raise EncodingDetectionError(file_path)
 
-            return self.parse(utf8str)
+            decoded = bytes_seq.decode(encoding)
+            return self.parse(decoded)
