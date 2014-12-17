@@ -1,4 +1,5 @@
 import extlib.vimlparser
+import chardet
 
 
 class Parser(object):
@@ -28,5 +29,10 @@ class Parser(object):
 
     def parse_file(self, file_path):
         """ Parse vim script file and return the AST. """
-        with file_path.open() as f:
-            return self.parse(f.read())
+        with file_path.open(mode='rb') as f:
+            bytes_seq = f.read()
+            encoding_hint = chardet.detect(bytes_seq)
+
+            utf8str = bytes_seq.decode(encoding_hint['encoding'])
+
+            return self.parse(utf8str)
