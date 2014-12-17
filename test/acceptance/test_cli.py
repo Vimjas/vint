@@ -6,7 +6,7 @@ import subprocess
 
 class TestCLI(unittest.TestCase):
     def assertReturnedStdoutEqual(self, expected_stdout, cmd):
-        got_stdout = None
+        got_stdout = '(no stdout)'
 
         try:
             got_stdout = subprocess.check_output(cmd, universal_newlines=True)
