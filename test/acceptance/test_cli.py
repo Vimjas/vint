@@ -1,5 +1,4 @@
 import unittest
-import os
 from pathlib import Path
 import json
 import subprocess
@@ -49,6 +48,21 @@ class TestCLI(unittest.TestCase):
         got_output = context_manager.exception.output
 
         self.assertTrue(got_output.startswith('vint error:'))
+
+
+    def test_exec_vint_with_stat_flag(self):
+        invalid_file = str(Path('test', 'fixture', 'cli', 'invalid1.vim'))
+        cmd = ['vint', '--stat', invalid_file]
+
+        with self.assertRaises(subprocess.CalledProcessError) as context_manager:
+            subprocess.check_output(cmd, universal_newlines=True)
+
+        got_output = context_manager.exception.output
+
+        expected_output_pattern = '{file_path}:1:13:'.format(file_path=invalid_file)
+        expected_stat_pattern = 'Total'
+        self.assertRegexpMatches(got_output, expected_output_pattern)
+        self.assertRegexpMatches(got_output, expected_stat_pattern)
 
 
     def test_exec_vint_with_json_flag(self):
