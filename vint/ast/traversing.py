@@ -1,5 +1,4 @@
 from vint.ast.node_type import NodeType
-from pprint import pprint
 
 SKIP_CHILDREN = 'SKIP_CHILDREN'
 
