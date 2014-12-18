@@ -5,14 +5,10 @@ from vint.ast.node_type import NodeType
 from vint.linting.policy_loader import register_policy
 
 
-PROHIBITED_COMMAND_PATTERNS = ('s/',
-                               'su/',
-                               'substitute/',
+PROHIBITED_COMMAND_PATTERNS = ('substitute',
                                '&',
                                '~',
-                               'sno/',
                                'snomagic',
-                               'sm/',
                                'smagic')
 
 
@@ -36,8 +32,8 @@ class ProhibitCommandWithUnintendedSideEffect(AbstractPolicy):
         This policy prohibit using `:s[ubstitute]` family.
         """
 
-        command = node['str']
-        is_prohibited_command = any(pattern in command
+        command = node['ea']['cmd']['name']
+        is_prohibited_command = any(pattern == command
                                     for pattern in PROHIBITED_COMMAND_PATTERNS)
 
         return not is_prohibited_command
