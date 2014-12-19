@@ -1,6 +1,7 @@
 import sys
 from argparse import ArgumentParser
 import pkg_resources
+import logging
 
 from vint.linting.linter import Linter
 from vint.linting.env import build_environment
@@ -14,22 +15,26 @@ from vint.linting.formatter.formatter import Formatter
 from vint.linting.formatter.json_formatter import JSONFormatter
 from vint.linting.formatter.statistic_formatter import StatisticFormatter
 
+LOG_FORMAT = 'vint %(levelname)s: %(message)s'
+
 
 def main():
     env = _build_env(sys.argv)
     config_dict = _build_config_dict(env)
     parser = _build_argparser()
 
+    _init_logger(config_dict)
+
     paths_to_lint = env['file_paths']
 
     if len(paths_to_lint) == 0:
-        print('vint error: nothing to lint\n')
+        logging.error('nothing to check')
         parser.print_help()
         parser.exit(status=1)
 
     for path_to_lint in paths_to_lint:
         if not path_to_lint.exists() or not path_to_lint.is_file():
-            print('vint error: no such file: `{path}`\n'.format(
+            logging.error('no such file or directory: `{path}`'.format(
                 path=str(path_to_lint)))
             parser.exit(status=1)
 
@@ -40,6 +45,14 @@ def main():
 
     _print_violations(violations, config_dict)
     parser.exit(status=1)
+
+
+def _init_logger(config_dict):
+    cmdargs = config_dict['cmdargs']
+
+    log_level = logging.DEBUG if 'verbose' in cmdargs else logging.WARNING
+
+    logging.basicConfig(format=LOG_FORMAT, level=log_level)
 
 
 def _build_config_dict(env):
