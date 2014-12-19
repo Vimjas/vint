@@ -50,7 +50,8 @@ def main():
 def _init_logger(config_dict):
     cmdargs = config_dict['cmdargs']
 
-    log_level = logging.DEBUG if 'verbose' in cmdargs else logging.WARNING
+    is_verbose = cmdargs.get('verbose', False)
+    log_level = logging.DEBUG if is_verbose else logging.WARNING
 
     logging.basicConfig(format=LOG_FORMAT, level=log_level)
 
