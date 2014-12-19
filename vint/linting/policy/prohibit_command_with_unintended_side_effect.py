@@ -32,7 +32,7 @@ class ProhibitCommandWithUnintendedSideEffect(AbstractPolicy):
         This policy prohibit using `:s[ubstitute]` family.
         """
 
-        command = node['ea']['cmd']['name']
+        command = node['ea']['cmd'].get('name', None)
         is_prohibited_command = any(pattern == command
                                     for pattern in PROHIBITED_COMMAND_PATTERNS)
 
