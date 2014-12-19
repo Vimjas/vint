@@ -1,6 +1,10 @@
 import os
 import os.path
+import re
+import logging
 from pathlib import Path
+
+VIM_SCRIPT_FILE_NAME_PATTERNS = r'(?:[\._]g?vimrc|.*\.vim$)'
 
 
 def build_environment(cmdargs):
@@ -35,8 +39,18 @@ def _collect_files(paths):
             dir_path = path
             result |= _collect_files(tuple(dir_path.iterdir()))
 
-        else:
+        elif _is_vim_script(path):
             file_path = path
             result.add(file_path)
 
+        else:
+            logging.debug('ignore not Vim script file: `{file_path}`'.format(
+                file_path=str(path)))
+
     return result
+
+
+def _is_vim_script(path):
+    file_name = path.name
+
+    return bool(re.search(VIM_SCRIPT_FILE_NAME_PATTERNS, file_name))
