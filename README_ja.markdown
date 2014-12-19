@@ -6,28 +6,28 @@
 [![Supported Python implementations](https://pypip.in/implementation/vim-vint/badge.svg)](https://pypi.python.org/pypi/vim-vint/)
 [![Build Status](https://travis-ci.org/Kuniwak/vint.svg?branch=master)](https://travis-ci.org/Kuniwak/vint)
 
-Vint is a Vim script Language Lint.
-The goal to reach for vint is:
+Vint は Vim script のための lint ツールです。
+下のような lint を目指しています：
 
-- Highly extensible lint
-- Highly customizable lint
-- High performance lint
+- 拡張性の高い lint
+- 設定が柔軟にできる lint
+- 高速に動作する lint
 
-**But now, Vint is under development. We hope you develop a policy to help us.**
+**Vint はまだ開発中なため安定していません。lint ルールの実装などにぜひ協力してください！**
 
 
-Quick start
------------
+インストール
+------------
 
-You can install with [pip](https://pip.pypa.io/en/latest/).
+pip でインストールします。
 
 	$ pip install vim-vint
 
 
-Configure
----------
+設定
+----
 
-vint will read config files on the following priority order:
+Vint は以下の優先順位で設定を読み込みます：
 
 - [User config](#user-config):
   - e.g. `~/.vintrc.yaml`
@@ -44,7 +44,7 @@ vint will read config files on the following priority order:
 
 ### User config
 
-You can configure global vint config by `~/.vintrc.yaml` as following:
+`~/.vintrc.yaml` に、プロジェクトに依らない vint の設定を記述できます:
 
 ```yaml
 cmdargs:
@@ -67,7 +67,7 @@ policies:
 
 ### Project config
 
-You can configure project local vint config by `.vintrc.yaml` as following:
+`.vintrc.yaml` に、プロジェクト固有の vint の設定を記述できます:
 
 ```yaml
 cmdargs:
@@ -90,14 +90,15 @@ policies:
 
 ### Command line config
 
-You can configure linting severity, max errors, ... as following:
+コマンドライン引数から、彩色オプションや警告レベル等を制御できます:
 
 	$ vint --color --style ~/.vimrc
 
 
 ### Comment config
 
-You can enable/disable linting policies by a comment as following:
+lint ルールの有効化/無効化をコメントからおこなうことができます。
+
 
 ```viml
 " vint: -ProhibitAbbreviationOption
@@ -115,25 +116,24 @@ let &cpo = s:save_cpo
 unlet s:save_cpo
 ```
 
-This syntax is: `" vint: [+-]<PolicyName> [+-]<PolicyName> ...`
+この構文規則は次の通りです: `" vint: [+-]<PolicyName> [+-]<PolicyName> ...`
 
 
-Code health
------------
+コードヘルス
+------------
 
 [![Coverage Status](https://img.shields.io/coveralls/Kuniwak/vint.svg)](https://coveralls.io/r/Kuniwak/vint)
 [![Code Health](https://landscape.io/github/Kuniwak/vint/master/landscape.png)](https://landscape.io/github/Kuniwak/vint/master)
 
 
-License
--------
+ライセンス
+----------
 
 [MIT](http://orgachem.mit-license.org/)
 
 
-
-Acknowledgement
----------------
+謝辞
+----
 
 * [ynkdir/vim-vimlparser](https://github.com/ynkdir/vim-vimlparser)
 * [Google Vimscript Style Guide](http://google-styleguide.googlecode.com/svn/trunk/vimscriptguide.xml?showone=Catching_Exceptions#Catching_Exceptions)
