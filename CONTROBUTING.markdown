@@ -101,11 +101,8 @@ How to Add New Policy
 		$ pyenv local 2.7.8 3.4.1 pypy-2.4.0
 		$ tox
 
-	If you want to test by py.test or the default unittest module,
-	you should add `vint/bin` to `$PATH` to make acceptance tests pass.
+	If you want to test by py.test, you should add `vint/bin` to `$PATH`
+	to make acceptance tests pass.
 
 		$ pip install -r requirements.txt -r test-requirements.txt`
-
-	or 
-
 		$ PATH="./bin:$PATH" py.test test`
