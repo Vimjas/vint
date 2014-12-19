@@ -1,6 +1,6 @@
 import re
 from pathlib import Path
-from vint.ast.parsing import Parser
+from vint.ast.parsing import Parser, EncodingDetectionError
 from vint.ast.traversing import traverse
 from vint.ast.node_type import NodeType
 # from vint.ast.plugin.scope_plugin import ScopePlugin
@@ -75,10 +75,10 @@ class Linter(object):
 
     def _create_unicode_error(self, path, err_message):
         return {
-            'name': 'UnicodeDecodeError',
+            'name': 'EncodingDetectionError',
             'level': Level.ERROR,
             'description': err_message,
-            'reference': 'ynkdir/vim-vimlparser',
+            'reference': 'no reference',
             'position': {
                 'line': 0,
                 'column': 0,
@@ -93,7 +93,7 @@ class Linter(object):
         except VimLParserException as exception:
             parse_error = self._create_parse_error(path, str(exception))
             return [parse_error]
-        except UnicodeDecodeError as exception:
+        except EncodingDetectionError as exception:
             # TODO: Is this a good way? I think a vint error is better.
             unicode_decode_error = self._create_unicode_error(path, str(exception))
             return [unicode_decode_error]
