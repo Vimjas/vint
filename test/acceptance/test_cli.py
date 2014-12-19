@@ -87,12 +87,13 @@ class TestCLI(unittest.TestCase):
         cmd = ['vint', '--json', invalid_file]
 
         with self.assertRaises(subprocess.CalledProcessError) as context_manager:
+            # We should not capture STRERR because coverage plugin use it.
             subprocess.check_output(cmd,
-                                    stderr=subprocess.STDOUT,
                                     universal_newlines=True)
 
         got_output = context_manager.exception.output
 
+        print(got_output)
         self.assertIsInstance(json.loads(got_output), list)
 
 
