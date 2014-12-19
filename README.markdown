@@ -49,7 +49,7 @@ You can configure global vint config by `~/.vintrc.yaml` as following:
 ```yaml
 cmdargs:
   # Checking more strictly
-  severity: style
+  severity: style_problem
 
   # Enable coloring
   color: true
@@ -72,7 +72,7 @@ You can configure project local vint config by `.vintrc.yaml` as following:
 ```yaml
 cmdargs:
   # Checking more strictly
-  severity: style
+  severity: style_problem
 
   # Enable coloring
   color: true

@@ -49,7 +49,7 @@ Vint は以下の優先順位で設定を読み込みます：
 ```yaml
 cmdargs:
   # Checking more strictly
-  severity: style
+  severity: style_problem
 
   # Enable coloring
   color: true
@@ -72,7 +72,7 @@ policies:
 ```yaml
 cmdargs:
   # Checking more strictly
-  severity: style
+  severity: style_problem
 
   # Enable coloring
   color: true
