@@ -1,0 +1,3 @@
+[submodule "vital.vim"]
+	path = vital.vim
+	url = https://github.com/vim-jp/vital.vim
