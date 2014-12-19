@@ -1,4 +1,4 @@
-![logo](https://raw.githubusercontent.com/Kuniwak/vint/logo/logo.svg)
+![logo](https://raw.githubusercontent.com/Kuniwak/vint/logo/logo.png)
 
 [![Development Status](https://pypip.in/status/vim-vint/badge.svg)](https://pypi.python.org/pypi/vim-vint/)
 [![Latest Version](https://pypip.in/version/vim-vint/badge.svg)](https://pypi.python.org/pypi/vim-vint/)
