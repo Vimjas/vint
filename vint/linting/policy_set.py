@@ -84,7 +84,7 @@ def import_all_policies():
     for loader, module_name, is_pkg in pkgutil.iter_modules([pkg_path]):
         if not is_pkg:
             module_fqn = pkg_name + '.' + module_name
-            logging.info('Loading the policy module `{fqn}`'.format(fqn=module_fqn))
+            logging.debug('Loading the policy module: `{fqn}`'.format(fqn=module_fqn))
             importlib.import_module(module_fqn)
 
 

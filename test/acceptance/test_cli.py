@@ -126,7 +126,7 @@ class TestCLI(unittest.TestCase):
                                              universal_newlines=True,
                                              stderr=subprocess.STDOUT)
 
-        expected_output_pattern = r'^vint INFO:'
+        expected_output_pattern = r'^vint DEBUG:'
         self.assertRegex(got_output, expected_output_pattern)
 
 
