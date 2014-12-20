@@ -1,6 +1,6 @@
 import re
 
-VIM_SCRIPT_FILE_NAME_PATTERNS = r'(?:^[\._]g?vimrc|.*\.vim$)'
+VIM_SCRIPT_FILE_NAME_PATTERNS = r'(?:^[\._]g?vimrc$|.*\.vim$)'
 
 
 def find_vim_script(file_paths):
