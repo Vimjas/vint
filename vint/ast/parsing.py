@@ -49,4 +49,7 @@ class Parser(object):
                 raise EncodingDetectionError(file_path)
 
             decoded = bytes_seq.decode(encoding)
-            return self.parse(decoded)
+
+            decoded_and_lf_normalized = decoded.replace('\r\n', '\n')
+
+            return self.parse(decoded_and_lf_normalized)
