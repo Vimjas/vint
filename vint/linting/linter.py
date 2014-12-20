@@ -1,4 +1,5 @@
 import re
+import logging
 from pathlib import Path
 from vint.ast.parsing import Parser, EncodingDetectionError
 from vint.ast.traversing import traverse
@@ -87,7 +88,14 @@ class Linter(object):
         }
 
 
+    def _log_file_path_to_lint(self, file_path):
+        msg = 'checking: `{file_path}`'.format(file_path=file_path)
+        logging.debug(msg)
+
+
     def lint_file(self, path):
+        self._log_file_path_to_lint(path)
+
         try:
             root_ast = self._parser.parse_file(path)
         except VimLParserException as exception:
