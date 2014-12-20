@@ -38,8 +38,7 @@ class Formatter(object):
         line_number = lambda violation: violation['position']['line']
         sorted_violations = sorted(violations, key=line_number)
 
-        formatted_lines = map(lambda violation: self.format_violation(violation),
-                              sorted_violations)
+        formatted_lines = map(self.format_violation, sorted_violations)
 
         return '\n'.join(formatted_lines)
 
