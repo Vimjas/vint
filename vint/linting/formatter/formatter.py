@@ -1,6 +1,5 @@
 from pathlib import Path
 from ansicolor import Colors, colorize
-from operator import attrgetter
 
 
 DEFAULT_FORMAT = '{file_path}:{line_number}:{column_number}: {description} (see {reference})'
