@@ -34,10 +34,13 @@ class Formatter(object):
             self._should_be_colorized = False
 
 
-    def format_violations(self, violations):
-        line_number = lambda violation: violation['position']['line']
-        sorted_violations = sorted(violations, key=line_number)
+    def _sort_violations(self, violations):
+        return sorted(violations, key=lambda violation: (violation['position']['path'],
+                                                         violation['position']['line']))
 
+
+    def format_violations(self, violations):
+        sorted_violations = self._sort_violations(violations)
         formatted_lines = map(self.format_violation, sorted_violations)
 
         return '\n'.join(formatted_lines)
