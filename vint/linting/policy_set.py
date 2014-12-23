@@ -48,11 +48,21 @@ class PolicySet(object):
                 self._warn_unexistent_policy(policy_name)
                 continue
 
-            if policy_config['enabled']:
+            is_policy_enabled = policy_config['enabled']
+
+            if is_policy_enabled:
                 enabled_policy = self._get_policy(policy_name)
                 self.enabled_policies.append(enabled_policy)
+
+            self._log_policy_status(policy_name, is_policy_enabled)
 
 
     def get_enabled_policies(self):
         """ Returns enabled policies. """
         return self.enabled_policies
+
+
+    def _log_policy_status(self, policy_name, enabled):
+        status = 'enabled' if enabled else 'disabled'
+        logging.debug('{status}: {policy_name}'.format(status=status,
+                                                       policy_name=policy_name))
