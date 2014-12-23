@@ -140,7 +140,13 @@ class CLI(object):
 
 
     def _get_version(self):
-        version = pkg_resources.require('vim-vint')[0].version
+        # In unit tests, pkg_resources cannot find vim-vint.
+        # So, I decided to return dummy version
+        try:
+            version = pkg_resources.require('vim-vint')[0].version
+        except pkg_resources.DistributionNotFound:
+            version = 'test_mode'
+
         return version
 
 
