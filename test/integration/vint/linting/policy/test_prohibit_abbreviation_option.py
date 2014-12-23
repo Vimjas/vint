@@ -13,7 +13,7 @@ class TestProhibitAbbreviationOption(PolicyAssertion, unittest.TestCase):
     def create_violation(self, line_number, col_number, path):
         return {
             'name': 'ProhibitAbbreviationOption',
-            'level': Level.WARNING,
+            'level': Level.STYLE_PROBLEM,
             'position': {
                 'line': line_number,
                 'column': col_number,

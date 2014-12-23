@@ -15,7 +15,7 @@ class ProhibitAbbreviationOption(AbstractPolicy):
         super(ProhibitAbbreviationOption, self).__init__()
         self.description = 'Use a full option name instead of the abbreviation'
         self.reference = ':help option-summary'
-        self.level = Level.WARNING
+        self.level = Level.STYLE_PROBLEM
 
         self.was_scriptencoding_found = False
         self.has_encoding_opt_after_scriptencoding = False

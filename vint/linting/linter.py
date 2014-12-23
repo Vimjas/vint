@@ -166,7 +166,7 @@ class Linter(object):
         config = self._config
 
         config_dict = config.get_config_dict()
-        policy_set.update_by_config(config_dict['policies'])
+        policy_set.update_by_config(config_dict)
 
 
     def _update_listeners_map(self):
