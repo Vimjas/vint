@@ -74,9 +74,9 @@ class Linter(object):
         }
 
 
-    def _create_unicode_error(self, path, err_message):
+    def _create_decoding_error(self, path, err_message):
         return {
-            'name': 'EncodingDetectionError',
+            'name': 'DecodingError',
             'level': Level.ERROR,
             'description': err_message,
             'reference': 'no reference',
@@ -102,9 +102,8 @@ class Linter(object):
             parse_error = self._create_parse_error(path, str(exception))
             return [parse_error]
         except EncodingDetectionError as exception:
-            # TODO: Is this a good way? I think a vint error is better.
-            unicode_decode_error = self._create_unicode_error(path, str(exception))
-            return [unicode_decode_error]
+            decoding_error = self._create_decoding_error(path, str(exception))
+            return [decoding_error]
 
 
         self._violations = []
