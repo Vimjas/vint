@@ -19,10 +19,11 @@ from vint.linting.formatter.statistic_formatter import StatisticFormatter
 class CLI(object):
     def start(self):
         env = self._build_env(sys.argv)
-        config_dict = self._build_config_dict(env)
-
         self._validate(env)
 
+        self._adjust_log_level(env)
+
+        config_dict = self._build_config_dict(env)
         violations = self._lint_all(env, config_dict)
 
         if len(violations) == 0:
@@ -140,3 +141,13 @@ class CLI(object):
     def _get_version(self):
         version = pkg_resources.require('vim-vint')[0].version
         return version
+
+
+    def _adjust_log_level(self, env):
+        cmdargs = env['cmdargs']
+
+        is_verbose = cmdargs.get('verbose', False)
+        log_level = logging.DEBUG if is_verbose else logging.WARNING
+
+        logger = logging.getLogger()
+        logger.setLevel(log_level)
