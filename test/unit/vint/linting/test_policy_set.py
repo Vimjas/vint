@@ -1,30 +1,20 @@
-from unittest import main, skip, TestCase
+from unittest import main, TestCase
 from compat.unittest import mock
-from vint.linting.policy_loader import get_policy_class_map
-from vint.linting.policy_set import PolicySet, import_all_policies
+from vint.bootstrap import import_all_policies
+from vint.linting.policy_set import PolicySet
 
-PACKAGE_NAME_GETTER = 'vint.linting.policy_set._get_policy_package_name_for_test'
+PACKAGE_NAME_GETTER = 'vint.bootstrap._get_policy_package_name_for_test'
 FIXTURE_PACKAGE_NAME = 'test.fixture.policy_set'
 
 
 class TestPolicySet(TestCase):
-    @skip('This test is very fragile because it depends to run sequence')
-    @mock.patch(PACKAGE_NAME_GETTER, lambda: FIXTURE_PACKAGE_NAME)
-    def test_import_all_policies(self):
-        """ Expect policy classes to be imported. """
-        policy_class_map_before_importing = get_policy_class_map()
-        self.assertNotIn('PolicyFixture1', policy_class_map_before_importing)
-        self.assertNotIn('PolicyFixture2', policy_class_map_before_importing)
-
-        import_all_policies()
-
-        policy_class_map_after_imported = get_policy_class_map()
-        self.assertIn('PolicyFixture1', policy_class_map_after_imported)
-        self.assertIn('PolicyFixture2', policy_class_map_after_imported)
-
-
+    @classmethod
     # Mock policy package directory
     @mock.patch(PACKAGE_NAME_GETTER, lambda: FIXTURE_PACKAGE_NAME)
+    def setUpClass(cls):
+        import_all_policies()
+
+
     def test_get_enabled_policies_when_no_updated(self):
         policy_set = PolicySet()
 
@@ -33,8 +23,6 @@ class TestPolicySet(TestCase):
                          'Expect all policies to be disabled')
 
 
-    # Mock policy package directory
-    @mock.patch(PACKAGE_NAME_GETTER, lambda: FIXTURE_PACKAGE_NAME)
     def test_get_enabled_policies(self):
         policy_enabling_map_to_enable_policy1 = {
             'PolicyFixture1': {
