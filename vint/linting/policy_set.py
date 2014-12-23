@@ -1,5 +1,5 @@
 import logging
-from vint.linting.policy_loader import get_policy_class_map
+from vint.linting.policy_registry import get_policy_class_map
 
 
 class PolicySet(object):

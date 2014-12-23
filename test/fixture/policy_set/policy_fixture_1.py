@@ -1,4 +1,4 @@
-from vint.linting.policy_loader import register_policy
+from vint.linting.policy_registry import register_policy
 
 
 @register_policy

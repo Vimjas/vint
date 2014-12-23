@@ -2,7 +2,7 @@ import re
 from vint.ast.node_type import NodeType
 from vint.linting.level import Level
 from vint.linting.policy.abstract_policy import AbstractPolicy
-from vint.linting.policy_loader import register_policy
+from vint.linting.policy_registry import register_policy
 
 
 @register_policy
