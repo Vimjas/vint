@@ -26,8 +26,9 @@ class CLI(object):
         config_dict = self._build_config_dict(env)
         violations = self._lint_all(env, config_dict)
 
+        parser = self._build_argparser()
+
         if len(violations) == 0:
-            parser = self._build_argparser()
             parser.exit(status=0)
 
         self._print_violations(violations, config_dict)
