@@ -1,5 +1,4 @@
-Vint
-====
+![logo](https://raw.githubusercontent.com/Kuniwak/vint/logo/logo.png)
 
 [![Development Status](https://pypip.in/status/vim-vint/badge.svg)](https://pypi.python.org/pypi/vim-vint/)
 [![Latest Version](https://pypip.in/version/vim-vint/badge.svg)](https://pypi.python.org/pypi/vim-vint/)
@@ -7,7 +6,12 @@ Vint
 [![Supported Python implementations](https://pypip.in/implementation/vim-vint/badge.svg)](https://pypi.python.org/pypi/vim-vint/)
 [![Build Status](https://travis-ci.org/Kuniwak/vint.svg?branch=master)](https://travis-ci.org/Kuniwak/vint)
 
-Vint is a faster and highly extensible Vim script Language Lint.
+Vint is a Vim script Language Lint.
+The goal to reach for vint is:
+
+- Highly extensible lint
+- Highly customizable lint
+- High performance lint
 
 **But now, Vint is under development. We hope you develop a policy to help us.**
 
@@ -15,96 +19,103 @@ Vint is a faster and highly extensible Vim script Language Lint.
 Quick start
 -----------
 
-You can install with [pip](https://pip.pypa.io/en/latest/): `pip install vim-vint`
+You can install with [pip](https://pip.pypa.io/en/latest/).
+
+	$ pip install vim-vint
 
 
-How to Add New Policy
----------------------
+Configure
+---------
 
-1. Write both valid/invalid Vim scripts to check
+vint will read config files on the following priority order:
 
-	Write both valid/invalid Vim scripts and put its to the fixture directory as `test/fixture/policy/policyname_valid.vim`.
+- [User config](#user-config):
+  - e.g. `~/.vintrc.yaml`
 
+- [Project config](#project-config):
+  - e.g. `path/to/proj/.vintrc.yaml`
 
-2. Write a test code
+- [Command line config](#command-line-config):
+  - e.g. `$ vint --error`, `$ vint --max-violations 10`
 
-	You can test easily by using `test.asserting.policy.PolicyAssertion`.
-
-	```python
-	import unittest
-	from test.asserting.policy import PolicyAssertion
-	from test.asserting.policy import get_fixture_path
-
-	from lib.linting.level import Levels
-	from lib.linting.policy.my_policy import MyPolicy
-
-	PATH_VALID_VIM_SCRIPT = get_fixture_path('my_policy_valid.vim')
-	PATH_INVALID_VIM_SCRIPT = get_fixture_path('my_policy_invalid.vim')
+- [Comment config](#comment-config) (highest priority):
+  - e.g. `" vint: -ProhibitAbbreviationOption +ProhibitSetNoCompatible`
 
 
-	class TestMyPolicy(PolicyAssertion, unittest.TestCase):
-		def test_lint_valid_file(self):
-			self.assertFoundNoViolations(PATH_VALID_VIM_SCRIPT, MyPolicy)
+### User config
+
+You can configure global vint config by `~/.vintrc.yaml` as following:
+
+```yaml
+cmdargs:
+  # Checking more strictly
+  severity: style_problem
+
+  # Enable coloring
+  color: true
+
+policies:
+  # Disable a violation
+  ProhibitSomethingEvil:
+    enabled: false
+
+  # Enable a violation
+  ProhibitSomethingBad:
+    enabled: true
+```
 
 
-		def test_lint_invalid_file(self):
-			expected_violations = [
-				{
-					'name': 'MyPolicy',
-					'level': Levels['WARNING'],
-					'position': {
-						'line': 2,
-						'column': 6,
-						'path': PATH_INVALID_VIM_SCRIPT
-					},
-				},
-				{
-					'name': 'MyPolicy',
-					'level': Levels['WARNING'],
-					'position': {
-						'line': 3,
-						'column': 6,
-						'path': PATH_INVALID_VIM_SCRIPT
-					},
-				},
-			]
+### Project config
 
-			self.assertFoundViolationsEqual(PATH_VALID_VIM_SCRIPT, MyPolicy, expected_violations)
+You can configure project local vint config by `.vintrc.yaml` as following:
 
-	if __name__ == '__main__':
-		unittest.main()
-	```
+```yaml
+cmdargs:
+  # Checking more strictly
+  severity: style_problem
+
+  # Enable coloring
+  color: true
+
+policies:
+  # Disable a violation
+  ProhibitSomethingEvil:
+    enabled: false
+
+  # Enable a violation
+  ProhibitSomethingBad:
+    enabled: true
+```
 
 
-3. Write a policy code
+### Command line config
 
-	You should inherit `lib.linting.policy.AbstractPolicy` and implement 2 methods;
+You can configure linting severity, max errors, ... as following:
 
-	* `is_valid(Node: ast_node, Environment: env): Boolean`
-
-		This method should return whether the given node is valid for the policy as Boolean.
-		And you can use an environment that has `root_ast: Node` and `file_path: String` to
-		special lint.
-
-	* `listen_node_type(): NodeType[]`
-
-		This method should return listened `NodeType` such as `NodeType.STRING`.
-		Use `NodeType.TOPLEVEL` if you need to lint only once.
+	$ vint --color --style ~/.vimrc
 
 
-4. Run the test
+### Comment config
 
-	You can test by [tox](https://tox.readthedocs.org/en/latest/) or [py.test](http://pytest.org/latest/) or the default unittest module.
+You can enable/disable linting policies by a comment as following:
 
-	There are test command examples;
+```viml
+" vint: -ProhibitAbbreviationOption
 
-	* `$ tox`
+let s:save_cpo = &cpo
+set cpo&vim
 
-	If you want to test by py.test or the default unittest module,
-	you should add `vint/bin` to `$PATH` to make acceptance tests pass.
+" vint: +ProhibitAbbreviationOption
 
-	* `$ PATH="./bin:$PATH" py.test test`
-	* `$ PATH="./bin:$PATH" python -m unittest discover test`
+" do something...
+
+" vint: -ProhibitAbbreviationOption
+
+let &cpo = s:save_cpo
+unlet s:save_cpo
+```
+
+This syntax is: `" vint: [+-]<PolicyName> [+-]<PolicyName> ...`
 
 
 Code health

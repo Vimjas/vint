@@ -3,7 +3,7 @@ from vint.ast.node_type import NodeType
 from vint.linting.level import Level
 from vint.linting.policy.abstract_policy import AbstractPolicy
 from vint.linting.policy.reference.googlevimscriptstyleguide import get_reference_source
-from vint.linting.policy_loader import register_policy
+from vint.linting.policy_registry import register_policy
 
 
 PROHIBITED_COMMAND_PATTERN = re.compile(r'norm(al)?\s|'
@@ -14,7 +14,7 @@ PROHIBITED_COMMAND_PATTERN = re.compile(r'norm(al)?\s|'
 class ProhibitCommandRelyOnUser(AbstractPolicy):
     def __init__(self):
         super(ProhibitCommandRelyOnUser, self).__init__()
-        self.description = 'Prefer single quoted strings'
+        self.description = 'Avoid commands that rely on user settings'
         self.reference = get_reference_source('FRAGILE')
         self.level = Level.WARNING
 

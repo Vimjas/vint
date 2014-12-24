@@ -53,8 +53,10 @@ class TestLinterIntegral(unittest.TestCase):
             return self._enabled_policies
 
 
-        def update_by_config(self, policy_enabling_map):
+        def update_by_config(self, config_dict):
             self._enabled_policies = []
+
+            policy_enabling_map = config_dict['policies']
 
             if policy_enabling_map['StubPolicy1']['enabled']:
                 self._enabled_policies.append(TestLinterIntegral.StubPolicy1())

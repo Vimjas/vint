@@ -1,0 +1,3 @@
+[submodule "test/fixture/cli/vital.vim"]
+	path = test/fixture/cli/vital.vim
+	url = https://github.com/vim-jp/vital.vim

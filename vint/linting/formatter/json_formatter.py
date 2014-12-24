@@ -16,8 +16,7 @@ class JSONFormatter(object):
         line_number = lambda violation: violation['position']['line']
         sorted_violations = sorted(violations, key=line_number)
 
-        normalized_violations = map(lambda violation: self._normalize_violation(violation),
-                                    sorted_violations)
+        normalized_violations = map(self._normalize_violation, sorted_violations)
 
         return list(normalized_violations)
 

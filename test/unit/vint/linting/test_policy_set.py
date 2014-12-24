@@ -1,30 +1,18 @@
-from unittest import main, skip, TestCase
+from unittest import main, TestCase
 from compat.unittest import mock
-from vint.linting.policy_loader import get_policy_class_map
-from vint.linting.policy_set import PolicySet, import_all_policies
+from pprint import pprint
+from vint.linting.policy_set import PolicySet
+from vint.linting.level import Level
 
-PACKAGE_NAME_GETTER = 'vint.linting.policy_set._get_policy_package_name_for_test'
-FIXTURE_PACKAGE_NAME = 'test.fixture.policy_set'
+from test.fixture.policy_set.policy_fixture_1 import PolicyFixture1
+from test.fixture.policy_set.policy_fixture_2 import PolicyFixture2
 
 
+@mock.patch('vint.linting.policy_registry.get_policy_class_map', lambda: {
+    'PolicyFixture1': PolicyFixture1,
+    'PolicyFixture2': PolicyFixture2,
+})
 class TestPolicySet(TestCase):
-    @skip('This test is very fragile because it depends to run sequence')
-    @mock.patch(PACKAGE_NAME_GETTER, lambda: FIXTURE_PACKAGE_NAME)
-    def test_import_all_policies(self):
-        """ Expect policy classes to be imported. """
-        policy_class_map_before_importing = get_policy_class_map()
-        self.assertNotIn('PolicyFixture1', policy_class_map_before_importing)
-        self.assertNotIn('PolicyFixture2', policy_class_map_before_importing)
-
-        import_all_policies()
-
-        policy_class_map_after_imported = get_policy_class_map()
-        self.assertIn('PolicyFixture1', policy_class_map_after_imported)
-        self.assertIn('PolicyFixture2', policy_class_map_after_imported)
-
-
-    # Mock policy package directory
-    @mock.patch(PACKAGE_NAME_GETTER, lambda: FIXTURE_PACKAGE_NAME)
     def test_get_enabled_policies_when_no_updated(self):
         policy_set = PolicySet()
 
@@ -33,28 +21,84 @@ class TestPolicySet(TestCase):
                          'Expect all policies to be disabled')
 
 
-    # Mock policy package directory
-    @mock.patch(PACKAGE_NAME_GETTER, lambda: FIXTURE_PACKAGE_NAME)
-    def test_get_enabled_policies(self):
-        policy_enabling_map_to_enable_policy1 = {
-            'PolicyFixture1': {
-                'enabled': True,
+    def assertEnabledPolicies(self, expected_enabled_policy_classes, actual_enabled_policies):
+        actual_enabled_policy_classes = {enabled_policy_class: False
+                                         for enabled_policy_class
+                                         in expected_enabled_policy_classes}
+
+        for actual_enabled_policy in actual_enabled_policies:
+            actual_enabled_policy_classes[actual_enabled_policy.__class__] = True
+
+        pprint(actual_enabled_policy_classes)
+        assert all(actual_enabled_policy_classes.values())
+
+
+    def test_get_enabled_policies_with_a_disabled_option(self):
+        config_dict = {
+            'cmdargs': {
+                'severity': Level.WARNING,
             },
-            'PolicyFixture2': {
-                'enabled': False,
-            },
+            'policies': {
+                'PolicyFixture1': {
+                    'enabled': True,
+                },
+                'PolicyFixture2': {
+                    'enabled': False,
+                },
+            }
         }
 
         policy_set = PolicySet()
-        policy_set.update_by_config(policy_enabling_map_to_enable_policy1)
+        policy_set.update_by_config(config_dict)
 
-        expected_policy1_to_be_enabled = policy_set.get_enabled_policies()
-        self.assertEqual(len(expected_policy1_to_be_enabled), 1,
-                         'Expect number of enabled policies to equal 1')
+        actual_enabled_policies = policy_set.get_enabled_policies()
 
-        from test.fixture.policy_set.policy_fixture_1 import PolicyFixture1
-        self.assertIsInstance(expected_policy1_to_be_enabled[0], PolicyFixture1,
-                              'Expect policy1 to be enabled')
+        expected_enabled_policy_classes = [
+            PolicyFixture1,
+        ]
+
+        self.assertEnabledPolicies(expected_enabled_policy_classes, actual_enabled_policies)
+
+
+    def test_get_enabled_policies_with_severity_warning(self):
+        config_dict = {
+            'cmdargs': {
+                'severity': Level.WARNING,
+            },
+            'policies': {}
+        }
+
+        policy_set = PolicySet()
+        policy_set.update_by_config(config_dict)
+
+        actual_enabled_policies = policy_set.get_enabled_policies()
+
+        expected_enabled_policy_classes = [
+            PolicyFixture1,
+        ]
+
+        self.assertEnabledPolicies(expected_enabled_policy_classes, actual_enabled_policies)
+
+
+    def test_get_enabled_policies_with_severity_style_problem(self):
+        config_dict = {
+            'cmdargs': {
+                'severity': Level.STYLE_PROBLEM,
+            },
+            'policies': {}
+        }
+
+        policy_set = PolicySet()
+        policy_set.update_by_config(config_dict)
+
+        actual_enabled_policies = policy_set.get_enabled_policies()
+
+        expected_enabled_policy_classes = [
+            PolicyFixture1,
+            PolicyFixture2,
+        ]
+
+        self.assertEnabledPolicies(expected_enabled_policy_classes, actual_enabled_policies)
 
 
 if __name__ == '__main__':

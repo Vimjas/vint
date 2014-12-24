@@ -1,4 +1,5 @@
-PyYAML >= 3.11
-ansicolor >= 0.2.4
-enum34 >= 1.0.3
-pathlib >= 1.0.1
+PyYAML == 3.11
+ansicolor == 0.2.4
+enum34 == 1.0.3
+pathlib == 1.0.1
+chardet == 2.3.0

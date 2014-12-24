@@ -28,7 +28,7 @@ class TestProhibitCommandWithUnintendedSideEffect(PolicyAssertion, unittest.Test
 
     def test_get_violation_if_found_with_invalid_file(self):
         expected_violations = [self._create_violation_by_line_number(line_number)
-                               for line_number in range(1, 12)]
+                               for line_number in range(1, 14)]
 
         # Offset range token length
         expected_violations[3]['position']['column'] = 2

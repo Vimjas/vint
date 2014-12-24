@@ -2,22 +2,3 @@ cmdargs:
   verbose: no
   severity: warning
   error-limit: 50
-
-policies:
-  ProhibitCommandRelyOnUser:
-    enabled: yes
-
-  ProhibitCommandWithUnintendedSideEffect:
-    enabled: yes
-
-  ProhibitEqualTildeOperator:
-    enabled: yes
-
-  ProhibitNoAbortFunction:
-    enabled: yes
-
-  ProhibitUnnecessaryDoubleQuote:
-    enabled: yes
-
-  ProhibitUsingUndeclaredVariable:
-    enabled: yes

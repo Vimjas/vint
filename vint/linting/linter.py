@@ -1,9 +1,10 @@
 import re
+import logging
 from pathlib import Path
-from vint.ast.parsing import Parser
+from vint.ast.parsing import Parser, EncodingDetectionError
 from vint.ast.traversing import traverse
 from vint.ast.node_type import NodeType
-from vint.ast.plugin.scope_plugin import ScopePlugin
+# from vint.ast.plugin.scope_plugin import ScopePlugin
 from vint.linting.config.config_container import ConfigContainer
 from vint.linting.config.config_dict_source import ConfigDictSource
 from vint.linting.config.config_comment_source import ConfigCommentSource
@@ -38,9 +39,9 @@ class Linter(object):
 
 
     def build_parser(self):
-        plugins = [ScopePlugin()]
+        # plugins = [ScopePlugin()]
 
-        parser = Parser(plugins)
+        parser = Parser()
         return parser
 
 
@@ -60,7 +61,6 @@ class Linter(object):
 
     def _create_parse_error(self, path, err_message):
         parser_error = self._parse_vimlparser_error(err_message)
-
         return {
             'name': 'SyntaxError',
             'level': Level.ERROR,
@@ -74,13 +74,37 @@ class Linter(object):
         }
 
 
+    def _create_decoding_error(self, path, err_message):
+        return {
+            'name': 'DecodingError',
+            'level': Level.ERROR,
+            'description': err_message,
+            'reference': 'no reference',
+            'position': {
+                'line': 0,
+                'column': 0,
+                'path': Path(path),
+            },
+        }
+
+
+    def _log_file_path_to_lint(self, file_path):
+        msg = 'checking: `{file_path}`'.format(file_path=file_path)
+        logging.debug(msg)
+
+
     def lint_file(self, path):
-        """ Lint the file and return the violations found. """
+        self._log_file_path_to_lint(path)
+
         try:
             root_ast = self._parser.parse_file(path)
         except VimLParserException as exception:
             parse_error = self._create_parse_error(path, str(exception))
             return [parse_error]
+        except EncodingDetectionError as exception:
+            decoding_error = self._create_decoding_error(path, str(exception))
+            return [decoding_error]
+
 
         self._violations = []
         self._update_listeners_map()
@@ -142,7 +166,7 @@ class Linter(object):
         config = self._config
 
         config_dict = config.get_config_dict()
-        policy_set.update_by_config(config_dict['policies'])
+        policy_set.update_by_config(config_dict)
 
 
     def _update_listeners_map(self):

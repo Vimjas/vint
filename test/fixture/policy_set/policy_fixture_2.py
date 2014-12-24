@@ -1,6 +1,9 @@
-from vint.linting.policy_loader import register_policy
+from vint.linting.level import Level
 
 
-@register_policy
 class PolicyFixture2(object):
-    pass
+    def __init__(self):
+        super(PolicyFixture2, self).__init__()
+        self.description = 'PolicyFixture2'
+        self.reference = 'PolicyFixture2'
+        self.level = Level.STYLE_PROBLEM
