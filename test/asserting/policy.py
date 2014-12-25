@@ -53,6 +53,7 @@ class PolicyAssertion(unittest.TestCase):
         linter = Linter(policy_set, config.get_config_dict())
         violations = linter.lint_file(path)
 
+        pprint(violations)
         assert len(violations) == len(expected_violations)
 
         for violation, expected_violation in zip_longest(violations, expected_violations):
