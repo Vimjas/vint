@@ -6,8 +6,13 @@ from vint.linting.policy.reference.googlevimscriptstyleguide import get_referenc
 from vint.linting.policy_registry import register_policy
 
 
-PROHIBITED_COMMAND_PATTERN = re.compile(r'norm(al)?\s|'
-                                        r's(u(bstitute)?)?/')
+ProhibitedCommands = {
+    'substitute': True,
+}
+
+CommandsShouldBeWithBang = {
+    'normal': True,
+}
 
 
 @register_policy
@@ -31,7 +36,20 @@ class ProhibitCommandRelyOnUser(AbstractPolicy):
          - substitute
         """
 
-        command = node['str']
-        is_command_not_prohibited = PROHIBITED_COMMAND_PATTERN.search(command) is None
+        ea = node['ea']
+        command = ea['cmd'].get('name', None)
 
-        return is_command_not_prohibited
+        # It seems line jump command
+        if command is None:
+            return True
+
+        is_prohibited_command = command in ProhibitedCommands
+        if is_prohibited_command:
+            return False
+
+        should_be_with_bang = command in CommandsShouldBeWithBang
+        if not should_be_with_bang:
+            return True
+
+        is_bang = ea.get('forceit', 0) == 1
+        return is_bang
