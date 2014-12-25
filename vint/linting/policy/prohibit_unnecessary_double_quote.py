@@ -8,8 +8,8 @@ from vint.linting.policy_registry import register_policy
 
 # see `:help expr-string`
 _special_char_matcher = re.compile(
-    r'\\'  # prefix back slash
-    r'('
+    r'(\'|'  # allow single quote
+    r'\\('  # prefix back slash
     r'(?P<octal>[0-7]{1,3})'
     r'|(?P<hexadecimal>[xX][0-9a-fA-F]{1,2})'
     r'|(?P<numeric_character_reference>[uU][0-9a-fA-F]{4})'
@@ -22,7 +22,7 @@ _special_char_matcher = re.compile(
     r'|(?P<backslash>\\)'
     r'|(?P<double_quote>")'
     r'|(?P<special_key><[^>]+>)'
-    r')')
+    r'))')
 
 
 @register_policy

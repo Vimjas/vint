@@ -14,3 +14,6 @@ echo "\t"
 echo "\\"
 echo "\""
 echo "\<xxx>"
+
+" Double quote literal should not be prohibited too
+echo "'"
