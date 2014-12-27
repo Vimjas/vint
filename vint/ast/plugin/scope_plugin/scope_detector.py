@@ -12,8 +12,8 @@ from vint.ast.plugin.scope_plugin.builtin_dictionary import BuiltinVariables
 class ScopeVisibility(enum.Enum):
     """ 5 types scope visibility.
     We interest to analyze the variable scope by checking a single file.
-    So, we do not interest to the strict visibility of the scope that is larger
-    than script local.
+    So, we do not interest to the strict visibility of the scopes that have a
+    larger visibility than script local.
     """
     GLOBAL_LIKE = 0
     BUILTIN = 1
@@ -57,42 +57,63 @@ IdentifierLikeNodeTypes = {
 
 
 class ScopeDetector(object):
+    """ An utility namespace for variable visibility detection. """
+
     @classmethod
     def is_builtin_variable(cls, id_node):
-        # TODO: Add unknown builtin flag
+        """ Whether the specified node is a builtin identifier. """
         id_value = id_node['value']
 
+        # TODO: Add unknown builtin flag
         if id_value.startswith('v:'):
+            # It is an explicit builtin variable such as: "v:count", "v:char"
             return True
 
+        # It is an implicit builtin variable such as: "count", "char"
         return id_value in BuiltinVariables
 
 
     @classmethod
     def is_analyzable_identifier(cls, node):
+        """ Whether the specified node is an analyzable identifier.
+
+        Node definition-identifier-like is analyzable if it is not dynamic
+        and not a member variable, because we can do static scope analysis.
+
+        Analyzable cases:
+          - let s:var = 0
+          - function! Func()
+          - echo s:var
+
+        Unanalyzable cases:
+          - let s:my_{var} = 0
+          - function! dict.Func()
+          - echo s:my_{var}
+        """
         is_identifier_like_node = IDENTIFIER_ATTRIBUTE in node
 
         if not is_identifier_like_node:
             return False
 
         id_attr = node[IDENTIFIER_ATTRIBUTE]
-
-        # Node definition-identifier-like is analyzable when it is not dynamic
-        # and not a member variable, because we can do static scope analysis.
-        #
-        # Analyzable cases:
-        #   - let s:var = 0
-        #   - function! Func()
-        #
-        # Unanalyzable cases:
-        #   - let s:my_{var} = 0
-        #   - function! dict.Func()
         return not (id_attr[IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG] or
                     id_attr[IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG])
 
 
     @classmethod
     def is_analyzable_definition_identifier(cls, node):
+        """ Whether the specified node is an analyzable declarative identifier.
+        Node definition-identifier-like is analyzable if it is not dynamic
+        and not a member variable, because we can do static scope analysis.
+
+        Analyzable cases:
+          - let s:var = 0
+          - function! Func()
+
+        Unanalyzable cases:
+          - let s:my_{var} = 0
+          - function! dict.Func()
+        """
         is_identifier_like_node = IDENTIFIER_ATTRIBUTE in node
 
         if not is_identifier_like_node:
@@ -100,22 +121,16 @@ class ScopeDetector(object):
 
         id_attr = node[IDENTIFIER_ATTRIBUTE]
 
-        # Node definition-identifier-like is analyzable when it is not dynamic
-        # and not a member variable, because we can do static scope analysis.
-        #
-        # Analyzable cases:
-        #   - let s:var = 0
-        #   - function! Func()
-        #
-        # Unanalyzable cases:
-        #   - let s:my_{var} = 0
-        #   - function! dict.Func()
         return id_attr[IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG] and \
             cls.is_analyzable_identifier(node)
 
 
     @classmethod
     def detect_scope_visibility(cls, node, context_scope):
+        """ Returns a variable visibility hint by the specified node.
+        The hint is a dict that has 2 attributes: "scope_visibility" and
+        "is_implicit".
+        """
         node_type = NodeType(node['type'])
 
         if not cls.is_analyzable_definition_identifier(node):
@@ -130,6 +145,16 @@ class ScopeDetector(object):
 
     @classmethod
     def normalize_variable_name(cls, node, context_scope):
+        """ Returns normalized variable name.
+        Normalizing means that variable names get explicit visibility by
+        visibility prefix such as: "g:", "s:", ...
+
+        Retunes None if the specified node is unanalyzable.
+        A node is unanalyzable if:
+
+        - the node is not identifier-like
+        - the node is named dynamically
+        """
         node_type = NodeType(node['type'])
 
         if not cls.is_analyzable_identifier(node):
@@ -138,6 +163,8 @@ class ScopeDetector(object):
         if node_type is NodeType.IDENTIFIER:
             return cls._normalize_identifier_value(node, context_scope)
 
+        # Nodes identifier-like without identifier is always normalized because
+        # the nodes can not have a visibility prefix.
         if node_type in IdentifierLikeNodeTypes:
             return node['value']
 
