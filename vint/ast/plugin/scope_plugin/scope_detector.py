@@ -34,7 +34,7 @@ IdentifierScopePrefixToScopeVisibility = {
 }
 
 
-ScopeVisibilityToIdentifierScopePrefix = {
+ImplicitScopeVisibilityToIdentifierScopePrefix = {
     ScopeVisibility.GLOBAL_LIKE: 'g:',
     ScopeVisibility.FUNCTION_LOCAL: 'l:',
     ScopeVisibility.BUILTIN: 'v:',
@@ -183,7 +183,7 @@ class ScopeDetector(object):
             return id_node['value']
 
         scope_visibility = scope_visibility_hint['scope_visibility']
-        scope_prefix = ScopeVisibilityToIdentifierScopePrefix[scope_visibility]
+        scope_prefix = ImplicitScopeVisibilityToIdentifierScopePrefix[scope_visibility]
 
         return scope_prefix + id_node['value']
 
