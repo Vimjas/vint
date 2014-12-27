@@ -39,7 +39,20 @@ AnalyzableSubScriptChildNodeTypes = {
 
 
 class IdentifierClassifier(object):
+    """ A class for identifier classifiers.
+    This class classify nodes by 3 flags:
+
+    - is dynamic: True if the identifier name can be determined by static analysis.
+    - is member: True if the identifier is a member of a subscription/dot/slice node.
+    - is declaring: True if the identifier is used to declare.
+    """
+
     class IdentifierCollector(object):
+        """ A class for identifier node collectors.
+        Only static and not member nodes will be collected and the nodes will
+        be grouped by 2 types; declaring or referencing.
+        """
+
         def collect_identifiers(self, ast):
             self.static_referencing_identifiers = []
             self.static_declaring_identifiers = []
@@ -71,6 +84,12 @@ class IdentifierClassifier(object):
 
 
     def attach_identifier_attributes(self, ast):
+        """ Attach 3 flags to the AST.
+
+        - is dynamic: True if the identifier name can be determined by static analysis.
+        - is member: True if the identifier is a member of a subscription/dot/slice node.
+        - is declaring: True if the identifier is used to declare.
+        """
         traverse(ast, on_enter=self._enter_handler)
         return ast
 
@@ -142,17 +161,23 @@ class IdentifierClassifier(object):
             self._enter_definition_identifier_node(id_like_node)
             return
 
-        # We can not do static analysis NodeType.CURLYNAME, because it can
-        # name dyamically.
+        # Curlyname node can have a dynamic name. For example:
+        #   let s:var = 'VAR'
+        #   let my_{s:var} = 0
         if id_like_node_type is NodeType.CURLYNAME:
             self._enter_definition_curlyname_node(id_like_node)
             return
 
 
     def _enter_function_node(self, func_node):
+        # Function node has declarative identifiers as the function name and
+        # the paramerter names.
+
+        # Function name is in the left.
         func_name_node = func_node['left']
         self._enter_definition_identifier_like_node(func_name_node)
 
+        # Function parameter names is in the r_list.
         func_param_nodes = func_node['rlist']
         for func_param_node in func_param_nodes:
             self._enter_definition_identifier_like_node(func_param_node)
@@ -181,7 +206,7 @@ class IdentifierClassifier(object):
             # We can do static analysis NodeType.SUBSCRIPT such as:
             #   let object['name'] = 0
             #
-            # but we cannot it in other cases:
+            # but we cannot do it in other cases such as:
             #   let object[var] = 0
             is_dynamic = subscript_right_type not in AnalyzableSubScriptChildNodeTypes
 
@@ -197,11 +222,11 @@ class IdentifierClassifier(object):
                 # We can do static analysis NodeType.SLICE such as:
                 #   let object[0:1] = 0
                 #
-                # but we cannot it in other cases:
+                # but we cannot do it in other cases such as:
                 #   let object[0:var] = 0
                 is_dynamic = elem_node_type not in AnalyzableSubScriptChildNodeTypes
 
-                # In following case, 0 is definition but var is not definition.
+                # In the following case, 0 is a definition but var is not definition.
                 # It is more like a reference.
                 #   let object[0:var] = 0
                 is_definition = elem_node_type in AnalyzableSubScriptChildNodeTypes
@@ -223,7 +248,7 @@ class IdentifierClassifier(object):
 
 
     def _enter_destructuring_assignment_node(self, node):
-        # In VimLParser spec, an empty array mean null.
+        # In VimLParser spec, an empty array means null.
         #
         # | Normal assignment    | Destructuring assignment    |
         # |:--------------------:|:---------------------------:|
