@@ -18,7 +18,15 @@ DeclarativeNodeTypes = {
 
 
 class ScopeLinker(object):
-    class ScopeStore(object):
+    """ A class for scope linker.
+    The class link identifiers in the given AST node and the scopes where the
+    identifier will be declared or referenced.
+    """
+
+    class ScopeTreeBuilder(object):
+        """ A class for event-driven builders to build a scope tree.
+        The class interest to scope-level events rather than AST-level events.
+        """
         def __init__(self):
             global_scope = self._create_scope(ScopeVisibility.GLOBAL_LIKE)
             self.scope_stack = [global_scope]
@@ -102,6 +110,11 @@ class ScopeLinker(object):
 
 
         def _create_virtual_identifier(self, id_value):
+            """ Returns a virtual identifier.
+            Virtual identifier is a virtual node for implicitly declarated
+            variables such as: a:0, a:000, a:firstline.
+            """
+
             return {
                 'type': NodeType.IDENTIFIER.value,
                 'value': id_value,
@@ -169,8 +182,7 @@ class ScopeLinker(object):
 
 
     def process(self, ast):
-        # TODO: add parent_scope
-        self.scope_store = ScopeLinker.ScopeStore()
+        self.scope_store = ScopeLinker.ScopeTreeBuilder()
 
         # We are already in script local scope.
         self.scope_store.enter_new_scope(ScopeVisibility.SCRIPT_LOCAL)
@@ -206,7 +218,13 @@ class ScopeLinker(object):
     def _handle_function_node(self, func_node):
         # We should interrupt traversing, because a node of the function
         # name should be added to the parent scope before the current
-        # scope switched to a new scope of the function:
+        # scope switched to a new scope of the function.
+        # We approach to it by the following 5 steps.
+        #   1. Add the function to the current scope
+        #   2. Create a new scope of the function
+        #   3. The current scope point to the new scope
+        #   4. Add parameters to the new scope
+        #   5. Add variables in the function body to the new scope
 
         # 1. Add the function to the current scope
         func_name_node = func_node['left']
@@ -224,14 +242,14 @@ class ScopeLinker(object):
             if param_node['value'] == '...':
                 has_variadic = True
             else:
-                # param_node type is always NodeType.IDENTIFIER
+                # the param_node type is always NodeType.IDENTIFIER
                 self.scope_store.handle_new_parameter_found(param_node)
 
         # We can always access a:0 and a:000
         self.scope_store.handle_new_parameters_list_and_length_found()
 
-        # In variadic function, we can access a:1 ... a:n
-        # (n = 20 - explicit parameters length)
+        # In a variadic function, we can access a:1 ... a:n
+        # (n = 20 - explicit parameters length). See :help a:0
         if has_variadic:
             # -1 means ignore '...'
             self.scope_store.handle_new_index_parameters_found(len(param_nodes) - 1)
