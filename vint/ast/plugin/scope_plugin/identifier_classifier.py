@@ -78,14 +78,11 @@ class IdentifierClassifier(object):
     def _set_identifier_attribute(self, node, is_definition=None, is_dynamic=None,
                                   is_member_of_subscript=None):
 
-        if IDENTIFIER_ATTRIBUTE in node:
-            id_attr = node[IDENTIFIER_ATTRIBUTE]
-        else:
-            id_attr = node[IDENTIFIER_ATTRIBUTE] = {
-                IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG: False,
-                IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: False,
-                IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG: False,
-            }
+        id_attr = node.setdefault(IDENTIFIER_ATTRIBUTE, {
+            IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG: False,
+            IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: False,
+            IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG: False,
+        })
 
         if is_definition is not None:
             id_attr[IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG] = is_definition
