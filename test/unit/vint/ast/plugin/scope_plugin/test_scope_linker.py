@@ -20,6 +20,7 @@ class Fixtures(enum.Enum):
     LOOP_VAR = Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_loop_var.vim')
     DICT_KEY = Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_declaring_with_dict_key.vim')
     DESTRUCTURING_ASSIGNMENT = Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_destructuring_assignment.vim')
+    DECLARING_AND_REFERENCING = Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_declaring_and_referencing.vim')
 
 
 class TestScopeLinker(unittest.TestCase):
@@ -54,7 +55,7 @@ class TestScopeLinker(unittest.TestCase):
         self.assertEqual(expected_scope_tree, actual_scope_tree)
 
 
-    def test_process_with_declaring_func(self):
+    def test_built_scope_tree_by_process_with_declaring_func(self):
         ast = self.create_ast(Fixtures.DECLARING_FUNC)
         linker = ScopeLinker()
 
@@ -126,7 +127,7 @@ class TestScopeLinker(unittest.TestCase):
         self.assertScopeTreeEqual(expected_scope_tree, linker.scope_tree)
 
 
-    def test_process_with_declaring_func_in_func(self):
+    def test_built_scope_tree_by_process_with_declaring_func_in_func(self):
         ast = self.create_ast(Fixtures.DECLARING_FUNC_IN_FUNC)
         linker = ScopeLinker()
 
@@ -174,7 +175,7 @@ class TestScopeLinker(unittest.TestCase):
         self.assertScopeTreeEqual(expected_scope_tree, linker.scope_tree)
 
 
-    def test_process_with_declaring_var(self):
+    def test_built_scope_tree_by_process_with_declaring_var(self):
         ast = self.create_ast(Fixtures.DECLARING_VAR)
         linker = ScopeLinker()
 
@@ -206,7 +207,7 @@ class TestScopeLinker(unittest.TestCase):
         self.assertScopeTreeEqual(expected_scope_tree, linker.scope_tree)
 
 
-    def test_process_with_declaring_var_in_func(self):
+    def test_built_scope_tree_by_process_with_declaring_var_in_func(self):
         ast = self.create_ast(Fixtures.DECLARING_VAR_IN_FUNC)
         linker = ScopeLinker()
 
@@ -239,7 +240,7 @@ class TestScopeLinker(unittest.TestCase):
         self.assertScopeTreeEqual(expected_scope_tree, linker.scope_tree)
 
 
-    def test_process_with_declaring_with_dict_key(self):
+    def test_built_scope_tree_by_process_with_declaring_with_dict_key(self):
         ast = self.create_ast(Fixtures.DICT_KEY)
         linker = ScopeLinker()
 
@@ -279,7 +280,7 @@ class TestScopeLinker(unittest.TestCase):
         self.assertScopeTreeEqual(expected_scope_tree, linker.scope_tree)
 
 
-    def test_process_with_destructuring_assignment(self):
+    def test_built_scope_tree_by_process_with_destructuring_assignment(self):
         ast = self.create_ast(Fixtures.DESTRUCTURING_ASSIGNMENT)
         linker = ScopeLinker()
 
@@ -302,7 +303,7 @@ class TestScopeLinker(unittest.TestCase):
         self.assertScopeTreeEqual(expected_scope_tree, linker.scope_tree)
 
 
-    def test_process_with_func_param(self):
+    def test_built_scope_tree_by_process_with_func_param(self):
         ast = self.create_ast(Fixtures.FUNC_PARAM)
         linker = ScopeLinker()
 
@@ -418,7 +419,7 @@ class TestScopeLinker(unittest.TestCase):
         self.assertScopeTreeEqual(expected_scope_tree, linker.scope_tree)
 
 
-    def test_process_with_func_call(self):
+    def test_built_scope_tree_by_process_with_func_call(self):
         ast = self.create_ast(Fixtures.CALLING_FUNC)
         linker = ScopeLinker()
 
@@ -435,7 +436,7 @@ class TestScopeLinker(unittest.TestCase):
         self.assertScopeTreeEqual(expected_scope_tree, linker.scope_tree)
 
 
-    def test_process_with_loop_var(self):
+    def test_built_scope_tree_by_process_with_loop_var(self):
         ast = self.create_ast(Fixtures.LOOP_VAR)
         linker = ScopeLinker()
 
@@ -452,6 +453,51 @@ class TestScopeLinker(unittest.TestCase):
         )
 
         self.assertScopeTreeEqual(expected_scope_tree, linker.scope_tree)
+
+
+    def test_built_referencing_identifier_links_by_process(self):
+        # Simplicated AST of the following code:
+        #
+        #     function! s:Function()
+        #     endfunction
+        #     call s:Function()
+        ast = self.create_ast(Fixtures.DECLARING_AND_REFERENCING)
+        ref_id_node = ast['body'][1]['left']['left']
+
+        linker = ScopeLinker()
+        linker.process(ast)
+
+        scope_tree = linker.scope_tree
+        # Expect a script local scope
+        expected_scope = scope_tree['child_scopes'][0]
+
+        link_registry = linker.link_registry
+        actual_scope = link_registry.get_scope_by_referencing_identifier(ref_id_node)
+
+        self.assertScopeTreeEqual(expected_scope, actual_scope)
+
+
+    def test_built_variable_links_by_process(self):
+        # Simplicated AST of the following code:
+        #
+        #     function! s:Function()
+        #     endfunction
+        #     call s:Function()
+        ast = self.create_ast(Fixtures.DECLARING_AND_REFERENCING)
+        expected_dec_id = ast['body'][0]['left']
+
+        linker = ScopeLinker()
+        linker.process(ast)
+
+        scope_tree = linker.scope_tree
+        # Function local scope
+        scope = scope_tree['child_scopes'][0]
+        variable_func = scope['variables']['s:Function'][0]
+
+        link_registry = linker.link_registry
+        actual_dec_id = link_registry.get_declarative_identifier_by_variable(variable_func)
+
+        self.assertScopeTreeEqual(expected_dec_id, actual_dec_id)
 
 
 if __name__ == '__main__':
