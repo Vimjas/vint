@@ -5,9 +5,6 @@ from vint.ast.plugin.scope_plugin.scope_detector import (
     ScopeVisibility,
 )
 
-SCOPE_TREE = 'VINT:scope_tree'
-SCOPE = 'VINT:scope'
-
 
 DeclarativeNodeTypes = {
     NodeType.FUNCTION: True,
@@ -18,7 +15,7 @@ DeclarativeNodeTypes = {
 
 
 class ScopeLinker(object):
-    """ A class for scope linker.
+    """ A class for scope linkers.
     The class link identifiers in the given AST node and the scopes where the
     identifier will be declared or referenced.
     """
@@ -27,9 +24,13 @@ class ScopeLinker(object):
         """ A class for event-driven builders to build a scope tree.
         The class interest to scope-level events rather than AST-level events.
         """
+
         def __init__(self):
             global_scope = self._create_scope(ScopeVisibility.GLOBAL_LIKE)
             self.scope_stack = [global_scope]
+
+            self.scopes_to_declarative_identifiers_map = {}
+            self.referencing_identifiers_to_scopes_map = {}
 
 
         def enter_new_scope(self, scope_visibility):
@@ -93,20 +94,31 @@ class ScopeLinker(object):
         def handle_new_variable_found(self, node):
             current_scope = self.get_current_scope()
             scope_visibility_hint = ScopeDetector.detect_scope_visibility(node, current_scope)
-
-            scope_visibility = scope_visibility_hint['scope_visibility']
             is_implicit = scope_visibility_hint['is_implicit']
 
+            objective_scope = self._get_objective_scope(node)
+            self._add_variable(objective_scope, node, is_implicit=is_implicit)
+
+
+        def _get_objective_scope(self, node):
+            current_scope = self.get_current_scope()
+            scope_visibility_hint = ScopeDetector.detect_scope_visibility(node, current_scope)
+            scope_visibility = scope_visibility_hint['scope_visibility']
+
             if scope_visibility is ScopeVisibility.GLOBAL_LIKE:
-                self._add_variable(self.get_global_scope(), node, is_implicit=is_implicit)
-                return
+                return self.get_global_scope()
 
             if scope_visibility is ScopeVisibility.SCRIPT_LOCAL:
-                self._add_variable(self.get_script_local_scope(), node, is_implicit=is_implicit)
-                return
+                return self.get_script_local_scope()
 
             # It is FUNCTION_LOCAL scope
-            self._add_variable(current_scope, node, is_implicit=is_implicit)
+            return current_scope
+
+
+        def handle_referencing_identifier_found(self, node):
+            objective_scope = self._get_objective_scope(node)
+
+            self._link_referencing_identifier_to_scope(node, objective_scope)
 
 
         def _create_virtual_identifier(self, id_value):
@@ -114,7 +126,6 @@ class ScopeLinker(object):
             Virtual identifier is a virtual node for implicitly declarated
             variables such as: a:0, a:000, a:firstline.
             """
-
             return {
                 'type': NodeType.IDENTIFIER.value,
                 'value': id_value,
@@ -124,9 +135,8 @@ class ScopeLinker(object):
 
         def _add_parameter(self, objective_scope, node):
             variable_name = ScopeDetector.normalize_parameter_name(node)
-            variable = self._create_variable(node)
 
-            self._add_variable_by_name(objective_scope, variable_name, variable)
+            self._register_variable(objective_scope, variable_name, node)
 
 
         def _add_variable(self, objective_scope, node, is_implicit=False):
@@ -135,39 +145,54 @@ class ScopeLinker(object):
             is_builtin = NodeType(node['type']) is NodeType.IDENTIFIER and \
                 ScopeDetector.is_builtin_variable(node)
 
+            # TODO: Split add_variable and add_global_variable
             if is_builtin:
                 self._add_builtin_variable(node, is_implicit=is_implicit)
                 return
 
             variable_name = ScopeDetector.normalize_variable_name(node, current_scope)
-            variable = self._create_variable(node,
-                                             is_implicit=is_implicit)
 
-            self._add_variable_by_name(objective_scope, variable_name, variable)
+            self._register_variable(objective_scope,
+                                    variable_name,
+                                    node,
+                                    is_implicit=is_implicit)
 
 
         def _add_builtin_variable(self, node, is_implicit=False):
             current_scope = self.get_current_scope()
-
             variable_name = ScopeDetector.normalize_variable_name(node, current_scope)
-            variable = self._create_variable(node,
-                                             is_implicit=is_implicit,
-                                             is_builtin=True)
 
-            self._add_variable_by_name(self.get_global_scope(), variable_name, variable)
+            self._register_variable(self.get_global_scope(),
+                                    variable_name,
+                                    node,
+                                    is_implicit=is_implicit,
+                                    is_builtin=True)
             return
 
 
-        def _add_variable_by_name(self, objective_scope, variable_name, variable):
-            same_name_variables = objective_scope['variables'].get(variable_name, [])
+        def _register_variable(self, objective_scope, variable_name, node,
+                               is_implicit=False, is_builtin=False):
+            variable = self._create_variable(is_implicit=is_implicit,
+                                             is_builtin=is_builtin)
+
+            same_name_variables = objective_scope['variables'].setdefault(variable_name, [])
             same_name_variables.append(variable)
 
-            objective_scope['variables'][variable_name] = same_name_variables
+            self._link_variable_to_declarative_identifier(variable, node)
 
 
-        def _create_variable(self, node, is_implicit=False, is_builtin=False):
+        def _link_variable_to_declarative_identifier(self, variable, declaring_identifier):
+            variable_id = id(variable)
+            self.scopes_to_declarative_identifiers_map[variable_id] = declaring_identifier
+
+
+        def _link_referencing_identifier_to_scope(self, scope, referencing_identifier):
+            node_id = id(referencing_identifier)
+            self.referencing_identifiers_to_scopes_map[node_id] = scope
+
+
+        def _create_variable(self, is_implicit=False, is_builtin=False):
             return {
-                'node': node,
                 'is_implicit': is_implicit,
                 'is_builtin': is_builtin,
             }
@@ -182,28 +207,29 @@ class ScopeLinker(object):
 
 
     def process(self, ast):
-        self.scope_store = ScopeLinker.ScopeTreeBuilder()
+        self.scope_tree = None
+
+        self._scope_store = ScopeLinker.ScopeTreeBuilder()
 
         # We are already in script local scope.
-        self.scope_store.enter_new_scope(ScopeVisibility.SCRIPT_LOCAL)
+        self._scope_store.enter_new_scope(ScopeVisibility.SCRIPT_LOCAL)
 
         traverse(ast,
                  on_enter=self._enter_handler,
                  on_leave=self._leave_handler)
 
-        ast[SCOPE_TREE] = self.scope_store.get_global_scope()
+        self.scope_tree = self._scope_store.get_global_scope()
 
 
     def _find_new_variable(self, node):
         if not ScopeDetector.is_analyzable_identifier(node):
             return
 
-        node[SCOPE] = self.scope_store.get_current_scope()
-
-        if not ScopeDetector.is_analyzable_definition_identifier(node):
+        if ScopeDetector.is_analyzable_definition_identifier(node):
+            self._scope_store.handle_new_variable_found(node)
             return
 
-        self.scope_store.handle_new_variable_found(node)
+        self._scope_store.handle_referencing_identifier_found(node)
 
 
     def _enter_handler(self, node):
@@ -232,7 +258,7 @@ class ScopeLinker(object):
 
         # 2. Create a new scope of the function
         # 3. The current scope point to the new scope
-        self.scope_store.enter_new_scope(ScopeVisibility.FUNCTION_LOCAL)
+        self._scope_store.enter_new_scope(ScopeVisibility.FUNCTION_LOCAL)
 
         has_variadic = False
 
@@ -243,22 +269,22 @@ class ScopeLinker(object):
                 has_variadic = True
             else:
                 # the param_node type is always NodeType.IDENTIFIER
-                self.scope_store.handle_new_parameter_found(param_node)
+                self._scope_store.handle_new_parameter_found(param_node)
 
         # We can always access a:0 and a:000
-        self.scope_store.handle_new_parameters_list_and_length_found()
+        self._scope_store.handle_new_parameters_list_and_length_found()
 
         # In a variadic function, we can access a:1 ... a:n
         # (n = 20 - explicit parameters length). See :help a:0
         if has_variadic:
             # -1 means ignore '...'
-            self.scope_store.handle_new_index_parameters_found(len(param_nodes) - 1)
+            self._scope_store.handle_new_index_parameters_found(len(param_nodes) - 1)
 
         # We can access "a:firstline" and "a:lastline" if the function is
         # declared with an attribute "range". See :func-range
         is_declared_with_range = func_node['attr']['range'] is not 0
         if is_declared_with_range:
-            self.scope_store.handle_new_range_parameters_found()
+            self._scope_store.handle_new_range_parameters_found()
 
         # 5. Add variables in the function body to the new scope
         func_body_nodes = func_node['body']
@@ -275,4 +301,4 @@ class ScopeLinker(object):
         node_type = NodeType(node['type'])
 
         if node_type is NodeType.FUNCTION:
-            self.scope_store.leave_current_scope()
+            self._scope_store.leave_current_scope()

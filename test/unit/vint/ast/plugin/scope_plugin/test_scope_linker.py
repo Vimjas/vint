@@ -3,7 +3,7 @@ import enum
 from pathlib import Path
 
 from vint.ast.parsing import Parser
-from vint.ast.plugin.scope_plugin.scope_linker import ScopeLinker, ScopeVisibility, SCOPE_TREE
+from vint.ast.plugin.scope_plugin.scope_linker import ScopeLinker, ScopeVisibility
 from vint.ast.plugin.scope_plugin.identifier_classifier import IdentifierClassifier
 
 
@@ -35,19 +35,9 @@ class TestScopeLinker(unittest.TestCase):
 
     def create_variable(self, is_implicit=False, is_builtin=False):
         return {
-            'node': 'DUMMY TO TEST',
             'is_implicit': is_implicit,
             'is_builtin': is_builtin,
         }
-
-
-    def remove_node_to_avoid_node_comparison(self, scope_tree):
-        for variables in scope_tree['variables'].values():
-            for variable in variables:
-                variable['node'] = 'DUMMY TO TEST'
-
-        for child_scope in scope_tree['child_scopes']:
-            self.remove_node_to_avoid_node_comparison(child_scope)
 
 
     def create_scope(self, scope_visibility, variables=None, child_scopes=None):
@@ -60,9 +50,6 @@ class TestScopeLinker(unittest.TestCase):
 
     def assertScopeTreeEqual(self, expected_scope_tree, actual_scope_tree):
         self.maxDiff = 10000
-
-        # TODO: It is workarround.
-        self.remove_node_to_avoid_node_comparison(actual_scope_tree)
 
         self.assertEqual(expected_scope_tree, actual_scope_tree)
 
@@ -136,7 +123,7 @@ class TestScopeLinker(unittest.TestCase):
             ]
         )
 
-        self.assertScopeTreeEqual(expected_scope_tree, ast[SCOPE_TREE])
+        self.assertScopeTreeEqual(expected_scope_tree, linker.scope_tree)
 
 
     def test_process_with_declaring_func_in_func(self):
@@ -184,7 +171,7 @@ class TestScopeLinker(unittest.TestCase):
             ]
         )
 
-        self.assertScopeTreeEqual(expected_scope_tree, ast[SCOPE_TREE])
+        self.assertScopeTreeEqual(expected_scope_tree, linker.scope_tree)
 
 
     def test_process_with_declaring_var(self):
@@ -216,7 +203,7 @@ class TestScopeLinker(unittest.TestCase):
             ]
         )
 
-        self.assertScopeTreeEqual(expected_scope_tree, ast[SCOPE_TREE])
+        self.assertScopeTreeEqual(expected_scope_tree, linker.scope_tree)
 
 
     def test_process_with_declaring_var_in_func(self):
@@ -249,7 +236,7 @@ class TestScopeLinker(unittest.TestCase):
             ]
         )
 
-        self.assertScopeTreeEqual(expected_scope_tree, ast[SCOPE_TREE])
+        self.assertScopeTreeEqual(expected_scope_tree, linker.scope_tree)
 
 
     def test_process_with_declaring_with_dict_key(self):
@@ -289,7 +276,7 @@ class TestScopeLinker(unittest.TestCase):
             ]
         )
 
-        self.assertScopeTreeEqual(expected_scope_tree, ast[SCOPE_TREE])
+        self.assertScopeTreeEqual(expected_scope_tree, linker.scope_tree)
 
 
     def test_process_with_destructuring_assignment(self):
@@ -312,7 +299,7 @@ class TestScopeLinker(unittest.TestCase):
             ]
         )
 
-        self.assertScopeTreeEqual(expected_scope_tree, ast[SCOPE_TREE])
+        self.assertScopeTreeEqual(expected_scope_tree, linker.scope_tree)
 
 
     def test_process_with_func_param(self):
@@ -428,7 +415,7 @@ class TestScopeLinker(unittest.TestCase):
             ]
         )
 
-        self.assertScopeTreeEqual(expected_scope_tree, ast[SCOPE_TREE])
+        self.assertScopeTreeEqual(expected_scope_tree, linker.scope_tree)
 
 
     def test_process_with_func_call(self):
@@ -445,7 +432,7 @@ class TestScopeLinker(unittest.TestCase):
             ]
         )
 
-        self.assertScopeTreeEqual(expected_scope_tree, ast[SCOPE_TREE])
+        self.assertScopeTreeEqual(expected_scope_tree, linker.scope_tree)
 
 
     def test_process_with_loop_var(self):
@@ -464,7 +451,7 @@ class TestScopeLinker(unittest.TestCase):
             ]
         )
 
-        self.assertScopeTreeEqual(expected_scope_tree, ast[SCOPE_TREE])
+        self.assertScopeTreeEqual(expected_scope_tree, linker.scope_tree)
 
 
 if __name__ == '__main__':
