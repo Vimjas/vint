@@ -27,10 +27,8 @@ class ScopeLinker(object):
 
         def __init__(self):
             global_scope = self._create_scope(ScopeVisibility.GLOBAL_LIKE)
-            self.scope_stack = [global_scope]
-
-            self.scopes_to_declarative_identifiers_map = {}
-            self.referencing_identifiers_to_scopes_map = {}
+            self._scope_stack = [global_scope]
+            self.link_registry = ScopeLinker.ScopeLinkRegistry()
 
 
         def enter_new_scope(self, scope_visibility):
@@ -39,23 +37,23 @@ class ScopeLinker(object):
 
             # Build a lexical scope chain
             current_scope['child_scopes'].append(new_scope)
-            self.scope_stack.append(new_scope)
+            self._scope_stack.append(new_scope)
 
 
         def leave_current_scope(self):
-            self.scope_stack.pop()
+            self._scope_stack.pop()
 
 
         def get_global_scope(self):
-            return self.scope_stack[0]
+            return self._scope_stack[0]
 
 
         def get_script_local_scope(self):
-            return self.scope_stack[1]
+            return self._scope_stack[1]
 
 
         def get_current_scope(self):
-            return self.scope_stack[-1]
+            return self._scope_stack[-1]
 
 
         def handle_new_parameter_found(self, id_node):
@@ -118,7 +116,7 @@ class ScopeLinker(object):
         def handle_referencing_identifier_found(self, node):
             objective_scope = self._get_objective_scope(node)
 
-            self._link_referencing_identifier_to_scope(node, objective_scope)
+            self.link_registry.link_referencing_identifier_to_scope(node, objective_scope)
 
 
         def _create_virtual_identifier(self, id_value):
@@ -178,17 +176,7 @@ class ScopeLinker(object):
             same_name_variables = objective_scope['variables'].setdefault(variable_name, [])
             same_name_variables.append(variable)
 
-            self._link_variable_to_declarative_identifier(variable, node)
-
-
-        def _link_variable_to_declarative_identifier(self, variable, declaring_identifier):
-            variable_id = id(variable)
-            self.scopes_to_declarative_identifiers_map[variable_id] = declaring_identifier
-
-
-        def _link_referencing_identifier_to_scope(self, scope, referencing_identifier):
-            node_id = id(referencing_identifier)
-            self.referencing_identifiers_to_scopes_map[node_id] = scope
+            self.link_registry.link_variable_to_declarative_identifier(variable, node)
 
 
         def _create_variable(self, is_implicit=False, is_builtin=False):
@@ -206,19 +194,58 @@ class ScopeLinker(object):
             }
 
 
-    def process(self, ast):
-        self.scope_tree = None
 
-        self._scope_store = ScopeLinker.ScopeTreeBuilder()
+    class ScopeLinkRegistry(object):
+        """ A class for registry services for links between scopes and
+        identifiers.
+        """
+
+        def __init__(self):
+            self._vars_to_declarative_ids_map = {}
+            self._ref_ids_to_scopes_map = {}
+
+
+        def link_variable_to_declarative_identifier(self, variable, declaring_id_node):
+            variable_id = id(variable)
+            self._vars_to_declarative_ids_map[variable_id] = declaring_id_node
+
+
+        def link_referencing_identifier_to_scope(self, ref_id_node, scope):
+            node_id = id(ref_id_node)
+            self._ref_ids_to_scopes_map[node_id] = scope
+
+
+        def get_declarative_identifier_by_variable(self, variable):
+            variable_id = id(variable)
+            return self._vars_to_declarative_ids_map.get(variable_id)
+
+
+        def get_scope_by_referencing_identifier(self, ref_id_node):
+            node_id = id(ref_id_node)
+            return self._ref_ids_to_scopes_map.get(node_id)
+
+
+    def __init__(self):
+        self.scope_tree = None
+        self.link_registry = None
+
+
+    def process(self, ast):
+        """ Build a scope tree and links between scopes and identifiers by the
+        specified ast. You can access the built scope tree and the built links
+        by .scope_tree and .link_registry.
+        """
+        self._scope_tree_builder = ScopeLinker.ScopeTreeBuilder()
 
         # We are already in script local scope.
-        self._scope_store.enter_new_scope(ScopeVisibility.SCRIPT_LOCAL)
+        self._scope_tree_builder.enter_new_scope(ScopeVisibility.SCRIPT_LOCAL)
 
         traverse(ast,
                  on_enter=self._enter_handler,
                  on_leave=self._leave_handler)
 
-        self.scope_tree = self._scope_store.get_global_scope()
+        self.scope_tree = self._scope_tree_builder.get_global_scope()
+        self.link_registry = self._scope_tree_builder.link_registry
 
 
     def _find_new_variable(self, node):
@@ -226,10 +253,10 @@ class ScopeLinker(object):
             return
 
         if ScopeDetector.is_analyzable_definition_identifier(node):
-            self._scope_store.handle_new_variable_found(node)
+            self._scope_tree_builder.handle_new_variable_found(node)
             return
 
-        self._scope_store.handle_referencing_identifier_found(node)
+        self._scope_tree_builder.handle_referencing_identifier_found(node)
 
 
     def _enter_handler(self, node):
@@ -258,7 +285,7 @@ class ScopeLinker(object):
 
         # 2. Create a new scope of the function
         # 3. The current scope point to the new scope
-        self._scope_store.enter_new_scope(ScopeVisibility.FUNCTION_LOCAL)
+        self._scope_tree_builder.enter_new_scope(ScopeVisibility.FUNCTION_LOCAL)
 
         has_variadic = False
 
@@ -269,22 +296,22 @@ class ScopeLinker(object):
                 has_variadic = True
             else:
                 # the param_node type is always NodeType.IDENTIFIER
-                self._scope_store.handle_new_parameter_found(param_node)
+                self._scope_tree_builder.handle_new_parameter_found(param_node)
 
         # We can always access a:0 and a:000
-        self._scope_store.handle_new_parameters_list_and_length_found()
+        self._scope_tree_builder.handle_new_parameters_list_and_length_found()
 
         # In a variadic function, we can access a:1 ... a:n
         # (n = 20 - explicit parameters length). See :help a:0
         if has_variadic:
             # -1 means ignore '...'
-            self._scope_store.handle_new_index_parameters_found(len(param_nodes) - 1)
+            self._scope_tree_builder.handle_new_index_parameters_found(len(param_nodes) - 1)
 
         # We can access "a:firstline" and "a:lastline" if the function is
         # declared with an attribute "range". See :func-range
         is_declared_with_range = func_node['attr']['range'] is not 0
         if is_declared_with_range:
-            self._scope_store.handle_new_range_parameters_found()
+            self._scope_tree_builder.handle_new_range_parameters_found()
 
         # 5. Add variables in the function body to the new scope
         func_body_nodes = func_node['body']
@@ -301,4 +328,4 @@ class ScopeLinker(object):
         node_type = NodeType(node['type'])
 
         if node_type is NodeType.FUNCTION:
-            self._scope_store.leave_current_scope()
+            self._scope_tree_builder.leave_current_scope()
