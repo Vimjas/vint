@@ -228,6 +228,7 @@ class ScopeLinker(object):
             return self._ref_ids_to_scopes_map.get(node_id)
 
 
+
     def __init__(self):
         self.scope_tree = None
         self.link_registry = None
