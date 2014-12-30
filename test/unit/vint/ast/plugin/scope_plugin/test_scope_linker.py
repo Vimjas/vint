@@ -4,7 +4,6 @@ from pathlib import Path
 
 from vint.ast.parsing import Parser
 from vint.ast.plugin.scope_plugin.scope_linker import ScopeLinker, ScopeVisibility
-from vint.ast.plugin.scope_plugin.identifier_classifier import IdentifierClassifier
 
 
 FIXTURE_BASE_PATH = Path('test', 'fixture', 'ast', 'scope_plugin')
@@ -27,11 +26,7 @@ class TestScopeLinker(unittest.TestCase):
     def create_ast(self, file_path):
         parser = Parser()
         ast = parser.parse_file(file_path.value)
-
-        id_classifier = IdentifierClassifier()
-        attached_ast = id_classifier.attach_identifier_attributes(ast)
-
-        return attached_ast
+        return ast
 
 
     def create_variable(self, is_implicit=False, is_builtin=False):

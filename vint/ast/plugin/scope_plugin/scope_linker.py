@@ -4,6 +4,9 @@ from vint.ast.plugin.scope_plugin.scope_detector import (
     ScopeDetector,
     ScopeVisibility,
 )
+from vint.ast.plugin.scope_plugin.identifier_classifier import (
+    IdentifierClassifier,
+)
 
 
 DeclarativeNodeTypes = {
@@ -235,12 +238,15 @@ class ScopeLinker(object):
         specified ast. You can access the built scope tree and the built links
         by .scope_tree and .link_registry.
         """
+        id_classifier = IdentifierClassifier()
+        attached_ast = id_classifier.attach_identifier_attributes(ast)
+
         self._scope_tree_builder = ScopeLinker.ScopeTreeBuilder()
 
         # We are already in script local scope.
         self._scope_tree_builder.enter_new_scope(ScopeVisibility.SCRIPT_LOCAL)
 
-        traverse(ast,
+        traverse(attached_ast,
                  on_enter=self._enter_handler,
                  on_leave=self._leave_handler)
 
