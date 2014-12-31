@@ -5,8 +5,12 @@ from vint.ast.plugin.scope_plugin.identifier_classifier import (
     IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG,
     IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG,
     IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG,
+    IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG,
 )
-from vint.ast.plugin.scope_plugin.builtin_dictionary import BuiltinVariables
+from vint.ast.plugin.scope_plugin.builtin_dictionary import (
+    BuiltinVariables,
+    BuiltinFunctions,
+)
 
 
 class ScopeVisibility(enum.Enum):
@@ -62,15 +66,49 @@ class ScopeDetector(object):
     @classmethod
     def is_builtin_variable(cls, id_node):
         """ Whether the specified node is a builtin identifier. """
-        id_value = id_node['value']
+        is_identifier_like_node = IDENTIFIER_ATTRIBUTE in id_node
+        if not is_identifier_like_node:
+            return False
 
-        # TODO: Add unknown builtin flag
+        id_value = id_node['value']
         if id_value.startswith('v:'):
             # It is an explicit builtin variable such as: "v:count", "v:char"
+            # TODO: Add unknown builtin flag
             return True
+
+        is_function = id_node[IDENTIFIER_ATTRIBUTE][IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG]
+        if is_function:
+            # There are defference between a function identifier and variable
+            # identifier:
+            #
+            #   let localtime = 0
+            #   echo localtime " => 0
+            #   echo localtime() " => 1420011455
+            return id_value in BuiltinFunctions
 
         # It is an implicit builtin variable such as: "count", "char"
         return id_value in BuiltinVariables
+
+
+    @classmethod
+    def is_builtin_function(cls, id_node):
+        """ Whether the specified node is a builtin function name identifier.
+        The given identifier should be a child node of NodeType.CALL.
+        """
+        id_value = id_node['value']
+        return id_value in BuiltinFunctions
+
+
+    @classmethod
+    def is_global_variable(cls, id_node, context_scope):
+        """ Whether the specified node is a builtin identifier. """
+        scope_visibility_hint = cls.detect_scope_visibility(id_node, context_scope)
+        scope_visibility = scope_visibility_hint['scope_visibility']
+
+        return scope_visibility in {
+            ScopeVisibility.GLOBAL_LIKE: True,
+            ScopeVisibility.BUILTIN: True,
+        }
 
 
     @classmethod
