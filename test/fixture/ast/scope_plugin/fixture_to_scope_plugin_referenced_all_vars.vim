@@ -21,3 +21,8 @@ echo @"
 echo &opt_var
 echo v:count
 echo count
+echo g:
+echo b:
+echo w:
+echo t:
+echo v:

@@ -1,4 +1,6 @@
 function! g:FunctionWithNoParams()
+    echo a:
+    echo l:
     echo a:0
     echo a:000
 endfunction

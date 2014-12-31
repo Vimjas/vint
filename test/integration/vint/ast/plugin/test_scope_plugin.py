@@ -105,6 +105,11 @@ class TestScopePlugin(unittest.TestCase):
             '&opt_var': True,
             'v:count': True,
             'count': True,
+            'g:': True,
+            'b:': True,
+            'w:': True,
+            't:': True,
+            'v:': True,
         }
 
         self.assertReferencingIdentifiersReachability(expected_ref_ids_reachability_map,
@@ -214,6 +219,8 @@ class TestScopePlugin(unittest.TestCase):
         scope_plugin.process(ast)
 
         expected_declarative_ids_referenced_map = {
+            'a:': True,
+            'l:': True,
             'a:0': True,
             'a:000': True,
 
