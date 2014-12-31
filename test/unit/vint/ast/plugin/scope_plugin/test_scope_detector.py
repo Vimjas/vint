@@ -187,9 +187,11 @@ def test_detect_scope_visibility(context_scope_visibility, id_node, expected_sco
     'context_scope_visibility, node, expected_variable_name', [
         (Vis.SCRIPT_LOCAL, create_id('g:explicit_global'), 'g:explicit_global'),
         (Vis.SCRIPT_LOCAL, create_id('implicit_global'), 'g:implicit_global'),
+        (Vis.SCRIPT_LOCAL, create_id('implicit_global', is_declarative=False), 'g:implicit_global'),
 
         (Vis.FUNCTION_LOCAL, create_id('l:explicit_function_local'), 'l:explicit_function_local'),
         (Vis.FUNCTION_LOCAL, create_id('implicit_function_local'), 'l:implicit_function_local'),
+        (Vis.FUNCTION_LOCAL, create_id('implicit_function_local', is_declarative=False), 'l:implicit_function_local'),
 
         (Vis.SCRIPT_LOCAL, create_id('v:count'), 'v:count'),
         (Vis.FUNCTION_LOCAL, create_id('v:count'), 'v:count'),
