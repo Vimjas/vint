@@ -95,6 +95,11 @@ class ScopeLinker(object):
         def handle_new_variable_found(self, node):
             current_scope = self.get_current_scope()
             scope_visibility_hint = ScopeDetector.detect_scope_visibility(node, current_scope)
+
+            if scope_visibility_hint is None:
+                # We cannot do anything
+                return
+
             is_implicit = scope_visibility_hint['is_implicit']
 
             objective_scope = self._get_objective_scope(node)
