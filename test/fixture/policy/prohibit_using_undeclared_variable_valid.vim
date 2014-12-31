@@ -47,7 +47,7 @@ function! MyFunc(param1, param2, ...) range
     echo w:declared_var3
     echo t:declared_var4
     echo s:declared_var5
-    echo declared_var6
+    echo g:declared_var6
 
     " Use prepared variables
     echo g:declared_on_other_var1
