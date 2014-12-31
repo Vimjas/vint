@@ -260,7 +260,7 @@ class ScopeLinker(object):
         self.link_registry = self._scope_tree_builder.link_registry
 
 
-    def _find_new_variable(self, node):
+    def _find_variable_like_nodes(self, node):
         if not ScopeDetector.is_analyzable_identifier(node):
             return
 
@@ -277,7 +277,7 @@ class ScopeLinker(object):
         if node_type is NodeType.FUNCTION:
             return self._handle_function_node(node)
 
-        self._find_new_variable(node)
+        self._find_variable_like_nodes(node)
 
 
     def _handle_function_node(self, func_node):
@@ -293,7 +293,7 @@ class ScopeLinker(object):
 
         # 1. Add the function to the current scope
         func_name_node = func_node['left']
-        traverse(func_name_node, on_enter=self._find_new_variable)
+        traverse(func_name_node, on_enter=self._find_variable_like_nodes)
 
         # 2. Create a new scope of the function
         # 3. The current scope point to the new scope
