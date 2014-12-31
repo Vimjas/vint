@@ -1,5 +1,6 @@
 import unittest
 from pathlib import Path
+from pprint import pprint
 
 from vint.ast.parsing import Parser
 from vint.ast.traversing import traverse
@@ -9,7 +10,8 @@ from vint.ast.plugin.scope_plugin.identifier_classifier import (
     IDENTIFIER_ATTRIBUTE,
     IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG,
     IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG,
-    IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG
+    IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG,
+    IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG,
 )
 
 
@@ -46,11 +48,13 @@ class TestIdentifierClassifier(unittest.TestCase):
         return ast
 
 
-    def create_id_attr(self, is_definition=False, is_dynamic=False, is_member_of_subscript=False):
+    def create_id_attr(self, is_definition=False, is_dynamic=False,
+                       is_member_of_subscript=False, is_function=False):
         return {
             IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG: is_definition,
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: is_dynamic,
             IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG: is_member_of_subscript,
+            IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: is_function,
         }
 
 
@@ -65,9 +69,8 @@ class TestIdentifierClassifier(unittest.TestCase):
             footstamps[id_name] = True
 
             # Print id_name for debugging
-            print(NodeType(node['type']), id_name)
-            self.assertEqual(expected_id_attr_map[id_name],
-                             node[IDENTIFIER_ATTRIBUTE])
+            pprint((NodeType(node['type']), id_name))
+            self.assertEqual(expected_id_attr_map[id_name], node[IDENTIFIER_ATTRIBUTE])
 
         traverse(ast, on_enter=on_enter_handler)
 
@@ -87,12 +90,12 @@ class TestIdentifierClassifier(unittest.TestCase):
         id_classifier = IdentifierClassifier()
 
         expected_id_attr_map = {
-            'g:ExplicitGlobalFunc': self.create_id_attr(is_definition=True),
-            'b:BufferLocalFunc': self.create_id_attr(is_definition=True),
-            'w:WindowLocalFunc': self.create_id_attr(is_definition=True),
-            't:TabLocalFunc': self.create_id_attr(is_definition=True),
-            's:ScriptLocalFunc': self.create_id_attr(is_definition=True),
-            'ImplicitGlobalFunc': self.create_id_attr(is_definition=True),
+            'g:ExplicitGlobalFunc': self.create_id_attr(is_definition=True, is_function=True),
+            'b:BufferLocalFunc': self.create_id_attr(is_definition=True, is_function=True),
+            'w:WindowLocalFunc': self.create_id_attr(is_definition=True, is_function=True),
+            't:TabLocalFunc': self.create_id_attr(is_definition=True, is_function=True),
+            's:ScriptLocalFunc': self.create_id_attr(is_definition=True, is_function=True),
+            'ImplicitGlobalFunc': self.create_id_attr(is_definition=True, is_function=True),
         }
 
         attached_ast = id_classifier.attach_identifier_attributes(ast)
@@ -106,21 +109,26 @@ class TestIdentifierClassifier(unittest.TestCase):
 
         expected_id_attr_map = {
             'FunctionCall':
-                self.create_id_attr(is_definition=False),
+                self.create_id_attr(is_definition=False,
+                                    is_function=True),
             'autoload#AutoloadFunctionCall':
-                self.create_id_attr(is_definition=False),
+                self.create_id_attr(is_definition=False,
+                                    is_function=True),
             'dot':
                 self.create_id_attr(is_definition=False),
             'DotFunctionCall':
                 self.create_id_attr(is_definition=False,
-                                    is_member_of_subscript=True),
+                                    is_member_of_subscript=True,
+                                    is_function=True),
             'subscript':
                 self.create_id_attr(is_definition=False),
             "'SubscriptFunctionCall'":
                 self.create_id_attr(is_definition=False,
-                                    is_member_of_subscript=True),
+                                    is_member_of_subscript=True,
+                                    is_function=True),
             'FunctionCallInExpressionContext':
-                self.create_id_attr(is_definition=False),
+                self.create_id_attr(is_definition=False,
+                                    is_function=True),
         }
 
         attached_ast = id_classifier.attach_identifier_attributes(ast)
@@ -133,10 +141,13 @@ class TestIdentifierClassifier(unittest.TestCase):
         id_classifier = IdentifierClassifier()
 
         expected_id_attr_map = {
-            'FuncContext': self.create_id_attr(is_definition=True),
-            'l:ExplicitFuncLocalFunc': self.create_id_attr(is_definition=True),
+            'FuncContext': self.create_id_attr(is_definition=True,
+                                               is_function=True),
+            'l:ExplicitFuncLocalFunc': self.create_id_attr(is_definition=True,
+                                                           is_function=True),
             'ImplicitFuncLocalFunc':
-                self.create_id_attr(is_definition=True),
+                self.create_id_attr(is_definition=True,
+                                    is_function=True),
         }
 
         attached_ast = id_classifier.attach_identifier_attributes(ast)
@@ -171,7 +182,7 @@ class TestIdentifierClassifier(unittest.TestCase):
         id_classifier = IdentifierClassifier()
 
         expected_id_attr_map = {
-            'FuncContext': self.create_id_attr(is_definition=True),
+            'FuncContext': self.create_id_attr(is_definition=True, is_function=True),
             'l:explicit_func_local_var': self.create_id_attr(is_definition=True),
             'implicit_func_local_var': self.create_id_attr(is_definition=True),
         }
@@ -187,10 +198,18 @@ class TestIdentifierClassifier(unittest.TestCase):
 
         expected_id_attr_map = {
             'g:dict': self.create_id_attr(is_definition=False),
-            'Function1': self.create_id_attr(is_definition=True, is_member_of_subscript=True),
-            "'Function2'": self.create_id_attr(is_definition=True, is_member_of_subscript=True),
-            'key1': self.create_id_attr(is_definition=True, is_member_of_subscript=True),
-            "'key2'": self.create_id_attr(is_definition=True, is_member_of_subscript=True),
+            'Function1': self.create_id_attr(is_definition=True,
+                                             is_member_of_subscript=True,
+                                             is_function=True),
+            "'Function2'": self.create_id_attr(is_definition=True,
+                                               is_member_of_subscript=True,
+                                               is_function=True),
+            'key1': self.create_id_attr(is_definition=True,
+                                        is_member_of_subscript=True,
+                                        is_function=False),
+            "'key2'": self.create_id_attr(is_definition=True,
+                                          is_member_of_subscript=True,
+                                          is_function=False),
         }
 
         attached_ast = id_classifier.attach_identifier_attributes(ast)
@@ -222,16 +241,16 @@ class TestIdentifierClassifier(unittest.TestCase):
         id_classifier = IdentifierClassifier()
 
         expected_id_attr_map = {
-            'g:FunctionWithNoParams': self.create_id_attr(is_definition=True),
-            'g:FunctionWithOneParam': self.create_id_attr(is_definition=True),
+            'g:FunctionWithNoParams': self.create_id_attr(is_definition=True, is_function=True),
+            'g:FunctionWithOneParam': self.create_id_attr(is_definition=True, is_function=True),
             'param': self.create_id_attr(is_definition=True),
-            'g:FunctionWithTwoParams': self.create_id_attr(is_definition=True),
+            'g:FunctionWithTwoParams': self.create_id_attr(is_definition=True, is_function=True),
             'param1': self.create_id_attr(is_definition=True),
             'param2': self.create_id_attr(is_definition=True),
-            'g:FunctionWithVarParams': self.create_id_attr(is_definition=True),
-            'g:FunctionWithParamsAndVarParams': self.create_id_attr(is_definition=True),
+            'g:FunctionWithVarParams': self.create_id_attr(is_definition=True, is_function=True),
+            'g:FunctionWithParamsAndVarParams': self.create_id_attr(is_definition=True, is_function=True),
             'param_var1': self.create_id_attr(is_definition=True),
-            'g:FunctionWithRange': self.create_id_attr(is_definition=True),
+            'g:FunctionWithRange': self.create_id_attr(is_definition=True, is_function=True),
             '...': self.create_id_attr(is_definition=True),
         }
 

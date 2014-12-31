@@ -6,6 +6,7 @@ IDENTIFIER_ATTRIBUTE = 'VINT:identifier_attribute'
 IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG = 'is_definition'
 IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG = 'is_dynamic'
 IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG = 'is_member_of_subscript'
+IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG = 'is_function'
 REFERENCING_IDENTIFIERS = 'VINT:referencing_identifiers'
 DECLARING_IDENTIFIERS = 'VINT:declaring_identifiers'
 
@@ -89,18 +90,21 @@ class IdentifierClassifier(object):
         - is dynamic: True if the identifier name can be determined by static analysis.
         - is member: True if the identifier is a member of a subscription/dot/slice node.
         - is declaring: True if the identifier is used to declare.
+        - is function: True if the identifier is a function. Vim distinguish
+                       between function identifiers and variable identifiers.
         """
         traverse(ast, on_enter=self._enter_handler)
         return ast
 
 
     def _set_identifier_attribute(self, node, is_definition=None, is_dynamic=None,
-                                  is_member_of_subscript=None):
+                                  is_member_of_subscript=None, is_function=None):
 
         id_attr = node.setdefault(IDENTIFIER_ATTRIBUTE, {
             IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG: False,
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: False,
             IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG: False,
+            IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
         })
 
         if is_definition is not None:
@@ -111,6 +115,9 @@ class IdentifierClassifier(object):
 
         if is_member_of_subscript is not None:
             id_attr[IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG] = is_member_of_subscript
+
+        if is_function is not None:
+            id_attr[IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG] = is_function
 
 
     def _enter_handler(self, node):
@@ -125,6 +132,9 @@ class IdentifierClassifier(object):
 
         if node_type in DeclarativeNodeTypes:
             self._enter_declarative_node(node)
+
+        if node_type is NodeType.CALL:
+            self._enter_call_node(node)
 
 
     def _pre_mark_accessor_children(self, node):
@@ -147,25 +157,33 @@ class IdentifierClassifier(object):
 
         if member_node_type in IdentifierTerminateNodeTypes or \
                 member_node_type in AnalyzableSubScriptChildNodeTypes:
-            self._set_identifier_attribute(member_node, is_member_of_subscript=True)
+            self._set_identifier_attribute(member_node,
+                                           is_member_of_subscript=True)
 
 
-    def _enter_definition_identifier_like_node(self, id_like_node):
+    def _enter_identifier_like_node(self, id_like_node, is_definition=None,
+                                    is_function=None):
         id_like_node_type = NodeType(id_like_node['type'])
 
         if id_like_node_type in AccessorLikeNodeTypes:
-            self._enter_definition_accessor_node(id_like_node)
+            self._enter_accessor_node(id_like_node,
+                                      is_definition=is_definition,
+                                      is_function=is_function)
             return
 
         if id_like_node_type in IdentifierTerminateNodeTypes:
-            self._enter_definition_identifier_node(id_like_node)
+            self._enter_identifier_node(id_like_node,
+                                        is_definition=is_definition,
+                                        is_function=is_function)
             return
 
         # Curlyname node can have a dynamic name. For example:
         #   let s:var = 'VAR'
         #   let my_{s:var} = 0
         if id_like_node_type is NodeType.CURLYNAME:
-            self._enter_definition_curlyname_node(id_like_node)
+            self._enter_curlyname_node(id_like_node,
+                                       is_definition=is_definition,
+                                       is_function=is_function)
             return
 
 
@@ -175,29 +193,38 @@ class IdentifierClassifier(object):
 
         # Function name is in the left.
         func_name_node = func_node['left']
-        self._enter_definition_identifier_like_node(func_name_node)
+        self._enter_identifier_like_node(func_name_node,
+                                         is_definition=True,
+                                         is_function=True)
 
         # Function parameter names is in the r_list.
         func_param_nodes = func_node['rlist']
         for func_param_node in func_param_nodes:
-            self._enter_definition_identifier_like_node(func_param_node)
+            self._enter_identifier_like_node(func_param_node,
+                                             is_definition=True)
 
 
-    def _enter_definition_curlyname_node(self, curlyname_node):
-        self._set_identifier_attribute(curlyname_node, is_dynamic=True)
+    def _enter_curlyname_node(self, curlyname_node, is_definition=None, is_function=None):
+        self._set_identifier_attribute(curlyname_node,
+                                       is_dynamic=True,
+                                       is_definition=is_definition,
+                                       is_function=is_function)
 
 
-    def _enter_definition_identifier_node(self, def_id_node):
-        self._set_identifier_attribute(def_id_node, is_definition=True)
+    def _enter_identifier_node(self, def_id_node, is_definition=None, is_function=None):
+        self._set_identifier_attribute(def_id_node,
+                                       is_definition=is_definition,
+                                       is_function=is_function)
 
 
-    def _enter_definition_accessor_node(self, accessor_node):
+    def _enter_accessor_node(self, accessor_node, is_definition=None, is_function=None):
         accessor_node_type = NodeType(accessor_node['type'])
 
         if accessor_node_type is NodeType.DOT:
             self._set_identifier_attribute(accessor_node['right'],
-                                           is_definition=True,
-                                           is_dynamic=False)
+                                           is_definition=is_definition,
+                                           is_dynamic=False,
+                                           is_function=is_function)
             return
 
         if accessor_node_type is NodeType.SUBSCRIPT:
@@ -210,9 +237,11 @@ class IdentifierClassifier(object):
             #   let object[var] = 0
             is_dynamic = subscript_right_type not in AnalyzableSubScriptChildNodeTypes
 
-            self._set_identifier_attribute(accessor_node['right'],
-                                           is_definition=True,
-                                           is_dynamic=is_dynamic)
+            if not is_dynamic:
+                self._set_identifier_attribute(accessor_node['right'],
+                                               is_definition=is_definition,
+                                               is_dynamic=False,
+                                               is_function=is_function)
             return
 
         if accessor_node_type is NodeType.SLICE:
@@ -233,7 +262,8 @@ class IdentifierClassifier(object):
 
                 self._set_identifier_attribute(elem_node,
                                                is_definition=is_definition,
-                                               is_dynamic=is_dynamic)
+                                               is_dynamic=is_dynamic,
+                                               is_function=is_function)
             return
 
         raise Exception()
@@ -260,9 +290,9 @@ class IdentifierClassifier(object):
 
         if is_destructuring_assignment:
             for elem_node in node['list']:
-                self._enter_definition_identifier_like_node(elem_node)
+                self._enter_identifier_like_node(elem_node, is_definition=True)
         else:
-            self._enter_definition_identifier_like_node(left_node)
+            self._enter_identifier_like_node(left_node, is_definition=True)
 
 
     def _enter_declarative_node(self, node):
@@ -277,3 +307,8 @@ class IdentifierClassifier(object):
         if node_type is NodeType.FOR:
             self._enter_for_node(node)
             return
+
+
+    def _enter_call_node(self, call_node):
+        left_node = call_node['left']
+        self._enter_identifier_like_node(left_node, is_function=True)
