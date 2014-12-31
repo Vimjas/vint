@@ -84,12 +84,22 @@ class ReferenceReachabilityTester(object):
     def check_reachability(self, ref_id_node):
         scope = self._link_registry.get_scope_by_referencing_identifier(ref_id_node)
         var_name = ScopeDetector.normalize_variable_name(ref_id_node, scope)
+        is_func_id = is_function_identifier(ref_id_node)
 
         while scope is not None:
-            variables_list = scope['functions'
-                                   if is_function_identifier(ref_id_node)
-                                   else 'variables']
+            if is_func_id:
+                functions_list = scope['functions']
+                if var_name in functions_list:
+                    for variable in functions_list[var_name]:
+                        declaring_id_node = self._link_registry\
+                            .get_declarative_identifier_by_variable(variable)
+                        declaring_id_node[REFERECED_FLAG] = True
 
+                    return True
+
+            # Probably it is a function reference.
+            # So the function can be accessed via variable function reference.
+            variables_list = scope['variables']
             if var_name in variables_list:
                 for variable in variables_list[var_name]:
                     declaring_id_node = self._link_registry\
