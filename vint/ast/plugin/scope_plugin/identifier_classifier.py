@@ -317,3 +317,36 @@ class IdentifierClassifier(object):
     def _enter_call_node(self, call_node):
         left_node = call_node['left']
         self._enter_identifier_like_node(left_node, is_function=True)
+
+
+
+def is_identifier_like_node(node):
+    return IDENTIFIER_ATTRIBUTE in node
+
+
+def is_function_identifier(node):
+    if not is_identifier_like_node(node):
+        return False
+
+    return node[IDENTIFIER_ATTRIBUTE][IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG]
+
+
+def is_dynamic_identifier(node):
+    if not is_identifier_like_node(node):
+        return False
+
+    return node[IDENTIFIER_ATTRIBUTE][IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG]
+
+
+def is_declarative_identifier(node):
+    if not is_identifier_like_node(node):
+        return False
+
+    return node[IDENTIFIER_ATTRIBUTE][IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG]
+
+
+def is_member_identifier(node):
+    if not is_identifier_like_node(node):
+        return False
+
+    return node[IDENTIFIER_ATTRIBUTE][IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG]
