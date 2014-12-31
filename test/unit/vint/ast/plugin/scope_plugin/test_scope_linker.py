@@ -47,7 +47,7 @@ class TestScopeLinker(unittest.TestCase):
 
 
     def assertScopeTreeEqual(self, expected_scope_tree, actual_scope_tree):
-        self.maxDiff = 10000
+        self.maxDiff = 20000
 
         self.assertEqual(expected_scope_tree, actual_scope_tree)
 
@@ -399,6 +399,7 @@ class TestScopeLinker(unittest.TestCase):
                 'g:FunctionWithVarParams': [self.create_variable()],
                 'g:FunctionWithParamsAndVarParams': [self.create_variable()],
                 'g:FunctionWithRange': [self.create_variable()],
+                'g:FunctionWithDict': [self.create_variable()],
             },
             child_scopes=[
                 self.create_scope(
@@ -505,6 +506,16 @@ class TestScopeLinker(unittest.TestCase):
                                 'a:000': [self.create_variable()],
                                 'a:firstline': [self.create_variable()],
                                 'a:lastline': [self.create_variable()],
+                            }
+                        ),
+                        self.create_scope(
+                            ScopeVisibility.FUNCTION_LOCAL,
+                            variables={
+                                'l:': [self.create_variable()],
+                                'l:self': [self.create_variable()],
+                                'a:': [self.create_variable()],
+                                'a:0': [self.create_variable()],
+                                'a:000': [self.create_variable()],
                             }
                         ),
                     ]

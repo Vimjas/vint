@@ -16,3 +16,7 @@ endfunction
 function! g:FunctionWithRange(param) range
     " a:firstline and a:lastline is declared implicitly.
 endfunction
+
+function! g:FunctionWithDict() dict
+    " self is declared implicitly.
+endfunction
