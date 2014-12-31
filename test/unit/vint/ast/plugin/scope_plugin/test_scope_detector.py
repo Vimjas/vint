@@ -6,6 +6,7 @@ from vint.ast.plugin.scope_plugin.identifier_classifier import (
     IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG,
     IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG,
     IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG,
+    IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG,
 )
 
 
@@ -22,7 +23,7 @@ def create_scope_visibility_hint(visibility, is_implicit=False):
     }
 
 
-def create_id(id_value, is_declarative=True):
+def create_id(id_value, is_declarative=True, is_function=False):
     return {
         'type': NodeType.IDENTIFIER.value,
         'value': id_value,
@@ -30,6 +31,7 @@ def create_id(id_value, is_declarative=True):
             IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG: is_declarative,
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: False,
             IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG: False,
+            IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: is_function,
         },
     }
 
@@ -42,6 +44,7 @@ def create_env(env_value):
             IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG: True,
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: False,
             IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG: False,
+            IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
         },
     }
 
@@ -54,6 +57,7 @@ def create_option(opt_value):
             IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG: True,
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: False,
             IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG: False,
+            IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
         },
     }
 
@@ -66,6 +70,7 @@ def create_reg(reg_value):
             IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG: True,
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: False,
             IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG: False,
+            IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
         },
     }
 
@@ -211,14 +216,42 @@ def test_normalize_variable_name(context_scope_visibility, node, expected_variab
 
 
 @pytest.mark.parametrize(
-    'id_value, expected_result', [
-        ('my_var', False),
-        ('count', True),
-        ('v:count', True),
+    'id_value, is_function, expected_result', [
+        ('my_var', False, False),
+        ('count', False, True),
+        ('v:count', False, True),
+
+        ('MyFunc', True, False),
+        ('localtime', True, True),
     ]
 )
-def test_is_builtin_variable(id_value, expected_result):
-    id_node = create_id(id_value)
+def test_is_builtin_variable(id_value, is_function, expected_result):
+    id_node = create_id(id_value, is_function=is_function)
     result = ScopeDetector.is_builtin_variable(id_node)
+
+    assert expected_result == result
+
+
+
+@pytest.mark.parametrize(
+    'id_value, context_scope_visibility, expected_result', [
+        ('g:my_var', Vis.SCRIPT_LOCAL, True),
+        ('g:my_var', Vis.FUNCTION_LOCAL, True),
+        ('my_var', Vis.SCRIPT_LOCAL, True),
+        ('my_var', Vis.FUNCTION_LOCAL, False),
+        ('s:my_var', Vis.SCRIPT_LOCAL, False),
+        ('s:my_var', Vis.FUNCTION_LOCAL, False),
+
+        ('count', Vis.SCRIPT_LOCAL, True),
+        ('v:count', Vis.SCRIPT_LOCAL, True),
+
+        ('count', Vis.FUNCTION_LOCAL, True),
+        ('v:count', Vis.FUNCTION_LOCAL, True),
+    ]
+)
+def test_is_global_variable(id_value, context_scope_visibility, expected_result):
+    id_node = create_id(id_value)
+    context_scope = create_scope(context_scope_visibility)
+    result = ScopeDetector.is_global_variable(id_node, context_scope)
 
     assert expected_result == result
