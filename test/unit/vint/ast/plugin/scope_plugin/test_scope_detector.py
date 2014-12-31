@@ -22,12 +22,12 @@ def create_scope_visibility_hint(visibility, is_implicit=False):
     }
 
 
-def create_id(id_value):
+def create_id(id_value, is_declarative=True):
     return {
         'type': NodeType.IDENTIFIER.value,
         'value': id_value,
         IDENTIFIER_ATTRIBUTE: {
-            IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG: True,
+            IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG: is_declarative,
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: False,
             IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG: False,
         },
@@ -70,7 +70,7 @@ def create_reg(reg_value):
     }
 
 
-def create_curlyname():
+def create_curlyname(is_declarative=True):
     """ Create a node as a `my_{'var'}`
     """
     return {
@@ -89,19 +89,19 @@ def create_curlyname():
             }
         ],
         IDENTIFIER_ATTRIBUTE: {
-            IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG: True,
+            IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG: is_declarative,
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: True,
             IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG: False,
         },
     }
 
 
-def create_subscript_member():
+def create_subscript_member(is_declarative=True):
     return {
         'type': NodeType.IDENTIFIER.value,
         'value': 'member',
         IDENTIFIER_ATTRIBUTE: {
-            IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG: True,
+            IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG: is_declarative,
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: False,
             IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG: True,
         },
@@ -110,6 +110,7 @@ def create_subscript_member():
 
 @pytest.mark.parametrize(
     'context_scope_visibility, id_node, expected_scope_visibility, expected_implicity', [
+        # Declarative variable test
         (Vis.SCRIPT_LOCAL, create_id('g:explicit_global'), Vis.GLOBAL_LIKE, False),
         (Vis.SCRIPT_LOCAL, create_id('implicit_global'), Vis.GLOBAL_LIKE, True),
         (Vis.FUNCTION_LOCAL, create_id('g:explicit_global'), Vis.GLOBAL_LIKE, False),
@@ -139,6 +140,37 @@ def create_subscript_member():
 
         (Vis.SCRIPT_LOCAL, create_subscript_member(), Vis.UNANALYZABLE, False),
         (Vis.FUNCTION_LOCAL, create_subscript_member(), Vis.UNANALYZABLE, False),
+
+        # Referencing variable test
+        (Vis.SCRIPT_LOCAL, create_id('g:explicit_global', is_declarative=False), Vis.GLOBAL_LIKE, False),
+        (Vis.SCRIPT_LOCAL, create_id('implicit_global', is_declarative=False), Vis.GLOBAL_LIKE, True),
+        (Vis.FUNCTION_LOCAL, create_id('g:explicit_global', is_declarative=False), Vis.GLOBAL_LIKE, False),
+
+        (Vis.SCRIPT_LOCAL, create_id('b:buffer_local', is_declarative=False), Vis.GLOBAL_LIKE, False),
+        (Vis.FUNCTION_LOCAL, create_id('b:buffer_local', is_declarative=False), Vis.GLOBAL_LIKE, False),
+
+        (Vis.SCRIPT_LOCAL, create_id('w:window_local', is_declarative=False), Vis.GLOBAL_LIKE, False),
+        (Vis.FUNCTION_LOCAL, create_id('w:window_local', is_declarative=False), Vis.GLOBAL_LIKE, False),
+
+        (Vis.SCRIPT_LOCAL, create_id('s:script_local', is_declarative=False), Vis.SCRIPT_LOCAL, False),
+        (Vis.FUNCTION_LOCAL, create_id('s:script_local', is_declarative=False), Vis.SCRIPT_LOCAL, False),
+
+        (Vis.FUNCTION_LOCAL, create_id('l:explicit_function_local', is_declarative=False), Vis.FUNCTION_LOCAL, False),
+        (Vis.FUNCTION_LOCAL, create_id('implicit_function_local', is_declarative=False), Vis.FUNCTION_LOCAL, True),
+
+        (Vis.FUNCTION_LOCAL, create_id('a:param', is_declarative=False), Vis.FUNCTION_LOCAL, False),
+        (Vis.FUNCTION_LOCAL, create_id('a:000', is_declarative=False), Vis.FUNCTION_LOCAL, False),
+        (Vis.FUNCTION_LOCAL, create_id('a:1', is_declarative=False), Vis.FUNCTION_LOCAL, False),
+
+        (Vis.SCRIPT_LOCAL, create_id('v:count', is_declarative=False), Vis.BUILTIN, False),
+        (Vis.FUNCTION_LOCAL, create_id('v:count', is_declarative=False), Vis.BUILTIN, False),
+        (Vis.FUNCTION_LOCAL, create_id('count', is_declarative=False), Vis.BUILTIN, True),
+
+        (Vis.SCRIPT_LOCAL, create_curlyname(is_declarative=False), Vis.UNANALYZABLE, False),
+        (Vis.FUNCTION_LOCAL, create_curlyname(is_declarative=False), Vis.UNANALYZABLE, False),
+
+        (Vis.SCRIPT_LOCAL, create_subscript_member(is_declarative=False), Vis.UNANALYZABLE, False),
+        (Vis.FUNCTION_LOCAL, create_subscript_member(is_declarative=False), Vis.UNANALYZABLE, False),
     ]
 )
 def test_detect_scope_visibility(context_scope_visibility, id_node, expected_scope_visibility, expected_implicity):

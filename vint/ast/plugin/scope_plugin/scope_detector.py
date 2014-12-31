@@ -133,7 +133,7 @@ class ScopeDetector(object):
         """
         node_type = NodeType(node['type'])
 
-        if not cls.is_analyzable_definition_identifier(node):
+        if not cls.is_analyzable_identifier(node):
             return cls._create_identifier_visibility_hint(ScopeVisibility.UNANALYZABLE)
 
         if node_type is NodeType.IDENTIFIER:
