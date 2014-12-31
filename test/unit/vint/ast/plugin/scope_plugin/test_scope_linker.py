@@ -60,6 +60,13 @@ class TestScopeLinker(unittest.TestCase):
 
         expected_scope_tree = self.create_scope(
             ScopeVisibility.GLOBAL_LIKE,
+            variables={
+                'g:': [self.create_variable()],
+                'b:': [self.create_variable()],
+                'w:': [self.create_variable()],
+                't:': [self.create_variable()],
+                'v:': [self.create_variable()],
+            },
             functions={
                 'g:ExplicitGlobalFunc': [self.create_variable()],
                 'b:BufferLocalFunc': [self.create_variable()],
@@ -70,6 +77,9 @@ class TestScopeLinker(unittest.TestCase):
             child_scopes=[
                 self.create_scope(
                     ScopeVisibility.SCRIPT_LOCAL,
+                    variables={
+                        's:': [self.create_variable()],
+                    },
                     functions={
                         's:ScriptLocalFunc': [self.create_variable()]
                     },
@@ -77,6 +87,7 @@ class TestScopeLinker(unittest.TestCase):
                         self.create_scope(
                             ScopeVisibility.FUNCTION_LOCAL,
                             variables={
+                                'l:': [self.create_variable()],
                                 'a:': [self.create_variable()],
                                 'a:0': [self.create_variable()],
                                 'a:000': [self.create_variable()],
@@ -85,6 +96,7 @@ class TestScopeLinker(unittest.TestCase):
                         self.create_scope(
                             ScopeVisibility.FUNCTION_LOCAL,
                             variables={
+                                'l:': [self.create_variable()],
                                 'a:': [self.create_variable()],
                                 'a:0': [self.create_variable()],
                                 'a:000': [self.create_variable()],
@@ -93,6 +105,7 @@ class TestScopeLinker(unittest.TestCase):
                         self.create_scope(
                             ScopeVisibility.FUNCTION_LOCAL,
                             variables={
+                                'l:': [self.create_variable()],
                                 'a:': [self.create_variable()],
                                 'a:0': [self.create_variable()],
                                 'a:000': [self.create_variable()],
@@ -101,6 +114,7 @@ class TestScopeLinker(unittest.TestCase):
                         self.create_scope(
                             ScopeVisibility.FUNCTION_LOCAL,
                             variables={
+                                'l:': [self.create_variable()],
                                 'a:': [self.create_variable()],
                                 'a:0': [self.create_variable()],
                                 'a:000': [self.create_variable()],
@@ -109,6 +123,7 @@ class TestScopeLinker(unittest.TestCase):
                         self.create_scope(
                             ScopeVisibility.FUNCTION_LOCAL,
                             variables={
+                                'l:': [self.create_variable()],
                                 'a:': [self.create_variable()],
                                 'a:0': [self.create_variable()],
                                 'a:000': [self.create_variable()],
@@ -117,6 +132,7 @@ class TestScopeLinker(unittest.TestCase):
                         self.create_scope(
                             ScopeVisibility.FUNCTION_LOCAL,
                             variables={
+                                'l:': [self.create_variable()],
                                 'a:': [self.create_variable()],
                                 'a:0': [self.create_variable()],
                                 'a:000': [self.create_variable()],
@@ -138,16 +154,27 @@ class TestScopeLinker(unittest.TestCase):
 
         expected_scope_tree = self.create_scope(
             ScopeVisibility.GLOBAL_LIKE,
+            variables={
+                'g:': [self.create_variable()],
+                'b:': [self.create_variable()],
+                'w:': [self.create_variable()],
+                't:': [self.create_variable()],
+                'v:': [self.create_variable()],
+            },
             functions={
                 'g:FuncContext': [self.create_variable(is_implicit=True)],
             },
             child_scopes=[
                 self.create_scope(
                     ScopeVisibility.SCRIPT_LOCAL,
+                    variables={
+                        's:': [self.create_variable()],
+                    },
                     child_scopes=[
                         self.create_scope(
                             ScopeVisibility.FUNCTION_LOCAL,
                             variables={
+                                'l:': [self.create_variable()],
                                 'a:': [self.create_variable()],
                                 'a:0': [self.create_variable()],
                                 'a:000': [self.create_variable()],
@@ -160,6 +187,7 @@ class TestScopeLinker(unittest.TestCase):
                                 self.create_scope(
                                     ScopeVisibility.FUNCTION_LOCAL,
                                     variables={
+                                        'l:': [self.create_variable()],
                                         'a:': [self.create_variable()],
                                         'a:0': [self.create_variable()],
                                         'a:000': [self.create_variable()],
@@ -168,6 +196,7 @@ class TestScopeLinker(unittest.TestCase):
                                 self.create_scope(
                                     ScopeVisibility.FUNCTION_LOCAL,
                                     variables={
+                                        'l:': [self.create_variable()],
                                         'a:': [self.create_variable()],
                                         'a:0': [self.create_variable()],
                                         'a:000': [self.create_variable()],
@@ -192,6 +221,11 @@ class TestScopeLinker(unittest.TestCase):
         expected_scope_tree = self.create_scope(
             ScopeVisibility.GLOBAL_LIKE,
             variables={
+                'g:': [self.create_variable()],
+                'b:': [self.create_variable()],
+                'w:': [self.create_variable()],
+                't:': [self.create_variable()],
+                'v:': [self.create_variable()],
                 'g:explicit_global_var': [self.create_variable()],
                 'b:buffer_local_var': [self.create_variable()],
                 'w:window_local_var': [self.create_variable()],
@@ -206,6 +240,7 @@ class TestScopeLinker(unittest.TestCase):
                 self.create_scope(
                     ScopeVisibility.SCRIPT_LOCAL,
                     variables={
+                        's:': [self.create_variable()],
                         's:script_local_var': [self.create_variable()],
                     }
                 )
@@ -223,16 +258,27 @@ class TestScopeLinker(unittest.TestCase):
 
         expected_scope_tree = self.create_scope(
             ScopeVisibility.GLOBAL_LIKE,
+            variables={
+                'g:': [self.create_variable()],
+                'b:': [self.create_variable()],
+                'w:': [self.create_variable()],
+                't:': [self.create_variable()],
+                'v:': [self.create_variable()],
+            },
             functions={
                 'g:FuncContext': [self.create_variable(is_implicit=True)],
             },
             child_scopes=[
                 self.create_scope(
                     ScopeVisibility.SCRIPT_LOCAL,
+                    variables={
+                        's:': [self.create_variable()],
+                    },
                     child_scopes=[
                         self.create_scope(
                             ScopeVisibility.FUNCTION_LOCAL,
                             variables={
+                                'l:': [self.create_variable()],
                                 'a:': [self.create_variable()],
                                 'a:0': [self.create_variable()],
                                 'a:000': [self.create_variable()],
@@ -257,18 +303,25 @@ class TestScopeLinker(unittest.TestCase):
         expected_scope_tree = self.create_scope(
             ScopeVisibility.GLOBAL_LIKE,
             variables={
+                'g:': [self.create_variable()],
+                'b:': [self.create_variable()],
+                'w:': [self.create_variable()],
+                't:': [self.create_variable()],
+                'v:': [self.create_variable()],
                 # Member functions are not analyzable
             },
             child_scopes=[
                 self.create_scope(
                     ScopeVisibility.SCRIPT_LOCAL,
                     variables={
+                        's:': [self.create_variable()],
                         # Member functions are not analyzable
                     },
                     child_scopes=[
                         self.create_scope(
                             ScopeVisibility.FUNCTION_LOCAL,
                             variables={
+                                'l:': [self.create_variable()],
                                 'a:': [self.create_variable()],
                                 'a:0': [self.create_variable()],
                                 'a:000': [self.create_variable()],
@@ -277,6 +330,7 @@ class TestScopeLinker(unittest.TestCase):
                         self.create_scope(
                             ScopeVisibility.FUNCTION_LOCAL,
                             variables={
+                                'l:': [self.create_variable()],
                                 'a:': [self.create_variable()],
                                 'a:0': [self.create_variable()],
                                 'a:000': [self.create_variable()],
@@ -299,6 +353,11 @@ class TestScopeLinker(unittest.TestCase):
         expected_scope_tree = self.create_scope(
             ScopeVisibility.GLOBAL_LIKE,
             variables={
+                'g:': [self.create_variable()],
+                'b:': [self.create_variable()],
+                'w:': [self.create_variable()],
+                't:': [self.create_variable()],
+                'v:': [self.create_variable()],
                 'g:for_var1': [self.create_variable()],
                 'g:for_var2': [self.create_variable()],
                 'g:let_var1': [self.create_variable()],
@@ -306,7 +365,12 @@ class TestScopeLinker(unittest.TestCase):
                 # g:list members are not analyzable
             },
             child_scopes=[
-                self.create_scope(ScopeVisibility.SCRIPT_LOCAL)
+                self.create_scope(
+                    ScopeVisibility.SCRIPT_LOCAL,
+                    variables={
+                        's:': [self.create_variable()],
+                    },
+                )
             ]
         )
 
@@ -321,6 +385,13 @@ class TestScopeLinker(unittest.TestCase):
 
         expected_scope_tree = self.create_scope(
             ScopeVisibility.GLOBAL_LIKE,
+            variables={
+                'g:': [self.create_variable()],
+                'b:': [self.create_variable()],
+                'w:': [self.create_variable()],
+                't:': [self.create_variable()],
+                'v:': [self.create_variable()],
+            },
             functions={
                 'g:FunctionWithNoParams': [self.create_variable()],
                 'g:FunctionWithOneParam': [self.create_variable()],
@@ -332,10 +403,14 @@ class TestScopeLinker(unittest.TestCase):
             child_scopes=[
                 self.create_scope(
                     ScopeVisibility.SCRIPT_LOCAL,
+                    variables={
+                        's:': [self.create_variable()],
+                    },
                     child_scopes=[
                         self.create_scope(
                             ScopeVisibility.FUNCTION_LOCAL,
                             variables={
+                                'l:': [self.create_variable()],
                                 'a:': [self.create_variable()],
                                 'a:0': [self.create_variable()],
                                 'a:000': [self.create_variable()],
@@ -344,6 +419,7 @@ class TestScopeLinker(unittest.TestCase):
                         self.create_scope(
                             ScopeVisibility.FUNCTION_LOCAL,
                             variables={
+                                'l:': [self.create_variable()],
                                 'a:': [self.create_variable()],
                                 'a:0': [self.create_variable()],
                                 'a:000': [self.create_variable()],
@@ -353,6 +429,7 @@ class TestScopeLinker(unittest.TestCase):
                         self.create_scope(
                             ScopeVisibility.FUNCTION_LOCAL,
                             variables={
+                                'l:': [self.create_variable()],
                                 'a:': [self.create_variable()],
                                 'a:0': [self.create_variable()],
                                 'a:000': [self.create_variable()],
@@ -363,6 +440,7 @@ class TestScopeLinker(unittest.TestCase):
                         self.create_scope(
                             ScopeVisibility.FUNCTION_LOCAL,
                             variables={
+                                'l:': [self.create_variable()],
                                 'a:': [self.create_variable()],
                                 'a:0': [self.create_variable()],
                                 'a:1': [self.create_variable()],
@@ -391,6 +469,7 @@ class TestScopeLinker(unittest.TestCase):
                         self.create_scope(
                             ScopeVisibility.FUNCTION_LOCAL,
                             variables={
+                                'l:': [self.create_variable()],
                                 'a:': [self.create_variable()],
                                 'a:param_var1': [self.create_variable()],
                                 'a:0': [self.create_variable()],
@@ -419,6 +498,7 @@ class TestScopeLinker(unittest.TestCase):
                         self.create_scope(
                             ScopeVisibility.FUNCTION_LOCAL,
                             variables={
+                                'l:': [self.create_variable()],
                                 'a:': [self.create_variable()],
                                 'a:param': [self.create_variable()],
                                 'a:0': [self.create_variable()],
@@ -444,8 +524,20 @@ class TestScopeLinker(unittest.TestCase):
         expected_scope_tree = self.create_scope(
             ScopeVisibility.GLOBAL_LIKE,
             # no variable definitions
+            variables={
+                'g:': [self.create_variable()],
+                'b:': [self.create_variable()],
+                'w:': [self.create_variable()],
+                't:': [self.create_variable()],
+                'v:': [self.create_variable()],
+            },
             child_scopes=[
-                self.create_scope(ScopeVisibility.SCRIPT_LOCAL)
+                self.create_scope(
+                    ScopeVisibility.SCRIPT_LOCAL,
+                    variables={
+                        's:': [self.create_variable()],
+                    },
+                )
             ]
         )
 
@@ -461,10 +553,20 @@ class TestScopeLinker(unittest.TestCase):
         expected_scope_tree = self.create_scope(
             ScopeVisibility.GLOBAL_LIKE,
             variables={
+                'g:': [self.create_variable()],
+                'b:': [self.create_variable()],
+                'w:': [self.create_variable()],
+                't:': [self.create_variable()],
+                'v:': [self.create_variable()],
                 'g:implicit_global_loop_var': [self.create_variable(is_implicit=True)]
             },
             child_scopes=[
-                self.create_scope(ScopeVisibility.SCRIPT_LOCAL)
+                self.create_scope(
+                    ScopeVisibility.SCRIPT_LOCAL,
+                    variables={
+                        's:': [self.create_variable()],
+                    }
+                )
             ]
         )
 
