@@ -322,6 +322,7 @@ class TestScopeLinker(unittest.TestCase):
                             ScopeVisibility.FUNCTION_LOCAL,
                             variables={
                                 'l:': [self.create_variable()],
+                                'l:self': [self.create_variable()],
                                 'a:': [self.create_variable()],
                                 'a:0': [self.create_variable()],
                                 'a:000': [self.create_variable()],
@@ -331,6 +332,7 @@ class TestScopeLinker(unittest.TestCase):
                             ScopeVisibility.FUNCTION_LOCAL,
                             variables={
                                 'l:': [self.create_variable()],
+                                'l:self': [self.create_variable()],
                                 'a:': [self.create_variable()],
                                 'a:0': [self.create_variable()],
                                 'a:000': [self.create_variable()],
