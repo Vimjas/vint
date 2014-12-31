@@ -17,6 +17,13 @@ DeclarativeNodeTypes = {
 }
 
 
+SymbolTableVariableNames = {
+    ScopeVisibility.GLOBAL_LIKE: ['g:', 'b:', 'w:', 't:', 'v:'],
+    ScopeVisibility.SCRIPT_LOCAL: ['s:'],
+    ScopeVisibility.FUNCTION_LOCAL: ['l:', 'a:'],
+}
+
+
 
 class ScopeLinker(object):
     """ A class for scope linkers.
@@ -30,9 +37,10 @@ class ScopeLinker(object):
         """
 
         def __init__(self):
+            self.link_registry = ScopeLinker.ScopeLinkRegistry()
+
             global_scope = self._create_scope(ScopeVisibility.GLOBAL_LIKE)
             self._scope_stack = [global_scope]
-            self.link_registry = ScopeLinker.ScopeLinkRegistry()
 
 
         def enter_new_scope(self, scope_visibility):
@@ -77,14 +85,12 @@ class ScopeLinker(object):
 
 
         def handle_new_parameters_list_and_length_found(self):
-            # We can always access a:, a:0, a:000
+            # We can always access a:0 and a:000
             # See :help internal-variables
-            param_dict_node = self._create_virtual_identifier('')
             param_length_node = self._create_virtual_identifier('0')
             param_list_node = self._create_virtual_identifier('000')
 
             current_scope = self.get_current_scope()
-            self._add_parameter(current_scope, param_dict_node)
             self._add_parameter(current_scope, param_length_node)
             self._add_parameter(current_scope, param_list_node)
 
@@ -138,18 +144,6 @@ class ScopeLinker(object):
             self.link_registry.link_referencing_identifier_to_current_scope(node, current_scope)
 
 
-        def _create_virtual_identifier(self, id_value):
-            """ Returns a virtual identifier.
-            Virtual identifier is a virtual node for implicitly declarated
-            variables such as: a:0, a:000, a:firstline.
-            """
-            return {
-                'type': NodeType.IDENTIFIER.value,
-                'value': id_value,
-                'is_virtual': True,
-            }
-
-
         def _add_parameter(self, objective_scope, node):
             variable_name = ScopeDetector.normalize_parameter_name(node)
 
@@ -189,6 +183,20 @@ class ScopeLinker(object):
             return
 
 
+        def _add_symbol_table_variables(self, objective_scope):
+            # We can always access any symbol tables such as: "g:", "s:", "l:", "a:"
+            # See :help internal-variables
+            scope_visibility = objective_scope['scope_visibility']
+            symbol_table_variable_names = SymbolTableVariableNames[scope_visibility]
+
+            for symbol_table_variable_name in symbol_table_variable_names:
+                virtual_node = self._create_virtual_identifier(symbol_table_variable_name)
+
+                self._register_variable(objective_scope,
+                                        symbol_table_variable_name,
+                                        virtual_node)
+
+
         def _register_variable(self, objective_scope, variable_name, node,
                                is_implicit=False, is_builtin=False, is_function=False):
             variable = self._create_variable(is_implicit=is_implicit,
@@ -211,11 +219,27 @@ class ScopeLinker(object):
 
 
         def _create_scope(self, scope_visibility):
-            return {
+            scope = {
                 'scope_visibility': scope_visibility,
                 'functions': {},
                 'variables': {},
                 'child_scopes': [],
+            }
+
+            self._add_symbol_table_variables(scope)
+
+            return scope
+
+
+        def _create_virtual_identifier(self, id_value):
+            """ Returns a virtual identifier.
+            Virtual identifier is a virtual node for implicitly declarated
+            variables such as: a:0, a:000, a:firstline.
+            """
+            return {
+                'type': NodeType.IDENTIFIER.value,
+                'value': id_value,
+                'is_virtual': True,
             }
 
 
@@ -327,7 +351,7 @@ class ScopeLinker(object):
                 # the param_node type is always NodeType.IDENTIFIER
                 self._scope_tree_builder.handle_new_parameter_found(param_node)
 
-        # We can always access a:, a:0, a:000
+        # We can always access a:0, a:000
         self._scope_tree_builder.handle_new_parameters_list_and_length_found()
 
         # In a variadic function, we can access a:1 ... a:n
