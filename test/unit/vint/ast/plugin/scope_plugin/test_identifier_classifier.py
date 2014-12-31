@@ -252,6 +252,7 @@ class TestIdentifierClassifier(unittest.TestCase):
             'param_var1': self.create_id_attr(is_definition=True),
             'g:FunctionWithRange': self.create_id_attr(is_definition=True, is_function=True),
             '...': self.create_id_attr(is_definition=True),
+            'g:FunctionWithDict': self.create_id_attr(is_definition=True, is_function=True),
         }
 
         attached_ast = id_classifier.attach_identifier_attributes(ast)
