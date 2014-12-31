@@ -9,13 +9,11 @@ PATH_INVALID_VIM_SCRIPT = get_fixture_path('prohibit_using_undeclared_variable_i
 
 
 class TestProhibitUsingUndeclaredVariable(PolicyAssertion, unittest.TestCase):
-    @unittest.skip('because ScopePlugin is temporary disabled')
     def test_get_violation_if_found_when_file_is_valid(self):
         self.assertFoundNoViolations(PATH_VALID_VIM_SCRIPT,
                                      ProhibitUsingUndeclaredVariable)
 
 
-    @unittest.skip('because ScopePlugin is temporary disabled')
     def test_get_violation_if_found_when_file_is_invalid(self):
         expected_violations = [
             {

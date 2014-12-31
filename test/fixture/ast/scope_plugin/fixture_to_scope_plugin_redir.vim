@@ -1,0 +1,1 @@
+redir => g:var
