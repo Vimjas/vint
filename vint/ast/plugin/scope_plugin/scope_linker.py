@@ -6,6 +6,7 @@ from vint.ast.plugin.scope_plugin.scope_detector import (
 )
 from vint.ast.plugin.scope_plugin.identifier_classifier import (
     IdentifierClassifier,
+    is_function_identifier,
 )
 
 
@@ -65,6 +66,8 @@ class ScopeLinker(object):
 
 
         def handle_new_range_parameters_found(self):
+            # We can access "a:firstline" and "a:lastline" if the function is
+            # declared with an attribute "range". See :func-range
             firstline_node = self._create_virtual_identifier('firstline')
             lastline_node = self._create_virtual_identifier('lastline')
 
@@ -74,10 +77,14 @@ class ScopeLinker(object):
 
 
         def handle_new_parameters_list_and_length_found(self):
+            # We can always access a:, a:0, a:000
+            # See :help internal-variables
+            param_dict_node = self._create_virtual_identifier('')
             param_length_node = self._create_virtual_identifier('0')
             param_list_node = self._create_virtual_identifier('000')
 
             current_scope = self.get_current_scope()
+            self._add_parameter(current_scope, param_dict_node)
             self._add_parameter(current_scope, param_length_node)
             self._add_parameter(current_scope, param_list_node)
 
@@ -101,9 +108,13 @@ class ScopeLinker(object):
                 return
 
             is_implicit = scope_visibility_hint['is_implicit']
+            is_function = is_function_identifier(node)
 
             objective_scope = self._get_objective_scope(node)
-            self._add_variable(objective_scope, node, is_implicit=is_implicit)
+            self._add_variable(objective_scope,
+                               node,
+                               is_function=is_function,
+                               is_implicit=is_implicit)
 
 
         def _get_objective_scope(self, node):
@@ -145,7 +156,7 @@ class ScopeLinker(object):
             self._register_variable(objective_scope, variable_name, node)
 
 
-        def _add_variable(self, objective_scope, node, is_implicit=False):
+        def _add_variable(self, objective_scope, node, is_implicit=False, is_function=False):
             current_scope = self.get_current_scope()
 
             is_builtin = NodeType(node['type']) is NodeType.IDENTIFIER and \
@@ -161,10 +172,11 @@ class ScopeLinker(object):
             self._register_variable(objective_scope,
                                     variable_name,
                                     node,
+                                    is_function=is_function,
                                     is_implicit=is_implicit)
 
 
-        def _add_builtin_variable(self, node, is_implicit=False):
+        def _add_builtin_variable(self, node, is_implicit=False, is_function=False):
             current_scope = self.get_current_scope()
             variable_name = ScopeDetector.normalize_variable_name(node, current_scope)
 
@@ -172,16 +184,20 @@ class ScopeLinker(object):
                                     variable_name,
                                     node,
                                     is_implicit=is_implicit,
+                                    is_function=is_function,
                                     is_builtin=True)
             return
 
 
         def _register_variable(self, objective_scope, variable_name, node,
-                               is_implicit=False, is_builtin=False):
+                               is_implicit=False, is_builtin=False, is_function=False):
             variable = self._create_variable(is_implicit=is_implicit,
                                              is_builtin=is_builtin)
 
-            same_name_variables = objective_scope['variables'].setdefault(variable_name, [])
+            objective_variable_list = objective_scope['functions' if is_function
+                                                      else 'variables']
+
+            same_name_variables = objective_variable_list.setdefault(variable_name, [])
             same_name_variables.append(variable)
 
             self.link_registry.link_variable_to_declarative_identifier(variable, node)
@@ -197,6 +213,7 @@ class ScopeLinker(object):
         def _create_scope(self, scope_visibility):
             return {
                 'scope_visibility': scope_visibility,
+                'functions': {},
                 'variables': {},
                 'child_scopes': [],
             }
@@ -310,7 +327,7 @@ class ScopeLinker(object):
                 # the param_node type is always NodeType.IDENTIFIER
                 self._scope_tree_builder.handle_new_parameter_found(param_node)
 
-        # We can always access a:0 and a:000
+        # We can always access a:, a:0, a:000
         self._scope_tree_builder.handle_new_parameters_list_and_length_found()
 
         # In a variadic function, we can access a:1 ... a:n
