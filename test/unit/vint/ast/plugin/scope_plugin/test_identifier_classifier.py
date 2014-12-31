@@ -230,6 +230,8 @@ class TestIdentifierClassifier(unittest.TestCase):
             'g:for_var2': self.create_id_attr(is_definition=True),
             'g:let_var1': self.create_id_attr(is_definition=True),
             'g:let_var2': self.create_id_attr(is_definition=True),
+            'g:let_var3': self.create_id_attr(is_definition=True),
+            'g:rest': self.create_id_attr(is_definition=True),
             'g:list': self.create_id_attr(is_definition=False),
             '1': self.create_id_attr(is_definition=True, is_member_of_subscript=True),
             'g:index_end': self.create_id_attr(is_definition=False, is_member_of_subscript=True, is_dynamic=True),

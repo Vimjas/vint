@@ -307,6 +307,11 @@ class IdentifierClassifier(object):
         else:
             self._enter_identifier_like_node(left_node, is_definition=True)
 
+        rest_node = node['rest']
+        has_rest = type(rest_node) is not list
+        if has_rest:
+            self._enter_identifier_like_node(rest_node, is_definition=True)
+
 
     def _enter_declarative_node(self, node):
         node_type = NodeType(node['type'])

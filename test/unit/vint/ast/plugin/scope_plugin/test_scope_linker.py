@@ -364,6 +364,8 @@ class TestScopeLinker(unittest.TestCase):
                 'g:for_var2': [self.create_variable()],
                 'g:let_var1': [self.create_variable()],
                 'g:let_var2': [self.create_variable()],
+                'g:let_var3': [self.create_variable()],
+                'g:rest': [self.create_variable()],
                 # g:list members are not analyzable
             },
             child_scopes=[

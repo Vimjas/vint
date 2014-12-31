@@ -4,3 +4,5 @@ endfor
 let [g:let_var1, g:let_var2] = [0, 1]
 
 let g:list[1:g:index_end] = [99, 99]
+
+let [g:let_var3 ; g:rest] = [0, 1]
