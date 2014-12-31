@@ -84,6 +84,13 @@ class ScopeLinker(object):
             self._add_parameter(current_scope, lastline_node)
 
 
+        def handle_new_dict_parameter_found(self):
+            # We can access "l:self" is declared with an attribute "dict".
+            # See :help self
+            current_scope = self.get_current_scope()
+            self._add_self_variable(current_scope)
+
+
         def handle_new_parameters_list_and_length_found(self):
             # We can always access a:0 and a:000
             # See :help internal-variables
@@ -145,9 +152,14 @@ class ScopeLinker(object):
 
 
         def _add_parameter(self, objective_scope, node):
-            variable_name = ScopeDetector.normalize_parameter_name(node)
-
+            variable_name = 'a:' + node['value']
             self._register_variable(objective_scope, variable_name, node)
+
+
+        def _add_self_variable(self, objective_scope):
+            variable_name = 'l:self'
+            virtual_node = self._create_virtual_identifier(variable_name)
+            self._register_variable(objective_scope, variable_name, virtual_node)
 
 
         def _add_variable(self, objective_scope, node, is_implicit=False, is_function=False):
@@ -362,9 +374,14 @@ class ScopeLinker(object):
 
         # We can access "a:firstline" and "a:lastline" if the function is
         # declared with an attribute "range". See :func-range
-        is_declared_with_range = func_node['attr']['range'] is not 0
+        attr = func_node['attr']
+        is_declared_with_range = attr['range'] is not 0
         if is_declared_with_range:
             self._scope_tree_builder.handle_new_range_parameters_found()
+
+        is_declared_with_dict = attr['dict'] is not 0
+        if is_declared_with_dict:
+            self._scope_tree_builder.handle_new_dict_parameter_found()
 
         # 5. Add variables in the function body to the new scope
         func_body_nodes = func_node['body']

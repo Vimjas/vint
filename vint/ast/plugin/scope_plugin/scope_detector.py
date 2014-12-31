@@ -208,12 +208,6 @@ class ScopeDetector(object):
 
 
     @classmethod
-    def normalize_parameter_name(cls, id_node):
-        # param node is always NodeType.IDENTIFIER
-        return 'a:' + id_node['value']
-
-
-    @classmethod
     def _normalize_identifier_value(cls, id_node, context_scope):
         scope_visibility_hint = cls.detect_scope_visibility(id_node, context_scope)
 
