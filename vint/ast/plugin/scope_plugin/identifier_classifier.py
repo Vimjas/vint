@@ -1,4 +1,8 @@
-from vint.ast.traversing import traverse
+from vint.ast.plugin.scope_plugin.redir_assignment_parser import (
+    RedirAssignmentParser,
+    traverse,
+    get_redir_content,
+)
 from vint.ast.node_type import NodeType
 
 
@@ -16,6 +20,7 @@ DeclarativeNodeTypes = {
     NodeType.LET: True,
     NodeType.FUNCTION: True,
     NodeType.FOR: True,
+    NodeType.EXCMD: True,
 }
 
 IdentifierTerminateNodeTypes = {
@@ -94,7 +99,10 @@ class IdentifierClassifier(object):
         - is function: True if the identifier is a function. Vim distinguish
                        between function identifiers and variable identifiers.
         """
-        traverse(ast, on_enter=self._enter_handler)
+        redir_assignment_parser = RedirAssignmentParser()
+        ast_with_parsed_redir = redir_assignment_parser.process(ast)
+
+        traverse(ast_with_parsed_redir, on_enter=self._enter_handler)
         return ast
 
 
@@ -325,11 +333,24 @@ class IdentifierClassifier(object):
         if node_type is NodeType.FOR:
             self._enter_for_node(node)
             return
+        if node_type is NodeType.EXCMD:
+            self._enter_excmd_node(node)
+            return
 
 
     def _enter_call_node(self, call_node):
         left_node = call_node['left']
         self._enter_identifier_like_node(left_node, is_function=True)
+
+
+    def _enter_excmd_node(self, cmd_node):
+        # Care an assignment by using command ":redir"
+        redir_content_node = get_redir_content(cmd_node)
+
+        if not redir_content_node:
+            return
+
+        self._enter_identifier_like_node(redir_content_node, is_definition=True)
 
 
 

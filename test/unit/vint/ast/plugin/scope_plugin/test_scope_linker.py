@@ -20,6 +20,7 @@ class Fixtures(enum.Enum):
     DICT_KEY = Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_declaring_with_dict_key.vim')
     DESTRUCTURING_ASSIGNMENT = Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_destructuring_assignment.vim')
     DECLARING_AND_REFERENCING = Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_declaring_and_referencing.vim')
+    REDIR = Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_redir.vim')
 
 
 class TestScopeLinker(unittest.TestCase):
@@ -574,6 +575,35 @@ class TestScopeLinker(unittest.TestCase):
                 't:': [self.create_variable()],
                 'v:': [self.create_variable()],
                 'g:implicit_global_loop_var': [self.create_variable(is_implicit=True)]
+            },
+            child_scopes=[
+                self.create_scope(
+                    ScopeVisibility.SCRIPT_LOCAL,
+                    variables={
+                        's:': [self.create_variable()],
+                    }
+                )
+            ]
+        )
+
+        self.assertScopeTreeEqual(expected_scope_tree, linker.scope_tree)
+
+
+    def test_built_scope_tree_by_process_with_redir(self):
+        ast = self.create_ast(Fixtures.REDIR)
+        linker = ScopeLinker()
+
+        linker.process(ast)
+
+        expected_scope_tree = self.create_scope(
+            ScopeVisibility.GLOBAL_LIKE,
+            variables={
+                'g:': [self.create_variable()],
+                'b:': [self.create_variable()],
+                'w:': [self.create_variable()],
+                't:': [self.create_variable()],
+                'v:': [self.create_variable()],
+                'g:var': [self.create_variable()]
             },
             child_scopes=[
                 self.create_scope(

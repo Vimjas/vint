@@ -3,7 +3,7 @@ from pathlib import Path
 from pprint import pprint
 
 from vint.ast.parsing import Parser
-from vint.ast.traversing import traverse
+from vint.ast.plugin.scope_plugin.redir_assignment_parser import traverse
 from vint.ast.node_type import NodeType
 from vint.ast.plugin.scope_plugin.identifier_classifier import (
     IdentifierClassifier,
@@ -39,6 +39,8 @@ Fixtures = {
         Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_destructuring_assignment.vim'),
     'BUILTIN':
         Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_builtins.vim'),
+    'REDIR':
+        Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_redir.vim')
 }
 
 
@@ -273,6 +275,19 @@ class TestIdentifierClassifier(unittest.TestCase):
         expected_id_attr_map = {
             'implicit_global_loop_var': self.create_id_attr(is_definition=True),
             'g:array': self.create_id_attr(is_definition=False),
+        }
+
+        attached_ast = id_classifier.attach_identifier_attributes(ast)
+
+        self.assertAttributesInIdentifiers(attached_ast, expected_id_attr_map)
+
+
+    def test_attach_identifier_attributes_with_redir(self):
+        ast = self.create_ast(Fixtures['REDIR'])
+        id_classifier = IdentifierClassifier()
+
+        expected_id_attr_map = {
+            'g:var': self.create_id_attr(is_definition=True),
         }
 
         attached_ast = id_classifier.attach_identifier_attributes(ast)
