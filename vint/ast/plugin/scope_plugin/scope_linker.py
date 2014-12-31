@@ -17,6 +17,12 @@ DeclarativeNodeTypes = {
 }
 
 
+FunctionNameNodesDeclaringVariableSelf = {
+    NodeType.DOT: True,
+    NodeType.SUBSCRIPT: True,
+}
+
+
 SymbolTableVariableNames = {
     ScopeVisibility.GLOBAL_LIKE: ['g:', 'b:', 'w:', 't:', 'v:'],
     ScopeVisibility.SCRIPT_LOCAL: ['s:'],
@@ -379,7 +385,10 @@ class ScopeLinker(object):
         if is_declared_with_range:
             self._scope_tree_builder.handle_new_range_parameters_found()
 
-        is_declared_with_dict = attr['dict'] is not 0
+        # We can access "l:self" is declared with an attribute "dict" or
+        # the function is a member of a dict. See :help self
+        is_declared_with_dict = attr['dict'] is not 0 \
+            or NodeType(func_name_node['type']) in FunctionNameNodesDeclaringVariableSelf
         if is_declared_with_dict:
             self._scope_tree_builder.handle_new_dict_parameter_found()
 
