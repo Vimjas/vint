@@ -12,6 +12,7 @@ from vint.ast.plugin.scope_plugin.identifier_classifier import (
     IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG,
     IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG,
     IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG,
+    IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG,
 )
 
 
@@ -49,12 +50,14 @@ class TestIdentifierClassifier(unittest.TestCase):
 
 
     def create_id_attr(self, is_definition=False, is_dynamic=False,
-                       is_member_of_subscript=False, is_function=False):
+                       is_member_of_subscript=False, is_function=False,
+                       is_autoload=False):
         return {
             IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG: is_definition,
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: is_dynamic,
             IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG: is_member_of_subscript,
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: is_function,
+            IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: is_autoload,
         }
 
 
@@ -113,6 +116,7 @@ class TestIdentifierClassifier(unittest.TestCase):
                                     is_function=True),
             'autoload#AutoloadFunctionCall':
                 self.create_id_attr(is_definition=False,
+                                    is_autoload=True,
                                     is_function=True),
             'dot':
                 self.create_id_attr(is_definition=False),
