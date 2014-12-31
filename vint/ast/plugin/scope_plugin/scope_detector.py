@@ -1,11 +1,12 @@
 import enum
 from vint.ast.node_type import NodeType
 from vint.ast.plugin.scope_plugin.identifier_classifier import (
-    IDENTIFIER_ATTRIBUTE,
-    IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG,
-    IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG,
-    IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG,
-    IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG,
+    is_identifier_like_node,
+    is_dynamic_identifier,
+    is_declarative_identifier,
+    is_function_identifier,
+    is_member_identifier,
+    is_autoload_identifier,
 )
 from vint.ast.plugin.scope_plugin.builtin_dictionary import (
     BuiltinVariables,
@@ -66,8 +67,7 @@ class ScopeDetector(object):
     @classmethod
     def is_builtin_variable(cls, id_node):
         """ Whether the specified node is a builtin identifier. """
-        is_identifier_like_node = IDENTIFIER_ATTRIBUTE in id_node
-        if not is_identifier_like_node:
+        if not is_identifier_like_node(id_node):
             return False
 
         id_value = id_node['value']
@@ -76,8 +76,7 @@ class ScopeDetector(object):
             # TODO: Add unknown builtin flag
             return True
 
-        is_function = id_node[IDENTIFIER_ATTRIBUTE][IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG]
-        if is_function:
+        if is_function_identifier(id_node):
             # There are defference between a function identifier and variable
             # identifier:
             #
@@ -128,14 +127,7 @@ class ScopeDetector(object):
           - function! dict.Func()
           - echo s:my_{var}
         """
-        is_identifier_like_node = IDENTIFIER_ATTRIBUTE in node
-
-        if not is_identifier_like_node:
-            return False
-
-        id_attr = node[IDENTIFIER_ATTRIBUTE]
-        return not (id_attr[IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG] or
-                    id_attr[IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG])
+        return not (is_dynamic_identifier(node) or is_member_identifier(node))
 
 
     @classmethod
@@ -152,14 +144,7 @@ class ScopeDetector(object):
           - let s:my_{var} = 0
           - function! dict.Func()
         """
-        is_identifier_like_node = IDENTIFIER_ATTRIBUTE in node
-
-        if not is_identifier_like_node:
-            return False
-
-        id_attr = node[IDENTIFIER_ATTRIBUTE]
-
-        return id_attr[IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG] and \
+        return is_declarative_identifier(node) and \
             cls.is_analyzable_identifier(node)
 
 
@@ -232,6 +217,11 @@ class ScopeDetector(object):
         # has a same name to Vim builtin variables.
         if cls.is_builtin_variable(id_node):
             return cls._create_identifier_visibility_hint(ScopeVisibility.BUILTIN,
+                                                          is_implicit=True)
+
+        # autoload functions are always on global
+        if is_function_identifier(id_node) and is_autoload_identifier(id_node):
+            return cls._create_identifier_visibility_hint(ScopeVisibility.GLOBAL_LIKE,
                                                           is_implicit=True)
 
         current_scope_visibility = context_scope['scope_visibility']

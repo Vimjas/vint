@@ -7,6 +7,7 @@ from vint.ast.plugin.scope_plugin.identifier_classifier import (
     IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG,
     IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG,
     IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG,
+    IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG,
 )
 
 
@@ -23,7 +24,7 @@ def create_scope_visibility_hint(visibility, is_implicit=False):
     }
 
 
-def create_id(id_value, is_declarative=True, is_function=False):
+def create_id(id_value, is_declarative=True, is_function=False, is_autoload=False):
     return {
         'type': NodeType.IDENTIFIER.value,
         'value': id_value,
@@ -32,6 +33,7 @@ def create_id(id_value, is_declarative=True, is_function=False):
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: False,
             IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG: False,
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: is_function,
+            IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: is_autoload,
         },
     }
 
@@ -45,6 +47,7 @@ def create_env(env_value):
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: False,
             IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG: False,
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
+            IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: False,
         },
     }
 
@@ -58,6 +61,7 @@ def create_option(opt_value):
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: False,
             IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG: False,
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
+            IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: False,
         },
     }
 
@@ -71,6 +75,7 @@ def create_reg(reg_value):
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: False,
             IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG: False,
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
+            IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: False,
         },
     }
 
@@ -97,6 +102,8 @@ def create_curlyname(is_declarative=True):
             IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG: is_declarative,
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: True,
             IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG: False,
+            IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
+            IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: False,
         },
     }
 
@@ -109,6 +116,8 @@ def create_subscript_member(is_declarative=True):
             IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG: is_declarative,
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: False,
             IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG: True,
+            IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
+            IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: False,
         },
     }
 
@@ -176,6 +185,8 @@ def create_subscript_member(is_declarative=True):
 
         (Vis.SCRIPT_LOCAL, create_subscript_member(is_declarative=False), Vis.UNANALYZABLE, False),
         (Vis.FUNCTION_LOCAL, create_subscript_member(is_declarative=False), Vis.UNANALYZABLE, False),
+
+        (Vis.FUNCTION_LOCAL, create_id('file#func', is_autoload=True, is_function=True, is_declarative=False), Vis.GLOBAL_LIKE, True),
     ]
 )
 def test_detect_scope_visibility(context_scope_visibility, id_node, expected_scope_visibility, expected_implicity):
