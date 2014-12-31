@@ -117,9 +117,9 @@ class ScopeLinker(object):
 
 
         def handle_referencing_identifier_found(self, node):
-            objective_scope = self._get_objective_scope(node)
+            current_scope = self.get_current_scope()
 
-            self.link_registry.link_referencing_identifier_to_scope(node, objective_scope)
+            self.link_registry.link_referencing_identifier_to_current_scope(node, current_scope)
 
 
         def _create_virtual_identifier(self, id_value):
@@ -213,7 +213,7 @@ class ScopeLinker(object):
             self._vars_to_declarative_ids_map[variable_id] = declaring_id_node
 
 
-        def link_referencing_identifier_to_scope(self, ref_id_node, scope):
+        def link_referencing_identifier_to_current_scope(self, ref_id_node, scope):
             node_id = id(ref_id_node)
             self._ref_ids_to_scopes_map[node_id] = scope
 
