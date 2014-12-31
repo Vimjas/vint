@@ -21,6 +21,8 @@ class Fixtures(enum.Enum):
         FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_missing_declaration.vim')
     SAME_NAME_FUNCTION_AND_REFERENCE = Path(
         FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_same_name_function_and_variable.vim')
+    FUNCTION_REF = Path(
+        FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_function_ref.vim')
 
 
 
@@ -86,6 +88,17 @@ class TestReferenceReachabilityTester(unittest.TestCase):
 
         self.assertTrue(is_referenced_declarative_identifier(declarative_variable_node))
         self.assertFalse(is_referenced_declarative_identifier(declarative_function_node))
+
+
+    def test_referenced_function_reference_by_process(self):
+        ast = self.create_ast(Fixtures.FUNCTION_REF)
+
+        declarative_variable_node = ast['body'][0]['left']
+
+        tester = ReferenceReachabilityTester()
+        tester.process(ast)
+
+        self.assertTrue(is_referenced_declarative_identifier(declarative_variable_node))
 
 
 if __name__ == '__main__':
