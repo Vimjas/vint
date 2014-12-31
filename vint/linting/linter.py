@@ -4,7 +4,7 @@ from pathlib import Path
 from vint.ast.parsing import Parser, EncodingDetectionError
 from vint.ast.traversing import traverse
 from vint.ast.node_type import NodeType
-# from vint.ast.plugin.scope_plugin import ScopePlugin
+from vint.ast.plugin.scope_plugin import ScopePlugin
 from vint.linting.config.config_container import ConfigContainer
 from vint.linting.config.config_dict_source import ConfigDictSource
 from vint.linting.config.config_comment_source import ConfigCommentSource
@@ -28,6 +28,9 @@ class Linter(object):
     returned by policies.
     """
     def __init__(self, policy_set, config_dict_global):
+        self._plugins = {
+            'scope': ScopePlugin(),
+        }
         self._parser = self.build_parser()
         self._policy_set = policy_set
 
@@ -39,9 +42,7 @@ class Linter(object):
 
 
     def build_parser(self):
-        # plugins = [ScopePlugin()]
-
-        parser = Parser()
+        parser = Parser(self._plugins)
         return parser
 
 
@@ -110,7 +111,12 @@ class Linter(object):
         self._update_listeners_map()
 
         # Given root AST to makepolicy flexibility
-        lint_context = {'path': path, 'root_node': root_ast, 'stack_trace': []}
+        lint_context = {
+            'path': path,
+            'root_node': root_ast,
+            'stack_trace': [],
+            'plugins': self._plugins,
+        }
 
         traverse(root_ast,
                  on_enter=lambda node: self._handle_enter(node, lint_context),

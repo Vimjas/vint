@@ -17,7 +17,7 @@ class Parser(object):
         """ Initialize Parser with the specified plugins.
         The plugins can add attributes to the AST.
         """
-        self.plugins = plugins or []
+        self.plugins = plugins.values() if plugins else []
 
 
     def parse(self, string):
