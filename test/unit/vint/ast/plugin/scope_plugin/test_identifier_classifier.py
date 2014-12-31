@@ -10,7 +10,7 @@ from vint.ast.plugin.scope_plugin.identifier_classifier import (
     IDENTIFIER_ATTRIBUTE,
     IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG,
     IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG,
-    IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG,
+    IDENTIFIER_ATTRIBUTE_MEMBER_FLAG,
     IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG,
     IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG,
 )
@@ -57,7 +57,7 @@ class TestIdentifierClassifier(unittest.TestCase):
         return {
             IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG: is_definition,
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: is_dynamic,
-            IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG: is_member_of_subscript,
+            IDENTIFIER_ATTRIBUTE_MEMBER_FLAG: is_member_of_subscript,
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: is_function,
             IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: is_autoload,
         }

@@ -9,7 +9,7 @@ from vint.ast.node_type import NodeType
 IDENTIFIER_ATTRIBUTE = 'VINT:identifier_attribute'
 IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG = 'is_definition'
 IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG = 'is_dynamic'
-IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG = 'is_member_of_subscript'
+IDENTIFIER_ATTRIBUTE_MEMBER_FLAG = 'is_member'
 IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG = 'is_function'
 IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG = 'is_autoload'
 REFERENCING_IDENTIFIERS = 'VINT:referencing_identifiers'
@@ -81,7 +81,7 @@ class IdentifierClassifier(object):
 
             id_attr = node[IDENTIFIER_ATTRIBUTE]
             if id_attr[IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG] or \
-                    id_attr[IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG]:
+                    id_attr[IDENTIFIER_ATTRIBUTE_MEMBER_FLAG]:
                 return
 
             if id_attr[IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG]:
@@ -107,13 +107,11 @@ class IdentifierClassifier(object):
 
 
     def _set_identifier_attribute(self, node, is_definition=None, is_dynamic=None,
-                                  is_member_of_subscript=None, is_function=None,
-                                  is_autoload=None):
-
+                                  is_member=None, is_function=None, is_autoload=None):
         id_attr = node.setdefault(IDENTIFIER_ATTRIBUTE, {
             IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG: False,
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: False,
-            IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG: False,
+            IDENTIFIER_ATTRIBUTE_MEMBER_FLAG: False,
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
             IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: False,
         })
@@ -124,8 +122,8 @@ class IdentifierClassifier(object):
         if is_dynamic is not None:
             id_attr[IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG] = is_dynamic
 
-        if is_member_of_subscript is not None:
-            id_attr[IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG] = is_member_of_subscript
+        if is_member is not None:
+            id_attr[IDENTIFIER_ATTRIBUTE_MEMBER_FLAG] = is_member
 
         if is_function is not None:
             id_attr[IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG] = is_function
@@ -176,8 +174,7 @@ class IdentifierClassifier(object):
 
         if member_node_type in IdentifierTerminateNodeTypes or \
                 member_node_type in AnalyzableSubScriptChildNodeTypes:
-            self._set_identifier_attribute(member_node,
-                                           is_member_of_subscript=True)
+            self._set_identifier_attribute(member_node, is_member=True)
 
 
     def _enter_identifier_like_node(self, id_like_node, is_definition=None,
@@ -383,7 +380,7 @@ def is_member_identifier(node):
     if not is_identifier_like_node(node):
         return False
 
-    return node[IDENTIFIER_ATTRIBUTE][IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG]
+    return node[IDENTIFIER_ATTRIBUTE][IDENTIFIER_ATTRIBUTE_MEMBER_FLAG]
 
 
 def is_autoload_identifier(node):
