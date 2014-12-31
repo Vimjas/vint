@@ -40,11 +40,11 @@ class ReferenceReachabilityTester(object):
         dec_id_nodes = classified_id_group['static_declaring_identifiers']
         ref_id_nodes = classified_id_group['static_referencing_identifiers']
 
-        scope_tree = scope_linker.scope_tree
+        self._scope_tree = scope_linker.scope_tree
         self._link_registry = scope_linker.link_registry
 
         # Attach a parent_scope accessor to the scope tree
-        ReferenceReachabilityTester.TwoWayScopeReferenceAttacher.attach(scope_tree)
+        ReferenceReachabilityTester.TwoWayScopeReferenceAttacher.attach(self._scope_tree)
 
         # Reset REFERECED_FLAG to False
         for dec_id_node in dec_id_nodes:
