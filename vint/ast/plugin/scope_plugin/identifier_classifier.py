@@ -7,6 +7,7 @@ IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG = 'is_definition'
 IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG = 'is_dynamic'
 IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG = 'is_member_of_subscript'
 IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG = 'is_function'
+IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG = 'is_autoload'
 REFERENCING_IDENTIFIERS = 'VINT:referencing_identifiers'
 DECLARING_IDENTIFIERS = 'VINT:declaring_identifiers'
 
@@ -98,13 +99,15 @@ class IdentifierClassifier(object):
 
 
     def _set_identifier_attribute(self, node, is_definition=None, is_dynamic=None,
-                                  is_member_of_subscript=None, is_function=None):
+                                  is_member_of_subscript=None, is_function=None,
+                                  is_autoload=None):
 
         id_attr = node.setdefault(IDENTIFIER_ATTRIBUTE, {
             IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG: False,
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: False,
             IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG: False,
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
+            IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: False,
         })
 
         if is_definition is not None:
@@ -118,6 +121,9 @@ class IdentifierClassifier(object):
 
         if is_function is not None:
             id_attr[IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG] = is_function
+
+        if is_autoload is not None:
+            id_attr[IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG] = is_autoload
 
 
     def _enter_handler(self, node):
@@ -216,9 +222,11 @@ class IdentifierClassifier(object):
                                        is_function=is_function)
 
 
-    def _enter_identifier_node(self, def_id_node, is_definition=None, is_function=None):
-        self._set_identifier_attribute(def_id_node,
+    def _enter_identifier_node(self, id_node, is_definition=None, is_function=None):
+        is_autoload = '#' in id_node['value']
+        self._set_identifier_attribute(id_node,
                                        is_definition=is_definition,
+                                       is_autoload=is_autoload,
                                        is_function=is_function)
 
 
@@ -350,3 +358,10 @@ def is_member_identifier(node):
         return False
 
     return node[IDENTIFIER_ATTRIBUTE][IDENTIFIER_ATTRIBUTE_SUBSCRIPT_MEMBER_FLAG]
+
+
+def is_autoload_identifier(node):
+    if not is_identifier_like_node(node):
+        return False
+
+    return node[IDENTIFIER_ATTRIBUTE][IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG]
