@@ -55,6 +55,16 @@ class ReferenceReachabilityTester(object):
             ref_id_node[REACHABILITY_FLAG] = is_reachable
 
 
+    def is_global_variable(self, node):
+        """ Whether the specified node is a global variable. """
+        context_scope = self._link_registry.get_scope_by_referencing_identifier(node)
+        if context_scope is None:
+            # Looks like not variable
+            return False
+
+        return ScopeDetector.is_global_variable(node, context_scope)
+
+
     def _reset_referenced_flag(self, scope_tree):
         for child_scope in scope_tree['child_scopes']:
             for variables in child_scope['variables'].values():
