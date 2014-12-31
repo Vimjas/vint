@@ -146,6 +146,11 @@ class IdentifierClassifier(object):
 
         if node_type is NodeType.SLICE:
             for member_node in node['rlist']:
+                # In VimLParser spec, an empty array means null.
+                #   list[1:] => {rlist: [node, []]}
+                if type(member_node) is list:
+                    continue
+
                 self._pre_mark_member_node(member_node)
         else:
             member_node = node['right']
