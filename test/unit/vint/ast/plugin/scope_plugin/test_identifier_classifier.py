@@ -8,7 +8,7 @@ from vint.ast.node_type import NodeType
 from vint.ast.plugin.scope_plugin.identifier_classifier import (
     IdentifierClassifier,
     IDENTIFIER_ATTRIBUTE,
-    IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG,
+    IDENTIFIER_ATTRIBUTE_DECLARATION_FLAG,
     IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG,
     IDENTIFIER_ATTRIBUTE_MEMBER_FLAG,
     IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG,
@@ -51,11 +51,11 @@ class TestIdentifierClassifier(unittest.TestCase):
         return ast
 
 
-    def create_id_attr(self, is_definition=False, is_dynamic=False,
+    def create_id_attr(self, is_declarative=False, is_dynamic=False,
                        is_member_of_subscript=False, is_function=False,
                        is_autoload=False):
         return {
-            IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG: is_definition,
+            IDENTIFIER_ATTRIBUTE_DECLARATION_FLAG: is_declarative,
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: is_dynamic,
             IDENTIFIER_ATTRIBUTE_MEMBER_FLAG: is_member_of_subscript,
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: is_function,
@@ -95,12 +95,12 @@ class TestIdentifierClassifier(unittest.TestCase):
         id_classifier = IdentifierClassifier()
 
         expected_id_attr_map = {
-            'g:ExplicitGlobalFunc': self.create_id_attr(is_definition=True, is_function=True),
-            'b:BufferLocalFunc': self.create_id_attr(is_definition=True, is_function=True),
-            'w:WindowLocalFunc': self.create_id_attr(is_definition=True, is_function=True),
-            't:TabLocalFunc': self.create_id_attr(is_definition=True, is_function=True),
-            's:ScriptLocalFunc': self.create_id_attr(is_definition=True, is_function=True),
-            'ImplicitGlobalFunc': self.create_id_attr(is_definition=True, is_function=True),
+            'g:ExplicitGlobalFunc': self.create_id_attr(is_declarative=True, is_function=True),
+            'b:BufferLocalFunc': self.create_id_attr(is_declarative=True, is_function=True),
+            'w:WindowLocalFunc': self.create_id_attr(is_declarative=True, is_function=True),
+            't:TabLocalFunc': self.create_id_attr(is_declarative=True, is_function=True),
+            's:ScriptLocalFunc': self.create_id_attr(is_declarative=True, is_function=True),
+            'ImplicitGlobalFunc': self.create_id_attr(is_declarative=True, is_function=True),
         }
 
         attached_ast = id_classifier.attach_identifier_attributes(ast)
@@ -114,26 +114,26 @@ class TestIdentifierClassifier(unittest.TestCase):
 
         expected_id_attr_map = {
             'FunctionCall':
-                self.create_id_attr(is_definition=False,
+                self.create_id_attr(is_declarative=False,
                                     is_function=True),
             'autoload#AutoloadFunctionCall':
-                self.create_id_attr(is_definition=False,
+                self.create_id_attr(is_declarative=False,
                                     is_autoload=True,
                                     is_function=True),
             'dot':
-                self.create_id_attr(is_definition=False),
+                self.create_id_attr(is_declarative=False),
             'DotFunctionCall':
-                self.create_id_attr(is_definition=False,
+                self.create_id_attr(is_declarative=False,
                                     is_member_of_subscript=True,
                                     is_function=True),
             'subscript':
-                self.create_id_attr(is_definition=False),
+                self.create_id_attr(is_declarative=False),
             "'SubscriptFunctionCall'":
-                self.create_id_attr(is_definition=False,
+                self.create_id_attr(is_declarative=False,
                                     is_member_of_subscript=True,
                                     is_function=True),
             'FunctionCallInExpressionContext':
-                self.create_id_attr(is_definition=False,
+                self.create_id_attr(is_declarative=False,
                                     is_function=True),
         }
 
@@ -147,12 +147,12 @@ class TestIdentifierClassifier(unittest.TestCase):
         id_classifier = IdentifierClassifier()
 
         expected_id_attr_map = {
-            'FuncContext': self.create_id_attr(is_definition=True,
+            'FuncContext': self.create_id_attr(is_declarative=True,
                                                is_function=True),
-            'l:ExplicitFuncLocalFunc': self.create_id_attr(is_definition=True,
+            'l:ExplicitFuncLocalFunc': self.create_id_attr(is_declarative=True,
                                                            is_function=True),
             'ImplicitFuncLocalFunc':
-                self.create_id_attr(is_definition=True,
+                self.create_id_attr(is_declarative=True,
                                     is_function=True),
         }
 
@@ -166,16 +166,16 @@ class TestIdentifierClassifier(unittest.TestCase):
         id_classifier = IdentifierClassifier()
 
         expected_id_attr_map = {
-            'g:explicit_global_var': self.create_id_attr(is_definition=True),
-            'b:buffer_local_var': self.create_id_attr(is_definition=True),
-            'w:window_local_var': self.create_id_attr(is_definition=True),
-            't:tab_local_var': self.create_id_attr(is_definition=True),
-            's:script_local_var': self.create_id_attr(is_definition=True),
-            'implicit_global_var': self.create_id_attr(is_definition=True),
-            '$ENV_VAR': self.create_id_attr(is_definition=True),
-            '@"': self.create_id_attr(is_definition=True),
-            '&opt_var': self.create_id_attr(is_definition=True),
-            'v:count': self.create_id_attr(is_definition=True),
+            'g:explicit_global_var': self.create_id_attr(is_declarative=True),
+            'b:buffer_local_var': self.create_id_attr(is_declarative=True),
+            'w:window_local_var': self.create_id_attr(is_declarative=True),
+            't:tab_local_var': self.create_id_attr(is_declarative=True),
+            's:script_local_var': self.create_id_attr(is_declarative=True),
+            'implicit_global_var': self.create_id_attr(is_declarative=True),
+            '$ENV_VAR': self.create_id_attr(is_declarative=True),
+            '@"': self.create_id_attr(is_declarative=True),
+            '&opt_var': self.create_id_attr(is_declarative=True),
+            'v:count': self.create_id_attr(is_declarative=True),
         }
 
         attached_ast = id_classifier.attach_identifier_attributes(ast)
@@ -188,9 +188,9 @@ class TestIdentifierClassifier(unittest.TestCase):
         id_classifier = IdentifierClassifier()
 
         expected_id_attr_map = {
-            'FuncContext': self.create_id_attr(is_definition=True, is_function=True),
-            'l:explicit_func_local_var': self.create_id_attr(is_definition=True),
-            'implicit_func_local_var': self.create_id_attr(is_definition=True),
+            'FuncContext': self.create_id_attr(is_declarative=True, is_function=True),
+            'l:explicit_func_local_var': self.create_id_attr(is_declarative=True),
+            'implicit_func_local_var': self.create_id_attr(is_declarative=True),
         }
 
         attached_ast = id_classifier.attach_identifier_attributes(ast)
@@ -203,17 +203,17 @@ class TestIdentifierClassifier(unittest.TestCase):
         id_classifier = IdentifierClassifier()
 
         expected_id_attr_map = {
-            'g:dict': self.create_id_attr(is_definition=False),
-            'Function1': self.create_id_attr(is_definition=True,
+            'g:dict': self.create_id_attr(is_declarative=False),
+            'Function1': self.create_id_attr(is_declarative=True,
                                              is_member_of_subscript=True,
                                              is_function=True),
-            "'Function2'": self.create_id_attr(is_definition=True,
+            "'Function2'": self.create_id_attr(is_declarative=True,
                                                is_member_of_subscript=True,
                                                is_function=True),
-            'key1': self.create_id_attr(is_definition=True,
+            'key1': self.create_id_attr(is_declarative=True,
                                         is_member_of_subscript=True,
                                         is_function=False),
-            "'key2'": self.create_id_attr(is_definition=True,
+            "'key2'": self.create_id_attr(is_declarative=True,
                                           is_member_of_subscript=True,
                                           is_function=False),
         }
@@ -228,15 +228,15 @@ class TestIdentifierClassifier(unittest.TestCase):
         id_classifier = IdentifierClassifier()
 
         expected_id_attr_map = {
-            'g:for_var1': self.create_id_attr(is_definition=True),
-            'g:for_var2': self.create_id_attr(is_definition=True),
-            'g:let_var1': self.create_id_attr(is_definition=True),
-            'g:let_var2': self.create_id_attr(is_definition=True),
-            'g:let_var3': self.create_id_attr(is_definition=True),
-            'g:rest': self.create_id_attr(is_definition=True),
-            'g:list': self.create_id_attr(is_definition=False),
-            '1': self.create_id_attr(is_definition=True, is_member_of_subscript=True),
-            'g:index_end': self.create_id_attr(is_definition=False, is_member_of_subscript=True, is_dynamic=True),
+            'g:for_var1': self.create_id_attr(is_declarative=True),
+            'g:for_var2': self.create_id_attr(is_declarative=True),
+            'g:let_var1': self.create_id_attr(is_declarative=True),
+            'g:let_var2': self.create_id_attr(is_declarative=True),
+            'g:let_var3': self.create_id_attr(is_declarative=True),
+            'g:rest': self.create_id_attr(is_declarative=True),
+            'g:list': self.create_id_attr(is_declarative=False),
+            '1': self.create_id_attr(is_declarative=True, is_member_of_subscript=True),
+            'g:index_end': self.create_id_attr(is_declarative=False, is_member_of_subscript=True, is_dynamic=True),
         }
 
         attached_ast = id_classifier.attach_identifier_attributes(ast)
@@ -249,18 +249,18 @@ class TestIdentifierClassifier(unittest.TestCase):
         id_classifier = IdentifierClassifier()
 
         expected_id_attr_map = {
-            'g:FunctionWithNoParams': self.create_id_attr(is_definition=True, is_function=True),
-            'g:FunctionWithOneParam': self.create_id_attr(is_definition=True, is_function=True),
-            'param': self.create_id_attr(is_definition=True),
-            'g:FunctionWithTwoParams': self.create_id_attr(is_definition=True, is_function=True),
-            'param1': self.create_id_attr(is_definition=True),
-            'param2': self.create_id_attr(is_definition=True),
-            'g:FunctionWithVarParams': self.create_id_attr(is_definition=True, is_function=True),
-            'g:FunctionWithParamsAndVarParams': self.create_id_attr(is_definition=True, is_function=True),
-            'param_var1': self.create_id_attr(is_definition=True),
-            'g:FunctionWithRange': self.create_id_attr(is_definition=True, is_function=True),
-            '...': self.create_id_attr(is_definition=True),
-            'g:FunctionWithDict': self.create_id_attr(is_definition=True, is_function=True),
+            'g:FunctionWithNoParams': self.create_id_attr(is_declarative=True, is_function=True),
+            'g:FunctionWithOneParam': self.create_id_attr(is_declarative=True, is_function=True),
+            'param': self.create_id_attr(is_declarative=True),
+            'g:FunctionWithTwoParams': self.create_id_attr(is_declarative=True, is_function=True),
+            'param1': self.create_id_attr(is_declarative=True),
+            'param2': self.create_id_attr(is_declarative=True),
+            'g:FunctionWithVarParams': self.create_id_attr(is_declarative=True, is_function=True),
+            'g:FunctionWithParamsAndVarParams': self.create_id_attr(is_declarative=True, is_function=True),
+            'param_var1': self.create_id_attr(is_declarative=True),
+            'g:FunctionWithRange': self.create_id_attr(is_declarative=True, is_function=True),
+            '...': self.create_id_attr(is_declarative=True),
+            'g:FunctionWithDict': self.create_id_attr(is_declarative=True, is_function=True),
         }
 
         attached_ast = id_classifier.attach_identifier_attributes(ast)
@@ -273,8 +273,8 @@ class TestIdentifierClassifier(unittest.TestCase):
         id_classifier = IdentifierClassifier()
 
         expected_id_attr_map = {
-            'implicit_global_loop_var': self.create_id_attr(is_definition=True),
-            'g:array': self.create_id_attr(is_definition=False),
+            'implicit_global_loop_var': self.create_id_attr(is_declarative=True),
+            'g:array': self.create_id_attr(is_declarative=False),
         }
 
         attached_ast = id_classifier.attach_identifier_attributes(ast)
@@ -287,7 +287,7 @@ class TestIdentifierClassifier(unittest.TestCase):
         id_classifier = IdentifierClassifier()
 
         expected_id_attr_map = {
-            'g:var': self.create_id_attr(is_definition=True),
+            'g:var': self.create_id_attr(is_declarative=True),
         }
 
         attached_ast = id_classifier.attach_identifier_attributes(ast)

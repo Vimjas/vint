@@ -539,7 +539,7 @@ class TestScopeLinker(unittest.TestCase):
 
         expected_scope_tree = self.create_scope(
             ScopeVisibility.GLOBAL_LIKE,
-            # no variable definitions
+            # no declarative variables
             variables={
                 'g:': [self.create_variable()],
                 'b:': [self.create_variable()],

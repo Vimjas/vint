@@ -90,17 +90,24 @@ class ReferenceReachabilityTester(object):
             if is_func_id:
                 functions_list = scope['functions']
                 if var_name in functions_list:
+                    # The function is found in the symbol table for functions.
                     for variable in functions_list[var_name]:
                         declaring_id_node = self._link_registry\
                             .get_declarative_identifier_by_variable(variable)
                         declaring_id_node[REFERECED_FLAG] = True
 
                     return True
+                else:
+                    # We can access the function via a variable function
+                    # reference if the function not found from the symbol table
+                    # for functions. So we should check the symbol table for
+                    # variables to search the function reference.
+                    pass
 
-            # Probably it is a function reference.
-            # So the function can be accessed via variable function reference.
             variables_list = scope['variables']
             if var_name in variables_list:
+                # The variable or function reference found in the symbol table
+                # for variables.
                 for variable in variables_list[var_name]:
                     declaring_id_node = self._link_registry\
                         .get_declarative_identifier_by_variable(variable)

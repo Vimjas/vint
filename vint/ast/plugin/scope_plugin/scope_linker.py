@@ -123,7 +123,8 @@ class ScopeLinker(object):
 
         def handle_new_variable_found(self, node):
             current_scope = self.get_current_scope()
-            scope_visibility_hint = ScopeDetector.detect_scope_visibility(node, current_scope)
+            scope_visibility_hint = ScopeDetector.detect_scope_visibility(
+                node, current_scope)
 
             if scope_visibility_hint is None:
                 # We cannot do anything
@@ -131,6 +132,12 @@ class ScopeLinker(object):
 
             is_implicit = scope_visibility_hint['is_implicit']
             is_function = is_function_identifier(node)
+
+            if ScopeDetector.is_builtin_variable(node):
+                self._add_builtin_variable(node,
+                                           is_function=is_function,
+                                           is_implicit=is_implicit)
+                return
 
             objective_scope = self._get_objective_scope(node)
             self._add_variable(objective_scope,
@@ -141,7 +148,8 @@ class ScopeLinker(object):
 
         def _get_objective_scope(self, node):
             current_scope = self.get_current_scope()
-            scope_visibility_hint = ScopeDetector.detect_scope_visibility(node, current_scope)
+            scope_visibility_hint = ScopeDetector.detect_scope_visibility(
+                node, current_scope)
             scope_visibility = scope_visibility_hint['scope_visibility']
 
             if scope_visibility is ScopeVisibility.GLOBAL_LIKE:
@@ -157,7 +165,8 @@ class ScopeLinker(object):
         def handle_referencing_identifier_found(self, node):
             current_scope = self.get_current_scope()
 
-            self.link_registry.link_referencing_identifier_to_current_scope(node, current_scope)
+            self.link_registry.link_referencing_identifier_to_current_scope(
+                node, current_scope)
 
 
         def _add_parameter(self, objective_scope, node):
@@ -173,15 +182,6 @@ class ScopeLinker(object):
 
         def _add_variable(self, objective_scope, node, is_implicit=False, is_function=False):
             current_scope = self.get_current_scope()
-
-            is_builtin = NodeType(node['type']) is NodeType.IDENTIFIER and \
-                ScopeDetector.is_builtin_variable(node)
-
-            # TODO: Split add_variable and add_global_variable
-            if is_builtin:
-                self._add_builtin_variable(node, is_implicit=is_implicit)
-                return
-
             variable_name = ScopeDetector.normalize_variable_name(node, current_scope)
 
             self._register_variable(objective_scope,
@@ -205,7 +205,7 @@ class ScopeLinker(object):
 
 
         def _add_symbol_table_variables(self, objective_scope):
-            # We can always access any symbol tables such as: "g:", "s:", "l:", "a:"
+            # We can always access any symbol tables such as: "g:", "s:", "l:".
             # See :help internal-variables
             scope_visibility = objective_scope['scope_visibility']
             symbol_table_variable_names = SymbolTableVariableNames[scope_visibility]
@@ -326,7 +326,7 @@ class ScopeLinker(object):
         if not ScopeDetector.is_analyzable_identifier(node):
             return
 
-        if ScopeDetector.is_analyzable_definition_identifier(node):
+        if ScopeDetector.is_analyzable_declarative_identifier(node):
             self._scope_tree_builder.handle_new_variable_found(node)
             return
 

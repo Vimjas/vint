@@ -4,7 +4,7 @@ from vint.ast.plugin.scope_plugin.scope_detector import ScopeDetector, ScopeVisi
 from vint.ast.plugin.scope_plugin.identifier_classifier import (
     IDENTIFIER_ATTRIBUTE,
     IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG,
-    IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG,
+    IDENTIFIER_ATTRIBUTE_DECLARATION_FLAG,
     IDENTIFIER_ATTRIBUTE_MEMBER_FLAG,
     IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG,
     IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG,
@@ -29,7 +29,7 @@ def create_id(id_value, is_declarative=True, is_function=False, is_autoload=Fals
         'type': NodeType.IDENTIFIER.value,
         'value': id_value,
         IDENTIFIER_ATTRIBUTE: {
-            IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG: is_declarative,
+            IDENTIFIER_ATTRIBUTE_DECLARATION_FLAG: is_declarative,
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: False,
             IDENTIFIER_ATTRIBUTE_MEMBER_FLAG: False,
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: is_function,
@@ -43,7 +43,7 @@ def create_env(env_value):
         'type': NodeType.ENV.value,
         'value': env_value,
         IDENTIFIER_ATTRIBUTE: {
-            IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG: True,
+            IDENTIFIER_ATTRIBUTE_DECLARATION_FLAG: True,
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: False,
             IDENTIFIER_ATTRIBUTE_MEMBER_FLAG: False,
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
@@ -57,7 +57,7 @@ def create_option(opt_value):
         'type': NodeType.OPTION.value,
         'value': opt_value,
         IDENTIFIER_ATTRIBUTE: {
-            IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG: True,
+            IDENTIFIER_ATTRIBUTE_DECLARATION_FLAG: True,
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: False,
             IDENTIFIER_ATTRIBUTE_MEMBER_FLAG: False,
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
@@ -71,7 +71,7 @@ def create_reg(reg_value):
         'type': NodeType.REG.value,
         'value': reg_value,
         IDENTIFIER_ATTRIBUTE: {
-            IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG: True,
+            IDENTIFIER_ATTRIBUTE_DECLARATION_FLAG: True,
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: False,
             IDENTIFIER_ATTRIBUTE_MEMBER_FLAG: False,
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
@@ -99,7 +99,7 @@ def create_curlyname(is_declarative=True):
             }
         ],
         IDENTIFIER_ATTRIBUTE: {
-            IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG: is_declarative,
+            IDENTIFIER_ATTRIBUTE_DECLARATION_FLAG: is_declarative,
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: True,
             IDENTIFIER_ATTRIBUTE_MEMBER_FLAG: False,
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
@@ -113,7 +113,7 @@ def create_subscript_member(is_declarative=True):
         'type': NodeType.IDENTIFIER.value,
         'value': 'member',
         IDENTIFIER_ATTRIBUTE: {
-            IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG: is_declarative,
+            IDENTIFIER_ATTRIBUTE_DECLARATION_FLAG: is_declarative,
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: False,
             IDENTIFIER_ATTRIBUTE_MEMBER_FLAG: True,
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
