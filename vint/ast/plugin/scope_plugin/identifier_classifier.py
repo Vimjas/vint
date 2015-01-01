@@ -7,7 +7,7 @@ from vint.ast.node_type import NodeType
 
 
 IDENTIFIER_ATTRIBUTE = 'VINT:identifier_attribute'
-IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG = 'is_definition'
+IDENTIFIER_ATTRIBUTE_DECLARATION_FLAG = 'is_declarative'
 IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG = 'is_dynamic'
 IDENTIFIER_ATTRIBUTE_MEMBER_FLAG = 'is_member'
 IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG = 'is_function'
@@ -47,11 +47,14 @@ AnalyzableSubScriptChildNodeTypes = {
 
 class IdentifierClassifier(object):
     """ A class for identifier classifiers.
-    This class classify nodes by 3 flags:
+    This class classify nodes by 5 flags:
 
     - is dynamic: True if the identifier name can be determined by static analysis.
     - is member: True if the identifier is a member of a subscription/dot/slice node.
     - is declaring: True if the identifier is used to declare.
+    - is autoload: True if the identifier is declared with autoload.
+    - is function: True if the identifier is a function. Vim distinguish
+                   between function identifiers and variable identifiers.
     """
 
     class IdentifierCollector(object):
@@ -84,18 +87,19 @@ class IdentifierClassifier(object):
                     id_attr[IDENTIFIER_ATTRIBUTE_MEMBER_FLAG]:
                 return
 
-            if id_attr[IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG]:
+            if id_attr[IDENTIFIER_ATTRIBUTE_DECLARATION_FLAG]:
                 self.static_declaring_identifiers.append(node)
             else:
                 self.static_referencing_identifiers.append(node)
 
 
     def attach_identifier_attributes(self, ast):
-        """ Attach 3 flags to the AST.
+        """ Attach 5 flags to the AST.
 
         - is dynamic: True if the identifier name can be determined by static analysis.
         - is member: True if the identifier is a member of a subscription/dot/slice node.
         - is declaring: True if the identifier is used to declare.
+        - is autoload: True if the identifier is declared with autoload.
         - is function: True if the identifier is a function. Vim distinguish
                        between function identifiers and variable identifiers.
         """
@@ -106,18 +110,18 @@ class IdentifierClassifier(object):
         return ast
 
 
-    def _set_identifier_attribute(self, node, is_definition=None, is_dynamic=None,
+    def _set_identifier_attribute(self, node, is_declarative=None, is_dynamic=None,
                                   is_member=None, is_function=None, is_autoload=None):
         id_attr = node.setdefault(IDENTIFIER_ATTRIBUTE, {
-            IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG: False,
+            IDENTIFIER_ATTRIBUTE_DECLARATION_FLAG: False,
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: False,
             IDENTIFIER_ATTRIBUTE_MEMBER_FLAG: False,
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
             IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: False,
         })
 
-        if is_definition is not None:
-            id_attr[IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG] = is_definition
+        if is_declarative is not None:
+            id_attr[IDENTIFIER_ATTRIBUTE_DECLARATION_FLAG] = is_declarative
 
         if is_dynamic is not None:
             id_attr[IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG] = is_dynamic
@@ -177,19 +181,19 @@ class IdentifierClassifier(object):
             self._set_identifier_attribute(member_node, is_member=True)
 
 
-    def _enter_identifier_like_node(self, id_like_node, is_definition=None,
+    def _enter_identifier_like_node(self, id_like_node, is_declarative=None,
                                     is_function=None):
         id_like_node_type = NodeType(id_like_node['type'])
 
         if id_like_node_type in AccessorLikeNodeTypes:
             self._enter_accessor_node(id_like_node,
-                                      is_definition=is_definition,
+                                      is_declarative=is_declarative,
                                       is_function=is_function)
             return
 
         if id_like_node_type in IdentifierTerminateNodeTypes:
             self._enter_identifier_node(id_like_node,
-                                        is_definition=is_definition,
+                                        is_declarative=is_declarative,
                                         is_function=is_function)
             return
 
@@ -198,7 +202,7 @@ class IdentifierClassifier(object):
         #   let my_{s:var} = 0
         if id_like_node_type is NodeType.CURLYNAME:
             self._enter_curlyname_node(id_like_node,
-                                       is_definition=is_definition,
+                                       is_declarative=is_declarative,
                                        is_function=is_function)
             return
 
@@ -210,37 +214,37 @@ class IdentifierClassifier(object):
         # Function name is in the left.
         func_name_node = func_node['left']
         self._enter_identifier_like_node(func_name_node,
-                                         is_definition=True,
+                                         is_declarative=True,
                                          is_function=True)
 
-        # Function parameter names is in the r_list.
+        # Function parameter names are in the r_list.
         func_param_nodes = func_node['rlist']
         for func_param_node in func_param_nodes:
             self._enter_identifier_like_node(func_param_node,
-                                             is_definition=True)
+                                             is_declarative=True)
 
 
-    def _enter_curlyname_node(self, curlyname_node, is_definition=None, is_function=None):
+    def _enter_curlyname_node(self, curlyname_node, is_declarative=None, is_function=None):
         self._set_identifier_attribute(curlyname_node,
                                        is_dynamic=True,
-                                       is_definition=is_definition,
+                                       is_declarative=is_declarative,
                                        is_function=is_function)
 
 
-    def _enter_identifier_node(self, id_node, is_definition=None, is_function=None):
+    def _enter_identifier_node(self, id_node, is_declarative=None, is_function=None):
         is_autoload = '#' in id_node['value']
         self._set_identifier_attribute(id_node,
-                                       is_definition=is_definition,
+                                       is_declarative=is_declarative,
                                        is_autoload=is_autoload,
                                        is_function=is_function)
 
 
-    def _enter_accessor_node(self, accessor_node, is_definition=None, is_function=None):
+    def _enter_accessor_node(self, accessor_node, is_declarative=None, is_function=None):
         accessor_node_type = NodeType(accessor_node['type'])
 
         if accessor_node_type is NodeType.DOT:
             self._set_identifier_attribute(accessor_node['right'],
-                                           is_definition=is_definition,
+                                           is_declarative=is_declarative,
                                            is_dynamic=False,
                                            is_function=is_function)
             return
@@ -257,7 +261,7 @@ class IdentifierClassifier(object):
 
             if not is_dynamic:
                 self._set_identifier_attribute(accessor_node['right'],
-                                               is_definition=is_definition,
+                                               is_declarative=is_declarative,
                                                is_dynamic=False,
                                                is_function=is_function)
             return
@@ -273,13 +277,13 @@ class IdentifierClassifier(object):
                 #   let object[0:var] = 0
                 is_dynamic = elem_node_type not in AnalyzableSubScriptChildNodeTypes
 
-                # In the following case, 0 is a definition but var is not definition.
+                # In the following case, 0 is a declarative but var is not declarative.
                 # It is more like a reference.
                 #   let object[0:var] = 0
-                is_definition = elem_node_type in AnalyzableSubScriptChildNodeTypes
+                is_declarative = elem_node_type in AnalyzableSubScriptChildNodeTypes
 
                 self._set_identifier_attribute(elem_node,
-                                               is_definition=is_definition,
+                                               is_declarative=is_declarative,
                                                is_dynamic=is_dynamic,
                                                is_function=is_function)
             return
@@ -308,14 +312,14 @@ class IdentifierClassifier(object):
 
         if is_destructuring_assignment:
             for elem_node in node['list']:
-                self._enter_identifier_like_node(elem_node, is_definition=True)
+                self._enter_identifier_like_node(elem_node, is_declarative=True)
         else:
-            self._enter_identifier_like_node(left_node, is_definition=True)
+            self._enter_identifier_like_node(left_node, is_declarative=True)
 
         rest_node = node['rest']
         has_rest = type(rest_node) is not list
         if has_rest:
-            self._enter_identifier_like_node(rest_node, is_definition=True)
+            self._enter_identifier_like_node(rest_node, is_declarative=True)
 
 
     def _enter_declarative_node(self, node):
@@ -347,7 +351,7 @@ class IdentifierClassifier(object):
         if not redir_content_node:
             return
 
-        self._enter_identifier_like_node(redir_content_node, is_definition=True)
+        self._enter_identifier_like_node(redir_content_node, is_declarative=True)
 
 
 
@@ -373,7 +377,7 @@ def is_declarative_identifier(node):
     if not is_identifier_like_node(node):
         return False
 
-    return node[IDENTIFIER_ATTRIBUTE][IDENTIFIER_ATTRIBUTE_DEFINITION_FLAG]
+    return node[IDENTIFIER_ATTRIBUTE][IDENTIFIER_ATTRIBUTE_DECLARATION_FLAG]
 
 
 def is_member_identifier(node):

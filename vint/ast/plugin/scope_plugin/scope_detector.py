@@ -114,7 +114,7 @@ class ScopeDetector(object):
     def is_analyzable_identifier(cls, node):
         """ Whether the specified node is an analyzable identifier.
 
-        Node definition-identifier-like is analyzable if it is not dynamic
+        Node declarative-identifier-like is analyzable if it is not dynamic
         and not a member variable, because we can do static scope analysis.
 
         Analyzable cases:
@@ -131,9 +131,9 @@ class ScopeDetector(object):
 
 
     @classmethod
-    def is_analyzable_definition_identifier(cls, node):
+    def is_analyzable_declarative_identifier(cls, node):
         """ Whether the specified node is an analyzable declarative identifier.
-        Node definition-identifier-like is analyzable if it is not dynamic
+        Node declarative-identifier-like is analyzable if it is not dynamic
         and not a member variable, because we can do static scope analysis.
 
         Analyzable cases:
@@ -219,15 +219,34 @@ class ScopeDetector(object):
             return cls._create_identifier_visibility_hint(ScopeVisibility.BUILTIN,
                                                           is_implicit=True)
 
-        # autoload functions are always on global
+        # Only autoload functions implicity declared are always on global.
+        # For example:
+        #
+        #   " in autoload/file.vim
+        #   let file#var = 0
+        #   function file#func()
+        #     return 1
+        #   endfunction
+        #
+        #
+        #   " in anywhere using autoload
+        #   function FuncContext()
+        #     " ok
+        #     echo g:file#func()
+        #     echo g:file#var
+        #     echo file#func()
+        #
+        #     " ng
+        #     echo file#var
+        #   endfunction
+        #   call FuncContext()
         if is_function_identifier(id_node) and is_autoload_identifier(id_node):
             return cls._create_identifier_visibility_hint(ScopeVisibility.GLOBAL_LIKE,
                                                           is_implicit=True)
 
-        current_scope_visibility = context_scope['scope_visibility']
-
         # Implicit scope variable will be resolved as a global variable when
         # current scope is script local. Otherwise be a function local variable.
+        current_scope_visibility = context_scope['scope_visibility']
         if current_scope_visibility is ScopeVisibility.SCRIPT_LOCAL:
             return cls._create_identifier_visibility_hint(ScopeVisibility.GLOBAL_LIKE,
                                                           is_implicit=True)

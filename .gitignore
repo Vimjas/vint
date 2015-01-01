@@ -1,6 +1,7 @@
 *.pyc
 *.egg-info
 .coverage
+.eggs
 .tox
 .python-version
 dist
