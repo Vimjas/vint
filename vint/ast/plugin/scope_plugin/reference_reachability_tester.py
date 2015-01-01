@@ -120,7 +120,7 @@ class ReferenceReachabilityTester(object):
         return False
 
 
-def is_referenced_identifier(node):
+def is_reference_identifier(node):
     return REACHABILITY_FLAG in node
 
 

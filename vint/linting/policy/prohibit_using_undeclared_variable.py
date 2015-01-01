@@ -2,7 +2,10 @@ from vint.ast.node_type import NodeType
 from vint.linting.level import Level
 from vint.linting.policy.abstract_policy import AbstractPolicy
 from vint.linting.policy_registry import register_policy
-from vint.ast.plugin.scope_plugin import REACHABILITY_FLAG
+from vint.ast.plugin.scope_plugin import (
+    is_reference_identifier,
+    is_reachable_reference_identifier,
+)
 
 
 @register_policy
@@ -32,11 +35,12 @@ class ProhibitUsingUndeclaredVariable(AbstractPolicy):
             - SUBSCRIPT
         """
 
-        if REACHABILITY_FLAG not in identifier:
+        if not is_reference_identifier(identifier):
             return True
 
         scope_plugin = lint_context['plugins']['scope']
-        is_global_variable = scope_plugin.is_global_variable(identifier)
+        is_global = scope_plugin.is_global_variable(identifier)
+        is_reachable = is_reachable_reference_identifier(identifier)
 
         # Ignore global like variables
-        return identifier[REACHABILITY_FLAG] or is_global_variable
+        return is_reachable or is_global
