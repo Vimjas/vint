@@ -7,8 +7,10 @@ from vint.ast.parsing import Parser
 from vint.ast.traversing import traverse
 from vint.ast.plugin.scope_plugin import (
     ScopePlugin,
-    REACHABILITY_FLAG,
-    REFERECED_FLAG,
+    is_reference_identifier,
+    is_reachable_reference_identifier,
+    is_declarative_identifier,
+    is_referenced_declarative_identifier,
 )
 
 
@@ -52,12 +54,12 @@ class TestScopePlugin(unittest.TestCase):
                                 in expected_declarative_ids_referenced_map.values()}
 
         def enter_handler(node):
-            if REFERECED_FLAG in node:
+            if is_declarative_identifier(node):
                 id_name = node['value']
 
                 pprint(node)
                 self.assertEqual(expected_declarative_ids_referenced_map[id_name],
-                                 node[REFERECED_FLAG])
+                                 is_referenced_declarative_identifier(node))
                 dec_id_footstamp_map[id_name] = True
 
         traverse(ast, on_enter=enter_handler)
@@ -72,12 +74,12 @@ class TestScopePlugin(unittest.TestCase):
                                 in expected_ref_ids_reachability_map.values()}
 
         def enter_handler(node):
-            if REACHABILITY_FLAG in node:
+            if is_reference_identifier(node):
                 id_name = node['value']
 
                 pprint(node)
                 self.assertEqual(expected_ref_ids_reachability_map[id_name],
-                                 node[REACHABILITY_FLAG])
+                                 is_reachable_reference_identifier(node))
                 ref_id_footstamp_map[id_name] = True
 
         traverse(ast, on_enter=enter_handler)
