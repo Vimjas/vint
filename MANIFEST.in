@@ -5,3 +5,5 @@ include MANIFEST.in
 include requirements.txt
 include test-requirements.txt
 recursive-include vint/asset *
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]
