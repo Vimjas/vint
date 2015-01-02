@@ -81,7 +81,7 @@ class ReferenceReachabilityTester(object):
 
 
     def check_reachability(self, ref_id_node):
-        scope = self._link_registry.get_scope_by_referencing_identifier(ref_id_node)
+        scope = self._link_registry.get_context_scope_by_identifier(ref_id_node)
         var_name = normalize_variable_name(ref_id_node, scope)
         is_func_id = is_function_identifier(ref_id_node)
 
