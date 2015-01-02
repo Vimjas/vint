@@ -27,6 +27,12 @@ class ScopeVisibility(enum.Enum):
     UNANALYZABLE = 4
 
 
+class ExplicityOfScopeVisibility(enum.Enum):
+    EXPLICIT = 0
+    IMPLICIT = 1
+    UNANALYZABLE = 2
+
+
 IdentifierScopePrefixToScopeVisibility = {
     'g:': ScopeVisibility.GLOBAL_LIKE,
     'b:': ScopeVisibility.GLOBAL_LIKE,
@@ -143,6 +149,19 @@ def detect_scope_visibility(node, context_scope):
 
     if node_type in GlobalLikeScopeVisibilityNodeTypes:
         return _create_identifier_visibility_hint(ScopeVisibility.GLOBAL_LIKE)
+
+
+def get_explicity_of_scope_visibility(node):
+    """ Whether the node has a explicit scope visibility such as "a:".
+    Returns True if the node is unanalyzable.
+    """
+    if not is_analyzable_identifier(node):
+        return ExplicityOfScopeVisibility.UNANALYZABLE
+
+    is_explicit = _get_explicit_scope_visibility(node['value']) is not None
+
+    return ExplicityOfScopeVisibility.EXPLICIT if is_explicit \
+        else ExplicityOfScopeVisibility.IMPLICIT
 
 
 def normalize_variable_name(node, context_scope):

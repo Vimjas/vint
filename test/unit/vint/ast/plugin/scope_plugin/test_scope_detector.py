@@ -1,11 +1,5 @@
 import pytest
 from vint.ast.node_type import NodeType
-from vint.ast.plugin.scope_plugin.scope_detector import (
-    ScopeVisibility as Vis,
-    detect_scope_visibility,
-    normalize_variable_name,
-    is_builtin_variable,
-)
 from vint.ast.plugin.scope_plugin.identifier_classifier import (
     IDENTIFIER_ATTRIBUTE,
     IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG,
@@ -13,6 +7,14 @@ from vint.ast.plugin.scope_plugin.identifier_classifier import (
     IDENTIFIER_ATTRIBUTE_MEMBER_FLAG,
     IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG,
     IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG,
+)
+from vint.ast.plugin.scope_plugin.scope_detector import (
+    ScopeVisibility as Vis,
+    detect_scope_visibility,
+    normalize_variable_name,
+    is_builtin_variable,
+    ExplicityOfScopeVisibility,
+    get_explicity_of_scope_visibility,
 )
 
 
@@ -245,4 +247,17 @@ def test_is_builtin_variable(id_value, is_function, expected_result):
     id_node = create_id(id_value, is_function=is_function)
     result = is_builtin_variable(id_node)
 
+    assert expected_result == result
+
+
+
+@pytest.mark.parametrize(
+    'node, expected_result', [
+        (create_id('my_var'), ExplicityOfScopeVisibility.IMPLICIT),
+        (create_id('g:my_var'), ExplicityOfScopeVisibility.EXPLICIT),
+        (create_curlyname(), ExplicityOfScopeVisibility.UNANALYZABLE),
+    ]
+)
+def test_get_explicity_of_scope_visibility(node, expected_result):
+    result = get_explicity_of_scope_visibility(node)
     assert expected_result == result
