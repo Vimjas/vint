@@ -1,6 +1,12 @@
 import pytest
 from vint.ast.node_type import NodeType
-from vint.ast.plugin.scope_plugin.scope_detector import ScopeDetector, ScopeVisibility as Vis
+from vint.ast.plugin.scope_plugin.scope_detector import (
+    ScopeVisibility as Vis,
+    detect_scope_visibility,
+    normalize_variable_name,
+    is_builtin_variable,
+    is_global_variable,
+)
 from vint.ast.plugin.scope_plugin.identifier_classifier import (
     IDENTIFIER_ATTRIBUTE,
     IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG,
@@ -191,7 +197,7 @@ def create_subscript_member(is_declarative=True):
 )
 def test_detect_scope_visibility(context_scope_visibility, id_node, expected_scope_visibility, expected_implicity):
     scope = create_scope(context_scope_visibility)
-    scope_visibility_hint = ScopeDetector.detect_scope_visibility(id_node, scope)
+    scope_visibility_hint = detect_scope_visibility(id_node, scope)
 
     expected_scope_visibility_hint = create_scope_visibility_hint(expected_scope_visibility,
                                                                   is_implicit=expected_implicity)
@@ -220,9 +226,9 @@ def test_detect_scope_visibility(context_scope_visibility, id_node, expected_sco
 )
 def test_normalize_variable_name(context_scope_visibility, node, expected_variable_name):
     scope = create_scope(context_scope_visibility)
-    normalize_variable_name = ScopeDetector.normalize_variable_name(node, scope)
+    normalized_variable_name = normalize_variable_name(node, scope)
 
-    assert expected_variable_name == normalize_variable_name
+    assert expected_variable_name == normalized_variable_name
 
 
 
@@ -238,7 +244,7 @@ def test_normalize_variable_name(context_scope_visibility, node, expected_variab
 )
 def test_is_builtin_variable(id_value, is_function, expected_result):
     id_node = create_id(id_value, is_function=is_function)
-    result = ScopeDetector.is_builtin_variable(id_node)
+    result = is_builtin_variable(id_node)
 
     assert expected_result == result
 
@@ -263,6 +269,6 @@ def test_is_builtin_variable(id_value, is_function, expected_result):
 def test_is_global_variable(id_value, context_scope_visibility, expected_result):
     id_node = create_id(id_value)
     context_scope = create_scope(context_scope_visibility)
-    result = ScopeDetector.is_global_variable(id_node, context_scope)
+    result = is_global_variable(id_node, context_scope)
 
     assert expected_result == result

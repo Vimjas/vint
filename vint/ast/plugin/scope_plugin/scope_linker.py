@@ -4,8 +4,12 @@ from vint.ast.plugin.scope_plugin.redir_assignment_parser import (
 )
 from vint.ast.node_type import NodeType
 from vint.ast.plugin.scope_plugin.scope_detector import (
-    ScopeDetector,
     ScopeVisibility,
+    detect_scope_visibility,
+    is_analyzable_identifier,
+    is_analyzable_declarative_identifier,
+    is_builtin_variable,
+    normalize_variable_name,
 )
 from vint.ast.plugin.scope_plugin.identifier_classifier import (
     IdentifierClassifier,
@@ -123,7 +127,7 @@ class ScopeLinker(object):
 
         def handle_new_variable_found(self, node):
             current_scope = self.get_current_scope()
-            scope_visibility_hint = ScopeDetector.detect_scope_visibility(
+            scope_visibility_hint = detect_scope_visibility(
                 node, current_scope)
 
             if scope_visibility_hint is None:
@@ -133,7 +137,7 @@ class ScopeLinker(object):
             is_implicit = scope_visibility_hint['is_implicit']
             is_function = is_function_identifier(node)
 
-            if ScopeDetector.is_builtin_variable(node):
+            if is_builtin_variable(node):
                 self._add_builtin_variable(node,
                                            is_function=is_function,
                                            is_implicit=is_implicit)
@@ -148,7 +152,7 @@ class ScopeLinker(object):
 
         def _get_objective_scope(self, node):
             current_scope = self.get_current_scope()
-            scope_visibility_hint = ScopeDetector.detect_scope_visibility(
+            scope_visibility_hint = detect_scope_visibility(
                 node, current_scope)
             scope_visibility = scope_visibility_hint['scope_visibility']
 
@@ -182,7 +186,7 @@ class ScopeLinker(object):
 
         def _add_variable(self, objective_scope, node, is_implicit=False, is_function=False):
             current_scope = self.get_current_scope()
-            variable_name = ScopeDetector.normalize_variable_name(node, current_scope)
+            variable_name = normalize_variable_name(node, current_scope)
 
             self._register_variable(objective_scope,
                                     variable_name,
@@ -193,7 +197,7 @@ class ScopeLinker(object):
 
         def _add_builtin_variable(self, node, is_implicit=False, is_function=False):
             current_scope = self.get_current_scope()
-            variable_name = ScopeDetector.normalize_variable_name(node, current_scope)
+            variable_name = normalize_variable_name(node, current_scope)
 
             self._register_variable(self.get_global_scope(),
                                     variable_name,
@@ -323,10 +327,10 @@ class ScopeLinker(object):
 
 
     def _find_variable_like_nodes(self, node):
-        if not ScopeDetector.is_analyzable_identifier(node):
+        if not is_analyzable_identifier(node):
             return
 
-        if ScopeDetector.is_analyzable_declarative_identifier(node):
+        if is_analyzable_declarative_identifier(node):
             self._scope_tree_builder.handle_new_variable_found(node)
             return
 
