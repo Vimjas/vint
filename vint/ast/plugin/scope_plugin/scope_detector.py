@@ -1,5 +1,9 @@
 import enum
 from vint.ast.node_type import NodeType
+from vint.ast.dictionary.builtins import (
+    BuiltinVariables,
+    BuiltinFunctions,
+)
 from vint.ast.plugin.scope_plugin.identifier_classifier import (
     is_identifier_like_node,
     is_dynamic_identifier,
@@ -7,10 +11,6 @@ from vint.ast.plugin.scope_plugin.identifier_classifier import (
     is_function_identifier,
     is_member_identifier,
     is_autoload_identifier,
-)
-from vint.ast.plugin.scope_plugin.builtin_dictionary import (
-    BuiltinVariables,
-    BuiltinFunctions,
 )
 
 

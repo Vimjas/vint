@@ -3,7 +3,7 @@ from vint.ast.node_type import NodeType
 from vint.linting.level import Level
 from vint.linting.policy.abstract_policy import AbstractPolicy
 from vint.linting.policy_registry import register_policy
-from vint.linting.policy.autocmd_event import AutoCmdEvents
+from vint.ast.dictionary.autocmd_events import AutoCmdEvents
 
 
 @register_policy
