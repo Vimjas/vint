@@ -93,17 +93,6 @@ def is_builtin_function(id_node):
     return id_value in BuiltinFunctions
 
 
-def is_global_variable(id_node, context_scope):
-    """ Whether the specified node is a builtin identifier. """
-    scope_visibility_hint = detect_scope_visibility(id_node, context_scope)
-    scope_visibility = scope_visibility_hint['scope_visibility']
-
-    return scope_visibility in {
-        ScopeVisibility.GLOBAL_LIKE: True,
-        ScopeVisibility.BUILTIN: True,
-    }
-
-
 def is_analyzable_identifier(node):
     """ Whether the specified node is an analyzable identifier.
 

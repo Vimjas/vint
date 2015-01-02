@@ -3,6 +3,7 @@ from vint.linting.level import Level
 from vint.linting.policy.abstract_policy import AbstractPolicy
 from vint.linting.policy_registry import register_policy
 from vint.ast.plugin.scope_plugin import (
+    ScopeVisibility,
     is_reference_identifier,
     is_reachable_reference_identifier,
 )
@@ -39,8 +40,11 @@ class ProhibitUsingUndeclaredVariable(AbstractPolicy):
             return True
 
         scope_plugin = lint_context['plugins']['scope']
-        is_global = scope_plugin.is_global_variable(identifier)
         is_reachable = is_reachable_reference_identifier(identifier)
 
+        scope_visibility = scope_plugin.get_objective_scope_visibility(identifier)
+        is_global = scope_visibility is ScopeVisibility.GLOBAL_LIKE
+        is_builtin = scope_visibility is ScopeVisibility.BUILTIN
+
         # Ignore global like variables
-        return is_reachable or is_global
+        return is_reachable or is_global or is_builtin

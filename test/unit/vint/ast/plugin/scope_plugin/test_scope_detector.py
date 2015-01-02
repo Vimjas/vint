@@ -5,7 +5,6 @@ from vint.ast.plugin.scope_plugin.scope_detector import (
     detect_scope_visibility,
     normalize_variable_name,
     is_builtin_variable,
-    is_global_variable,
 )
 from vint.ast.plugin.scope_plugin.identifier_classifier import (
     IDENTIFIER_ATTRIBUTE,
@@ -245,30 +244,5 @@ def test_normalize_variable_name(context_scope_visibility, node, expected_variab
 def test_is_builtin_variable(id_value, is_function, expected_result):
     id_node = create_id(id_value, is_function=is_function)
     result = is_builtin_variable(id_node)
-
-    assert expected_result == result
-
-
-
-@pytest.mark.parametrize(
-    'id_value, context_scope_visibility, expected_result', [
-        ('g:my_var', Vis.SCRIPT_LOCAL, True),
-        ('g:my_var', Vis.FUNCTION_LOCAL, True),
-        ('my_var', Vis.SCRIPT_LOCAL, True),
-        ('my_var', Vis.FUNCTION_LOCAL, False),
-        ('s:my_var', Vis.SCRIPT_LOCAL, False),
-        ('s:my_var', Vis.FUNCTION_LOCAL, False),
-
-        ('count', Vis.SCRIPT_LOCAL, True),
-        ('v:count', Vis.SCRIPT_LOCAL, True),
-
-        ('count', Vis.FUNCTION_LOCAL, True),
-        ('v:count', Vis.FUNCTION_LOCAL, True),
-    ]
-)
-def test_is_global_variable(id_value, context_scope_visibility, expected_result):
-    id_node = create_id(id_value)
-    context_scope = create_scope(context_scope_visibility)
-    result = is_global_variable(id_node, context_scope)
 
     assert expected_result == result

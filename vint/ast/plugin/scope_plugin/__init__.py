@@ -5,3 +5,6 @@ from vint.ast.plugin.scope_plugin.reference_reachability_tester import (
     is_declarative_identifier,
     is_referenced_declarative_identifier,
 )
+from vint.ast.plugin.scope_plugin.scope_detector import (
+    ScopeVisibility,
+)
