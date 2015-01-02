@@ -220,6 +220,11 @@ def _detect_identifier_scope_visibility(id_node, context_scope):
         return _create_identifier_visibility_hint(ScopeVisibility.GLOBAL_LIKE,
                                                   is_implicit=True)
 
+    if not context_scope:
+        # We cannot detect implicit scope visibility if context scope is not
+        # specified.
+        return _create_identifier_visibility_hint(ScopeVisibility.UNANALYZABLE)
+
     # Implicit scope variable will be resolved as a global variable when
     # current scope is script local. Otherwise be a function local variable.
     current_scope_visibility = context_scope['scope_visibility']
