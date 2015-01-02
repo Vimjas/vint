@@ -124,6 +124,7 @@ unlet s:save_cpo
 
 [![Coverage Status](https://img.shields.io/coveralls/Kuniwak/vint.svg)](https://coveralls.io/r/Kuniwak/vint)
 [![Code Health](https://landscape.io/github/Kuniwak/vint/master/landscape.png)](https://landscape.io/github/Kuniwak/vint/master)
+[![Dependency Status](https://gemnasium.com/Kuniwak/vint.svg)](https://gemnasium.com/Kuniwak/vint)
 
 
 ライセンス
@@ -137,3 +138,4 @@ unlet s:save_cpo
 
 * [ynkdir/vim-vimlparser](https://github.com/ynkdir/vim-vimlparser)
 * [Google Vimscript Style Guide](http://google-styleguide.googlecode.com/svn/trunk/vimscriptguide.xml?showone=Catching_Exceptions#Catching_Exceptions)
+* [Anti-pattern of vimrc](http://rbtnn.hateblo.jp/entry/2014/12/28/010913)
