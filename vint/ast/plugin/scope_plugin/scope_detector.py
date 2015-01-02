@@ -1,5 +1,9 @@
 import enum
 from vint.ast.node_type import NodeType
+from vint.ast.dictionary.builtins import (
+    BuiltinVariables,
+    BuiltinFunctions,
+)
 from vint.ast.plugin.scope_plugin.identifier_classifier import (
     is_identifier_like_node,
     is_dynamic_identifier,
@@ -7,10 +11,6 @@ from vint.ast.plugin.scope_plugin.identifier_classifier import (
     is_function_identifier,
     is_member_identifier,
     is_autoload_identifier,
-)
-from vint.ast.plugin.scope_plugin.builtin_dictionary import (
-    BuiltinVariables,
-    BuiltinFunctions,
 )
 
 
@@ -25,6 +25,12 @@ class ScopeVisibility(enum.Enum):
     SCRIPT_LOCAL = 2
     FUNCTION_LOCAL = 3
     UNANALYZABLE = 4
+
+
+class ExplicityOfScopeVisibility(enum.Enum):
+    EXPLICIT = 0
+    IMPLICIT = 1
+    UNANALYZABLE = 2
 
 
 IdentifierScopePrefixToScopeVisibility = {
@@ -61,210 +67,202 @@ IdentifierLikeNodeTypes = {
 }
 
 
-class ScopeDetector(object):
-    """ An utility namespace for variable visibility detection. """
+def is_builtin_variable(id_node):
+    """ Whether the specified node is a builtin identifier. """
+    if not is_identifier_like_node(id_node):
+        return False
 
-    @classmethod
-    def is_builtin_variable(cls, id_node):
-        """ Whether the specified node is a builtin identifier. """
-        if not is_identifier_like_node(id_node):
-            return False
+    id_value = id_node['value']
+    if id_value.startswith('v:'):
+        # It is an explicit builtin variable such as: "v:count", "v:char"
+        # TODO: Add unknown builtin flag
+        return True
 
-        id_value = id_node['value']
-        if id_value.startswith('v:'):
-            # It is an explicit builtin variable such as: "v:count", "v:char"
-            # TODO: Add unknown builtin flag
-            return True
-
-        if is_function_identifier(id_node):
-            # There are defference between a function identifier and variable
-            # identifier:
-            #
-            #   let localtime = 0
-            #   echo localtime " => 0
-            #   echo localtime() " => 1420011455
-            return id_value in BuiltinFunctions
-
-        # It is an implicit builtin variable such as: "count", "char"
-        return id_value in BuiltinVariables
-
-
-    @classmethod
-    def is_builtin_function(cls, id_node):
-        """ Whether the specified node is a builtin function name identifier.
-        The given identifier should be a child node of NodeType.CALL.
-        """
-        id_value = id_node['value']
+    if is_function_identifier(id_node):
+        # There are defference between a function identifier and variable
+        # identifier:
+        #
+        #   let localtime = 0
+        #   echo localtime " => 0
+        #   echo localtime() " => 1420011455
         return id_value in BuiltinFunctions
 
-
-    @classmethod
-    def is_global_variable(cls, id_node, context_scope):
-        """ Whether the specified node is a builtin identifier. """
-        scope_visibility_hint = cls.detect_scope_visibility(id_node, context_scope)
-        scope_visibility = scope_visibility_hint['scope_visibility']
-
-        return scope_visibility in {
-            ScopeVisibility.GLOBAL_LIKE: True,
-            ScopeVisibility.BUILTIN: True,
-        }
+    # It is an implicit builtin variable such as: "count", "char"
+    return id_value in BuiltinVariables
 
 
-    @classmethod
-    def is_analyzable_identifier(cls, node):
-        """ Whether the specified node is an analyzable identifier.
-
-        Node declarative-identifier-like is analyzable if it is not dynamic
-        and not a member variable, because we can do static scope analysis.
-
-        Analyzable cases:
-          - let s:var = 0
-          - function! Func()
-          - echo s:var
-
-        Unanalyzable cases:
-          - let s:my_{var} = 0
-          - function! dict.Func()
-          - echo s:my_{var}
-        """
-        return not (is_dynamic_identifier(node) or is_member_identifier(node))
+def is_builtin_function(id_node):
+    """ Whether the specified node is a builtin function name identifier.
+    The given identifier should be a child node of NodeType.CALL.
+    """
+    id_value = id_node['value']
+    return id_value in BuiltinFunctions
 
 
-    @classmethod
-    def is_analyzable_declarative_identifier(cls, node):
-        """ Whether the specified node is an analyzable declarative identifier.
-        Node declarative-identifier-like is analyzable if it is not dynamic
-        and not a member variable, because we can do static scope analysis.
+def is_analyzable_identifier(node):
+    """ Whether the specified node is an analyzable identifier.
 
-        Analyzable cases:
-          - let s:var = 0
-          - function! Func()
+    Node declarative-identifier-like is analyzable if it is not dynamic
+    and not a member variable, because we can do static scope analysis.
 
-        Unanalyzable cases:
-          - let s:my_{var} = 0
-          - function! dict.Func()
-        """
-        return is_declarative_identifier(node) and \
-            cls.is_analyzable_identifier(node)
+    Analyzable cases:
+      - let s:var = 0
+      - function! Func()
+      - echo s:var
 
-
-    @classmethod
-    def detect_scope_visibility(cls, node, context_scope):
-        """ Returns a variable visibility hint by the specified node.
-        The hint is a dict that has 2 attributes: "scope_visibility" and
-        "is_implicit".
-        """
-        node_type = NodeType(node['type'])
-
-        if not cls.is_analyzable_identifier(node):
-            return cls._create_identifier_visibility_hint(ScopeVisibility.UNANALYZABLE)
-
-        if node_type is NodeType.IDENTIFIER:
-            return cls._detect_identifier_scope_visibility(node, context_scope)
-
-        if node_type in GlobalLikeScopeVisibilityNodeTypes:
-            return cls._create_identifier_visibility_hint(ScopeVisibility.GLOBAL_LIKE)
+    Unanalyzable cases:
+      - let s:my_{var} = 0
+      - function! dict.Func()
+      - echo s:my_{var}
+    """
+    return not (is_dynamic_identifier(node) or is_member_identifier(node))
 
 
-    @classmethod
-    def normalize_variable_name(cls, node, context_scope):
-        """ Returns normalized variable name.
-        Normalizing means that variable names get explicit visibility by
-        visibility prefix such as: "g:", "s:", ...
+def is_analyzable_declarative_identifier(node):
+    """ Whether the specified node is an analyzable declarative identifier.
+    Node declarative-identifier-like is analyzable if it is not dynamic
+    and not a member variable, because we can do static scope analysis.
 
-        Retunes None if the specified node is unanalyzable.
-        A node is unanalyzable if:
+    Analyzable cases:
+      - let s:var = 0
+      - function! Func()
 
-        - the node is not identifier-like
-        - the node is named dynamically
-        """
-        node_type = NodeType(node['type'])
-
-        if not cls.is_analyzable_identifier(node):
-            return None
-
-        if node_type is NodeType.IDENTIFIER:
-            return cls._normalize_identifier_value(node, context_scope)
-
-        # Nodes identifier-like without identifier is always normalized because
-        # the nodes can not have a visibility prefix.
-        if node_type in IdentifierLikeNodeTypes:
-            return node['value']
+    Unanalyzable cases:
+      - let s:my_{var} = 0
+      - function! dict.Func()
+    """
+    return is_declarative_identifier(node) and is_analyzable_identifier(node)
 
 
-    @classmethod
-    def _normalize_identifier_value(cls, id_node, context_scope):
-        scope_visibility_hint = cls.detect_scope_visibility(id_node, context_scope)
+def detect_scope_visibility(node, context_scope):
+    """ Returns a variable visibility hint by the specified node.
+    The hint is a dict that has 2 attributes: "scope_visibility" and
+    "is_implicit".
+    """
+    node_type = NodeType(node['type'])
 
-        if not scope_visibility_hint['is_implicit']:
-            return id_node['value']
+    if not is_analyzable_identifier(node):
+        return _create_identifier_visibility_hint(ScopeVisibility.UNANALYZABLE)
 
-        scope_visibility = scope_visibility_hint['scope_visibility']
-        scope_prefix = ImplicitScopeVisibilityToIdentifierScopePrefix[scope_visibility]
+    if node_type is NodeType.IDENTIFIER:
+        return _detect_identifier_scope_visibility(node, context_scope)
 
-        return scope_prefix + id_node['value']
-
-
-    @classmethod
-    def _detect_identifier_scope_visibility(cls, id_node, context_scope):
-        id_value = id_node['value']
-
-        explicit_scope_visibility = cls._get_explicit_scope_visibility(id_value)
-        if explicit_scope_visibility is not None:
-            return cls._create_identifier_visibility_hint(explicit_scope_visibility)
-
-        # Implicit scope variable will be resolved as a builtin variable if it
-        # has a same name to Vim builtin variables.
-        if cls.is_builtin_variable(id_node):
-            return cls._create_identifier_visibility_hint(ScopeVisibility.BUILTIN,
-                                                          is_implicit=True)
-
-        # Only autoload functions implicity declared are always on global.
-        # For example:
-        #
-        #   " in autoload/file.vim
-        #   let file#var = 0
-        #   function file#func()
-        #     return 1
-        #   endfunction
-        #
-        #
-        #   " in anywhere using autoload
-        #   function FuncContext()
-        #     " ok
-        #     echo g:file#func()
-        #     echo g:file#var
-        #     echo file#func()
-        #
-        #     " ng
-        #     echo file#var
-        #   endfunction
-        #   call FuncContext()
-        if is_function_identifier(id_node) and is_autoload_identifier(id_node):
-            return cls._create_identifier_visibility_hint(ScopeVisibility.GLOBAL_LIKE,
-                                                          is_implicit=True)
-
-        # Implicit scope variable will be resolved as a global variable when
-        # current scope is script local. Otherwise be a function local variable.
-        current_scope_visibility = context_scope['scope_visibility']
-        if current_scope_visibility is ScopeVisibility.SCRIPT_LOCAL:
-            return cls._create_identifier_visibility_hint(ScopeVisibility.GLOBAL_LIKE,
-                                                          is_implicit=True)
-
-        return cls._create_identifier_visibility_hint(ScopeVisibility.FUNCTION_LOCAL,
-                                                      is_implicit=True)
+    if node_type in GlobalLikeScopeVisibilityNodeTypes:
+        return _create_identifier_visibility_hint(ScopeVisibility.GLOBAL_LIKE)
 
 
-    @classmethod
-    def _get_explicit_scope_visibility(cls, id_value):
-        # See :help internal-variables
-        scope_prefix = id_value[0:2]
-        return IdentifierScopePrefixToScopeVisibility.get(scope_prefix, None)
+def get_explicity_of_scope_visibility(node):
+    """ Whether the node has a explicit scope visibility such as "a:".
+    Returns True if the node is unanalyzable.
+    """
+    if not is_analyzable_identifier(node):
+        return ExplicityOfScopeVisibility.UNANALYZABLE
+
+    is_explicit = _get_explicit_scope_visibility(node['value']) is not None
+
+    return ExplicityOfScopeVisibility.EXPLICIT if is_explicit \
+        else ExplicityOfScopeVisibility.IMPLICIT
 
 
-    @classmethod
-    def _create_identifier_visibility_hint(cls, visibility, is_implicit=False):
-        return {
-            'scope_visibility': visibility,
-            'is_implicit': is_implicit,
-        }
+def normalize_variable_name(node, context_scope):
+    """ Returns normalized variable name.
+    Normalizing means that variable names get explicit visibility by
+    visibility prefix such as: "g:", "s:", ...
+
+    Retunes None if the specified node is unanalyzable.
+    A node is unanalyzable if:
+
+    - the node is not identifier-like
+    - the node is named dynamically
+    """
+    node_type = NodeType(node['type'])
+
+    if not is_analyzable_identifier(node):
+        return None
+
+    if node_type is NodeType.IDENTIFIER:
+        return _normalize_identifier_value(node, context_scope)
+
+    # Nodes identifier-like without identifier is always normalized because
+    # the nodes can not have a visibility prefix.
+    if node_type in IdentifierLikeNodeTypes:
+        return node['value']
+
+
+def _normalize_identifier_value(id_node, context_scope):
+    scope_visibility_hint = detect_scope_visibility(id_node, context_scope)
+
+    if not scope_visibility_hint['is_implicit']:
+        return id_node['value']
+
+    scope_visibility = scope_visibility_hint['scope_visibility']
+    scope_prefix = ImplicitScopeVisibilityToIdentifierScopePrefix[scope_visibility]
+
+    return scope_prefix + id_node['value']
+
+
+def _detect_identifier_scope_visibility(id_node, context_scope):
+    id_value = id_node['value']
+
+    explicit_scope_visibility = _get_explicit_scope_visibility(id_value)
+    if explicit_scope_visibility is not None:
+        return _create_identifier_visibility_hint(explicit_scope_visibility)
+
+    # Implicit scope variable will be resolved as a builtin variable if it
+    # has a same name to Vim builtin variables.
+    if is_builtin_variable(id_node):
+        return _create_identifier_visibility_hint(ScopeVisibility.BUILTIN,
+                                                  is_implicit=True)
+
+    # Only autoload functions implicity declared are always on global.
+    # For example:
+    #
+    #   " in autoload/file.vim
+    #   let file#var = 0
+    #   function file#func()
+    #     return 1
+    #   endfunction
+    #
+    #
+    #   " in anywhere using autoload
+    #   function FuncContext()
+    #     " ok
+    #     echo g:file#func()
+    #     echo g:file#var
+    #     echo file#func()
+    #
+    #     " ng
+    #     echo file#var
+    #   endfunction
+    #   call FuncContext()
+    if is_function_identifier(id_node) and is_autoload_identifier(id_node):
+        return _create_identifier_visibility_hint(ScopeVisibility.GLOBAL_LIKE,
+                                                  is_implicit=True)
+
+    if not context_scope:
+        # We cannot detect implicit scope visibility if context scope is not
+        # specified.
+        return _create_identifier_visibility_hint(ScopeVisibility.UNANALYZABLE)
+
+    # Implicit scope variable will be resolved as a global variable when
+    # current scope is script local. Otherwise be a function local variable.
+    current_scope_visibility = context_scope['scope_visibility']
+    if current_scope_visibility is ScopeVisibility.SCRIPT_LOCAL:
+        return _create_identifier_visibility_hint(ScopeVisibility.GLOBAL_LIKE,
+                                                  is_implicit=True)
+
+    return _create_identifier_visibility_hint(ScopeVisibility.FUNCTION_LOCAL,
+                                              is_implicit=True)
+
+
+def _get_explicit_scope_visibility(id_value):
+    # See :help internal-variables
+    scope_prefix = id_value[0:2]
+    return IdentifierScopePrefixToScopeVisibility.get(scope_prefix, None)
+
+
+def _create_identifier_visibility_hint(visibility, is_implicit=False):
+    return {
+        'scope_visibility': visibility,
+        'is_implicit': is_implicit,
+    }

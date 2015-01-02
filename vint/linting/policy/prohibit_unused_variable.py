@@ -6,10 +6,10 @@ from vint.ast.plugin.scope_plugin import ScopeVisibility
 
 
 @register_policy
-class ProhibitUsingUndeclaredVariable(AbstractPolicy):
+class ProhibitUnusedVariable(AbstractPolicy):
     def __init__(self):
-        super(ProhibitUsingUndeclaredVariable, self).__init__()
-        self.description = 'Variable is not declared'
+        super(ProhibitUnusedVariable, self).__init__()
+        self.description = 'Variable is unused'
         self.reference = ':help E738'
         self.level = Level.WARNING
 
@@ -19,7 +19,7 @@ class ProhibitUsingUndeclaredVariable(AbstractPolicy):
 
 
     def is_valid(self, identifier, lint_context):
-        """ Whether all variables are used after declared.
+        """ Whether the variables are used.
         This policy cannot determine the following node types:
           - Global identifier like nodes
             - ENV
@@ -33,7 +33,7 @@ class ProhibitUsingUndeclaredVariable(AbstractPolicy):
         """
 
         scope_plugin = lint_context['plugins']['scope']
-        is_reachable = not scope_plugin.is_unreachable_reference_identifier(identifier)
+        is_used = not scope_plugin.is_unused_declarative_identifier(identifier)
 
         scope_visibility = scope_plugin.get_objective_scope_visibility(identifier)
         is_global = scope_visibility is ScopeVisibility.GLOBAL_LIKE
@@ -41,4 +41,4 @@ class ProhibitUsingUndeclaredVariable(AbstractPolicy):
         is_unanalyzable = scope_visibility is ScopeVisibility.UNANALYZABLE
 
         # Ignore global like variables
-        return is_reachable or is_global or is_builtin or is_unanalyzable
+        return is_used or is_global or is_builtin or is_unanalyzable

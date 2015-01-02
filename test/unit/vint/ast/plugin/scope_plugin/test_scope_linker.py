@@ -618,13 +618,10 @@ class TestScopeLinker(unittest.TestCase):
         self.assertScopeTreeEqual(expected_scope_tree, linker.scope_tree)
 
 
-    def test_built_referencing_identifier_links_by_process(self):
-        # Simplicated AST of the following code:
-        #
-        #     function! s:Function()
-        #     endfunction
-        #     call s:Function()
+    def test_built_identifier_links_by_process(self):
         ast = self.create_ast(Fixtures.DECLARING_AND_REFERENCING)
+
+        # Function call reference identifier node
         ref_id_node = ast['body'][1]['left']['left']
 
         linker = ScopeLinker()
@@ -635,18 +632,34 @@ class TestScopeLinker(unittest.TestCase):
         expected_scope = scope_tree['child_scopes'][0]
 
         link_registry = linker.link_registry
-        actual_scope = link_registry.get_scope_by_referencing_identifier(ref_id_node)
+        actual_scope = link_registry.get_context_scope_by_identifier(ref_id_node)
 
         self.assertScopeTreeEqual(expected_scope, actual_scope)
 
 
-    def test_built_variable_links_by_process(self):
-        # Simplicated AST of the following code:
-        #
-        #     function! s:Function()
-        #     endfunction
-        #     call s:Function()
+    def test_built_declarative_identifier_links_by_process(self):
         ast = self.create_ast(Fixtures.DECLARING_AND_REFERENCING)
+
+        # Function name identifier node
+        dec_id_node = ast['body'][0]['left']
+
+        linker = ScopeLinker()
+        linker.process(ast)
+
+        scope_tree = linker.scope_tree
+        # Expect a script local scope
+        expected_scope = scope_tree['child_scopes'][0]
+
+        link_registry = linker.link_registry
+        actual_scope = link_registry.get_context_scope_by_identifier(dec_id_node)
+
+        self.assertScopeTreeEqual(expected_scope, actual_scope)
+
+
+    def test_built_reference_variable_links_by_process(self):
+        ast = self.create_ast(Fixtures.DECLARING_AND_REFERENCING)
+
+        # Function name identifier node
         expected_dec_id = ast['body'][0]['left']
 
         linker = ScopeLinker()

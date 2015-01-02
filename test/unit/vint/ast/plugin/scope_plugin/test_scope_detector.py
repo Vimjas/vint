@@ -1,6 +1,5 @@
 import pytest
 from vint.ast.node_type import NodeType
-from vint.ast.plugin.scope_plugin.scope_detector import ScopeDetector, ScopeVisibility as Vis
 from vint.ast.plugin.scope_plugin.identifier_classifier import (
     IDENTIFIER_ATTRIBUTE,
     IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG,
@@ -8,6 +7,14 @@ from vint.ast.plugin.scope_plugin.identifier_classifier import (
     IDENTIFIER_ATTRIBUTE_MEMBER_FLAG,
     IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG,
     IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG,
+)
+from vint.ast.plugin.scope_plugin.scope_detector import (
+    ScopeVisibility as Vis,
+    detect_scope_visibility,
+    normalize_variable_name,
+    is_builtin_variable,
+    ExplicityOfScopeVisibility,
+    get_explicity_of_scope_visibility,
 )
 
 
@@ -191,7 +198,7 @@ def create_subscript_member(is_declarative=True):
 )
 def test_detect_scope_visibility(context_scope_visibility, id_node, expected_scope_visibility, expected_implicity):
     scope = create_scope(context_scope_visibility)
-    scope_visibility_hint = ScopeDetector.detect_scope_visibility(id_node, scope)
+    scope_visibility_hint = detect_scope_visibility(id_node, scope)
 
     expected_scope_visibility_hint = create_scope_visibility_hint(expected_scope_visibility,
                                                                   is_implicit=expected_implicity)
@@ -220,9 +227,9 @@ def test_detect_scope_visibility(context_scope_visibility, id_node, expected_sco
 )
 def test_normalize_variable_name(context_scope_visibility, node, expected_variable_name):
     scope = create_scope(context_scope_visibility)
-    normalize_variable_name = ScopeDetector.normalize_variable_name(node, scope)
+    normalized_variable_name = normalize_variable_name(node, scope)
 
-    assert expected_variable_name == normalize_variable_name
+    assert expected_variable_name == normalized_variable_name
 
 
 
@@ -238,31 +245,19 @@ def test_normalize_variable_name(context_scope_visibility, node, expected_variab
 )
 def test_is_builtin_variable(id_value, is_function, expected_result):
     id_node = create_id(id_value, is_function=is_function)
-    result = ScopeDetector.is_builtin_variable(id_node)
+    result = is_builtin_variable(id_node)
 
     assert expected_result == result
 
 
 
 @pytest.mark.parametrize(
-    'id_value, context_scope_visibility, expected_result', [
-        ('g:my_var', Vis.SCRIPT_LOCAL, True),
-        ('g:my_var', Vis.FUNCTION_LOCAL, True),
-        ('my_var', Vis.SCRIPT_LOCAL, True),
-        ('my_var', Vis.FUNCTION_LOCAL, False),
-        ('s:my_var', Vis.SCRIPT_LOCAL, False),
-        ('s:my_var', Vis.FUNCTION_LOCAL, False),
-
-        ('count', Vis.SCRIPT_LOCAL, True),
-        ('v:count', Vis.SCRIPT_LOCAL, True),
-
-        ('count', Vis.FUNCTION_LOCAL, True),
-        ('v:count', Vis.FUNCTION_LOCAL, True),
+    'node, expected_result', [
+        (create_id('my_var'), ExplicityOfScopeVisibility.IMPLICIT),
+        (create_id('g:my_var'), ExplicityOfScopeVisibility.EXPLICIT),
+        (create_curlyname(), ExplicityOfScopeVisibility.UNANALYZABLE),
     ]
 )
-def test_is_global_variable(id_value, context_scope_visibility, expected_result):
-    id_node = create_id(id_value)
-    context_scope = create_scope(context_scope_visibility)
-    result = ScopeDetector.is_global_variable(id_node, context_scope)
-
+def test_get_explicity_of_scope_visibility(node, expected_result):
+    result = get_explicity_of_scope_visibility(node)
     assert expected_result == result

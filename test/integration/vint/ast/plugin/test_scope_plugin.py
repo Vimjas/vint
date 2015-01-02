@@ -5,13 +5,11 @@ from pprint import pprint
 
 from vint.ast.parsing import Parser
 from vint.ast.traversing import traverse
-from vint.ast.plugin.scope_plugin import (
-    ScopePlugin,
+from vint.ast.plugin.scope_plugin.reference_reachability_tester import (
     is_reference_identifier,
-    is_reachable_reference_identifier,
     is_declarative_identifier,
-    is_referenced_declarative_identifier,
 )
+from vint.ast.plugin.scope_plugin import ScopePlugin
 
 
 FIXTURE_BASE_PATH = Path('test', 'fixture', 'ast', 'scope_plugin')
@@ -47,19 +45,17 @@ class TestScopePlugin(unittest.TestCase):
         return ast
 
 
-    def assertDeclarativeIdentifiersReferenced(self,
-                                               expected_declarative_ids_referenced_map,
-                                               ast):
+    def assertVariablesUnused(self, expected_variables_unused, scope_plugin, ast):
         dec_id_footstamp_map = {id_name: False for id_name
-                                in expected_declarative_ids_referenced_map.values()}
+                                in expected_variables_unused.values()}
 
         def enter_handler(node):
             if is_declarative_identifier(node):
                 id_name = node['value']
 
                 pprint(node)
-                self.assertEqual(expected_declarative_ids_referenced_map[id_name],
-                                 is_referenced_declarative_identifier(node))
+                self.assertEqual(expected_variables_unused[id_name],
+                                 scope_plugin.is_unused_declarative_identifier(node))
                 dec_id_footstamp_map[id_name] = True
 
         traverse(ast, on_enter=enter_handler)
@@ -67,19 +63,17 @@ class TestScopePlugin(unittest.TestCase):
         self.assertTrue(dec_id_footstamp_map.values())
 
 
-    def assertReferencingIdentifiersReachability(self,
-                                                 expected_ref_ids_reachability_map,
-                                                 ast):
+    def assertVariablesUndeclared(self, expected_variables_undeclared, scope_plugin, ast):
         ref_id_footstamp_map = {id_name: False for id_name
-                                in expected_ref_ids_reachability_map.values()}
+                                in expected_variables_undeclared.values()}
 
         def enter_handler(node):
             if is_reference_identifier(node):
                 id_name = node['value']
 
                 pprint(node)
-                self.assertEqual(expected_ref_ids_reachability_map[id_name],
-                                 is_reachable_reference_identifier(node))
+                self.assertEqual(expected_variables_undeclared[id_name],
+                                 scope_plugin.is_unreachable_reference_identifier(node))
                 ref_id_footstamp_map[id_name] = True
 
         traverse(ast, on_enter=enter_handler)
@@ -94,28 +88,29 @@ class TestScopePlugin(unittest.TestCase):
         scope_plugin = ScopePlugin()
         scope_plugin.process(ast)
 
-        expected_ref_ids_reachability_map = {
-            'g:explicit_global_var': True,
-            'b:buffer_local_var': True,
-            'w:window_local_var': True,
-            't:tab_local_var': True,
-            's:script_local_var': True,
-            'implicit_global_var': True,
-            'g:implicit_global_var': True,
-            '$ENV_VAR': True,
-            '@"': True,
-            '&opt_var': True,
-            'v:count': True,
-            'count': True,
-            'g:': True,
-            'b:': True,
-            'w:': True,
-            't:': True,
-            'v:': True,
+        expected_variables_undeclared = {
+            'g:explicit_global_var': False,
+            'b:buffer_local_var': False,
+            'w:window_local_var': False,
+            't:tab_local_var': False,
+            's:script_local_var': False,
+            'implicit_global_var': False,
+            'g:implicit_global_var': False,
+            '$ENV_VAR': False,
+            '@"': False,
+            '&opt_var': False,
+            'v:count': False,
+            'count': False,
+            'g:': False,
+            'b:': False,
+            'w:': False,
+            't:': False,
+            'v:': False,
         }
 
-        self.assertReferencingIdentifiersReachability(expected_ref_ids_reachability_map,
-                                                      ast)
+        self.assertVariablesUndeclared(expected_variables_undeclared,
+                                       scope_plugin,
+                                       ast)
 
 
     def test_reference_reachability_with_referenced_all_func(self):
@@ -124,18 +119,19 @@ class TestScopePlugin(unittest.TestCase):
         scope_plugin = ScopePlugin()
         scope_plugin.process(ast)
 
-        expected_ref_ids_reachability_map = {
-            'g:ExplicitGlobalFunc': True,
-            'b:BufferLocalFunc': True,
-            'w:WindowLocalFunc': True,
-            't:TabLocalFunc': True,
-            's:ScriptLocalFunc': True,
-            'ImplicitGlobalFunc': True,
-            'g:ImplicitGlobalFunc': True,
+        expected_variables_undeclared = {
+            'g:ExplicitGlobalFunc': False,
+            'b:BufferLocalFunc': False,
+            'w:WindowLocalFunc': False,
+            't:TabLocalFunc': False,
+            's:ScriptLocalFunc': False,
+            'ImplicitGlobalFunc': False,
+            'g:ImplicitGlobalFunc': False,
         }
 
-        self.assertReferencingIdentifiersReachability(expected_ref_ids_reachability_map,
-                                                      ast)
+        self.assertVariablesUndeclared(expected_variables_undeclared,
+                                       scope_plugin,
+                                       ast)
 
 
     def test_declarative_identifiers_referenced_with_referenced_all_func(self):
@@ -144,17 +140,18 @@ class TestScopePlugin(unittest.TestCase):
         scope_plugin = ScopePlugin()
         scope_plugin.process(ast)
 
-        expected_declarative_ids_referenced_map = {
-            'g:ExplicitGlobalFunc': True,
-            'b:BufferLocalFunc': True,
-            'w:WindowLocalFunc': True,
-            't:TabLocalFunc': True,
-            's:ScriptLocalFunc': True,
-            'ImplicitGlobalFunc': True,
+        expected_variables_unused = {
+            'g:ExplicitGlobalFunc': False,
+            'b:BufferLocalFunc': False,
+            'w:WindowLocalFunc': False,
+            't:TabLocalFunc': False,
+            's:ScriptLocalFunc': False,
+            'ImplicitGlobalFunc': False,
         }
 
-        self.assertDeclarativeIdentifiersReferenced(expected_declarative_ids_referenced_map,
-                                                    ast)
+        self.assertVariablesUnused(expected_variables_unused,
+                                   scope_plugin,
+                                   ast)
 
 
     def test_reference_reachability_with_referenced_all_funcs_in_func(self):
@@ -163,16 +160,17 @@ class TestScopePlugin(unittest.TestCase):
         scope_plugin = ScopePlugin()
         scope_plugin.process(ast)
 
-        expected_ref_ids_reachability_map = {
-            'l:ExplicitFuncLocalFunc': True,
-            'ExplicitFuncLocalFunc': True,
+        expected_variables_undeclared = {
+            'l:ExplicitFuncLocalFunc': False,
+            'ExplicitFuncLocalFunc': False,
 
-            'l:ImplicitFuncLocalFunc': True,
-            'ImplicitFuncLocalFunc': True,
+            'l:ImplicitFuncLocalFunc': False,
+            'ImplicitFuncLocalFunc': False,
         }
 
-        self.assertReferencingIdentifiersReachability(expected_ref_ids_reachability_map,
-                                                      ast)
+        self.assertVariablesUndeclared(expected_variables_undeclared,
+                                       scope_plugin,
+                                       ast)
 
 
     def test_declarative_identifiers_referenced_with_referenced_all_funcs_in_func(self):
@@ -181,14 +179,15 @@ class TestScopePlugin(unittest.TestCase):
         scope_plugin = ScopePlugin()
         scope_plugin.process(ast)
 
-        expected_declarative_ids_referenced_map = {
-            'FuncContext': False,
-            'l:ExplicitFuncLocalFunc': True,
-            'ImplicitFuncLocalFunc': True,
+        expected_variables_unused = {
+            'FuncContext': True,
+            'l:ExplicitFuncLocalFunc': False,
+            'ImplicitFuncLocalFunc': False,
         }
 
-        self.assertDeclarativeIdentifiersReferenced(expected_declarative_ids_referenced_map,
-                                                    ast)
+        self.assertVariablesUnused(expected_variables_unused,
+                                   scope_plugin,
+                                   ast)
 
 
     def test_declarative_identifiers_referenced_with_referenced_all(self):
@@ -197,21 +196,22 @@ class TestScopePlugin(unittest.TestCase):
         scope_plugin = ScopePlugin()
         scope_plugin.process(ast)
 
-        expected_declarative_ids_referenced_map = {
-            'g:explicit_global_var': True,
-            'b:buffer_local_var': True,
-            'w:window_local_var': True,
-            't:tab_local_var': True,
-            's:script_local_var': True,
-            'implicit_global_var': True,
-            '$ENV_VAR': True,
-            '@"': True,
-            '&opt_var': True,
-            'v:count': True,
+        expected_variables_unused = {
+            'g:explicit_global_var': False,
+            'b:buffer_local_var': False,
+            'w:window_local_var': False,
+            't:tab_local_var': False,
+            's:script_local_var': False,
+            'implicit_global_var': False,
+            '$ENV_VAR': False,
+            '@"': False,
+            '&opt_var': False,
+            'v:count': False,
         }
 
-        self.assertDeclarativeIdentifiersReferenced(expected_declarative_ids_referenced_map,
-                                                    ast)
+        self.assertVariablesUnused(expected_variables_unused,
+                                   scope_plugin,
+                                   ast)
 
 
     def test_reference_reachability_with_referenced_all_params(self):
@@ -220,26 +220,27 @@ class TestScopePlugin(unittest.TestCase):
         scope_plugin = ScopePlugin()
         scope_plugin.process(ast)
 
-        expected_declarative_ids_referenced_map = {
-            'a:': True,
-            'l:': True,
-            'a:0': True,
-            'a:000': True,
+        expected_variables_unused = {
+            'a:': False,
+            'l:': False,
+            'a:0': False,
+            'a:000': False,
 
-            'a:param': True,
+            'a:param': False,
 
-            'a:param1': True,
-            'a:param2': True,
+            'a:param1': False,
+            'a:param2': False,
 
-            'a:param_var': True,
+            'a:param_var': False,
 
-            'a:param_with_range': True,
-            'a:firstline': True,
-            'a:lastline': True,
+            'a:param_with_range': False,
+            'a:firstline': False,
+            'a:lastline': False,
         }
 
-        self.assertReferencingIdentifiersReachability(expected_declarative_ids_referenced_map,
-                                                      ast)
+        self.assertVariablesUndeclared(expected_variables_unused,
+                                       scope_plugin,
+                                       ast)
 
 
     def test_reference_reachability_with_referenced_loop_var(self):
@@ -248,13 +249,14 @@ class TestScopePlugin(unittest.TestCase):
         scope_plugin = ScopePlugin()
         scope_plugin.process(ast)
 
-        expected_ref_ids_reachability_map = {
-            'g:array': False,
-            'g:implicit_global_loop_var': True,
+        expected_variables_undeclared = {
+            'g:array': True,
+            'g:implicit_global_loop_var': False,
         }
 
-        self.assertReferencingIdentifiersReachability(expected_ref_ids_reachability_map,
-                                                      ast)
+        self.assertVariablesUndeclared(expected_variables_undeclared,
+                                       scope_plugin,
+                                       ast)
 
 
     def test_reference_reachability_with_unreferenced_params(self):
@@ -263,19 +265,20 @@ class TestScopePlugin(unittest.TestCase):
         scope_plugin = ScopePlugin()
         scope_plugin.process(ast)
 
-        expected_ref_ids_reachability_map = {
-            'param': False,
-            'a:1': False,
-            'a:firstline': False,
-            'a:lastline': False,
+        expected_variables_undeclared = {
+            'param': True,
+            'a:1': True,
+            'a:firstline': True,
+            'a:lastline': True,
 
-            'a:18': False,
-            'a:19': False,
-            'a:20': False,
+            'a:18': True,
+            'a:19': True,
+            'a:20': True,
         }
 
-        self.assertReferencingIdentifiersReachability(expected_ref_ids_reachability_map,
-                                                      ast)
+        self.assertVariablesUndeclared(expected_variables_undeclared,
+                                       scope_plugin,
+                                       ast)
 
 
     def test_reference_reachability_with_unreferenced_func(self):
@@ -284,12 +287,13 @@ class TestScopePlugin(unittest.TestCase):
         scope_plugin = ScopePlugin()
         scope_plugin.process(ast)
 
-        expected_ref_ids_reachability_map = {
-            's:ImplicitGlobalFunc': False,
+        expected_variables_undeclared = {
+            's:ImplicitGlobalFunc': True,
         }
 
-        self.assertReferencingIdentifiersReachability(expected_ref_ids_reachability_map,
-                                                      ast)
+        self.assertVariablesUndeclared(expected_variables_undeclared,
+                                       scope_plugin,
+                                       ast)
 
 
     def test_reference_reachability_with_unreferenced_func_in_func(self):
@@ -298,15 +302,16 @@ class TestScopePlugin(unittest.TestCase):
         scope_plugin = ScopePlugin()
         scope_plugin.process(ast)
 
-        expected_ref_ids_reachability_map = {
-            'l:ExplicitFuncLocalFunc': False,
-            'ExplicitFuncLocalFunc': False,
-            'l:ImplicitFuncLocalFunc': False,
-            'ImplicitFuncLocalFunc': False,
+        expected_variables_undeclared = {
+            'l:ExplicitFuncLocalFunc': True,
+            'ExplicitFuncLocalFunc': True,
+            'l:ImplicitFuncLocalFunc': True,
+            'ImplicitFuncLocalFunc': True,
         }
 
-        self.assertReferencingIdentifiersReachability(expected_ref_ids_reachability_map,
-                                                      ast)
+        self.assertVariablesUndeclared(expected_variables_undeclared,
+                                       scope_plugin,
+                                       ast)
 
 
     def test_declarative_identifiers_referenced_with_unreferenced_func_in_func(self):
@@ -315,14 +320,15 @@ class TestScopePlugin(unittest.TestCase):
         scope_plugin = ScopePlugin()
         scope_plugin.process(ast)
 
-        expected_declarative_ids_referenced_map = {
-            'FuncContext': False,
-            'l:ExplicitFuncLocalFunc': False,
-            'ImplicitFuncLocalFunc': False,
+        expected_variables_unused = {
+            'FuncContext': True,
+            'l:ExplicitFuncLocalFunc': True,
+            'ImplicitFuncLocalFunc': True,
         }
 
-        self.assertDeclarativeIdentifiersReferenced(expected_declarative_ids_referenced_map,
-                                                    ast)
+        self.assertVariablesUnused(expected_variables_unused,
+                                   scope_plugin,
+                                   ast)
 
 
     def test_reference_reachability_with_unreferenced_var(self):
@@ -331,12 +337,13 @@ class TestScopePlugin(unittest.TestCase):
         scope_plugin = ScopePlugin()
         scope_plugin.process(ast)
 
-        expected_ref_ids_reachability_map = {
-            's:implicit_global_var': False,
+        expected_variables_undeclared = {
+            's:implicit_global_var': True,
         }
 
-        self.assertReferencingIdentifiersReachability(expected_ref_ids_reachability_map,
-                                                      ast)
+        self.assertVariablesUndeclared(expected_variables_undeclared,
+                                       scope_plugin,
+                                       ast)
 
 
     def test_reference_reachability_with_unanalyzable(self):
@@ -345,13 +352,14 @@ class TestScopePlugin(unittest.TestCase):
         scope_plugin = ScopePlugin()
         scope_plugin.process(ast)
 
-        expected_ref_ids_reachability_map = {
-            'list_slice': False,
-            'dict': False,
+        expected_variables_undeclared = {
+            'list_slice': True,
+            'dict': True,
         }
 
-        self.assertReferencingIdentifiersReachability(expected_ref_ids_reachability_map,
-                                                      ast)
+        self.assertVariablesUndeclared(expected_variables_undeclared,
+                                       scope_plugin,
+                                       ast)
 
 
 if __name__ == '__main__':

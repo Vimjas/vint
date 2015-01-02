@@ -1,4 +1,7 @@
-from vint.ast.plugin.scope_plugin.scope_detector import ScopeDetector
+from vint.ast.plugin.scope_plugin.scope_detector import (
+    detect_scope_visibility,
+    normalize_variable_name,
+)
 from vint.ast.plugin.scope_plugin.scope_linker import ScopeLinker
 from vint.ast.plugin.scope_plugin.identifier_classifier import (
     IdentifierClassifier,
@@ -58,14 +61,10 @@ class ReferenceReachabilityTester(object):
             ref_id_node[REACHABILITY_FLAG] = is_reachable
 
 
-    def is_global_variable(self, node):
-        """ Whether the specified node is a global variable. """
+    def get_objective_scope_visibility(self, node):
+        """ Returns a objective scope visibility. """
         context_scope = self._link_registry.get_scope_by_referencing_identifier(node)
-        if context_scope is None:
-            # Looks like not variable
-            return False
-
-        return ScopeDetector.is_global_variable(node, context_scope)
+        return detect_scope_visibility(node, context_scope)['scope_visibility']
 
 
     def _reset_referenced_flag(self, scope_tree):
@@ -82,8 +81,8 @@ class ReferenceReachabilityTester(object):
 
 
     def check_reachability(self, ref_id_node):
-        scope = self._link_registry.get_scope_by_referencing_identifier(ref_id_node)
-        var_name = ScopeDetector.normalize_variable_name(ref_id_node, scope)
+        scope = self._link_registry.get_context_scope_by_identifier(ref_id_node)
+        var_name = normalize_variable_name(ref_id_node, scope)
         is_func_id = is_function_identifier(ref_id_node)
 
         while scope is not None:

@@ -66,12 +66,9 @@ class PolicyAssertion(unittest.TestCase):
 
         pprint(actual_violation)
 
-        self.assertEqual(actual_violation['name'], expected_violation['name'],
-                         'Expected violation name was returned')
-        self.assertEqual(actual_violation['position'], expected_violation['position'],
-                         'Expected violation position was returned')
-        self.assertEqual(actual_violation['level'], expected_violation['level'],
-                         'Expected violation level was returned')
+        assert actual_violation['name'] == expected_violation['name']
+        assert actual_violation['position'] == expected_violation['position']
+        assert actual_violation['level'] == expected_violation['level']
 
         self.assertIsInstance(actual_violation['description'], str)
 
