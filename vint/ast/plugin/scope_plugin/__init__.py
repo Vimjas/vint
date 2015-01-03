@@ -7,13 +7,16 @@ from vint.ast.plugin.scope_plugin.reference_reachability_tester import (
 )
 from vint.ast.plugin.scope_plugin.scope_detector import (
     ScopeVisibility as _ScopeVisibility,
+    ExplicityOfScopeVisibility as _ExplicityOfScopeVisibility,
     detect_scope_visibility,
     get_explicity_of_scope_visibility,
+    normalize_variable_name,
 )
 
 
-# Expose to global
+# Expose
 ScopeVisibility = _ScopeVisibility
+ExplicityOfScopeVisibility = _ExplicityOfScopeVisibility
 
 
 class ScopePlugin(object):
@@ -51,3 +54,9 @@ class ScopePlugin(object):
 
     def get_explicity_of_scope_visibility(self, node):
         return get_explicity_of_scope_visibility(node)
+
+
+    def normalize_variable_name(self, node):
+        link_registry = self._get_link_registry()
+        context_scope = link_registry.get_context_scope_by_identifier(node)
+        return normalize_variable_name(node, context_scope)
