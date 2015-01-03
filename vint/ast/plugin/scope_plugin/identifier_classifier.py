@@ -179,10 +179,28 @@ class IdentifierClassifier(object):
                 if type(member_node) is list:
                     continue
 
+                if NodeType(member_node['type']) is NodeType.IDENTIFIER:
+                    # Only the identifier should be flagged as a member that
+                    # the variable is an accessor for a list or dictionary.
+                    # For example, the variable that is "l:end" in list[0 : l:end]
+                    # is not accessor for the symbol table of the variable "list",
+                    # but it is a variable symbol table accessor.
+                    continue
+
                 self._pre_mark_member_node(member_node)
-        else:
-            member_node = node['right']
-            self._pre_mark_member_node(member_node)
+            return
+
+        member_node = node['right']
+        if node_type is NodeType.SUBSCRIPT:
+            if NodeType(member_node['type']) is NodeType.IDENTIFIER:
+                # Only the identifier should be flagged as a member that
+                # the variable is an accessor for a list or dictionary.
+                # For example, the variable that is "l:key" in dict[l:key]
+                # is not accessor for the symbol table of the variable "dict",
+                # but it is a variable symbol table accessor.
+                return
+
+        self._pre_mark_member_node(member_node)
 
 
     def _pre_mark_member_node(self, member_node):
