@@ -195,6 +195,7 @@ def create_subscript_member(is_declarative=True):
         (Vis.SCRIPT_LOCAL, create_id('v:count', is_declarative=False), Vis.BUILTIN, False),
         (Vis.FUNCTION_LOCAL, create_id('v:count', is_declarative=False), Vis.BUILTIN, False),
         (Vis.FUNCTION_LOCAL, create_id('count', is_declarative=False), Vis.BUILTIN, True),
+        (Vis.SCRIPT_LOCAL, create_id('localtime', is_function=True), Vis.BUILTIN, False),
 
         (Vis.SCRIPT_LOCAL, create_curlyname(is_declarative=False), Vis.UNANALYZABLE, False),
         (Vis.FUNCTION_LOCAL, create_curlyname(is_declarative=False), Vis.UNANALYZABLE, False),

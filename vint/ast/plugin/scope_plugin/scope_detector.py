@@ -223,8 +223,10 @@ def _detect_identifier_scope_visibility(id_node, context_scope):
     # Implicit scope variable will be resolved as a builtin variable if it
     # has a same name to Vim builtin variables.
     if is_builtin_variable(id_node):
+        # Builtin functions can not have explicit scope visibility.
+        is_implicit = not is_function_identifier(id_node)
         return _create_identifier_visibility_hint(ScopeVisibility.BUILTIN,
-                                                  is_implicit=True)
+                                                  is_implicit=is_implicit)
 
     # Only autoload functions implicity declared are always on global.
     # For example:
