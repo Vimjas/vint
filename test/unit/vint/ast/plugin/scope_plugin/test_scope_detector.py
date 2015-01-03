@@ -195,7 +195,7 @@ def create_subscript_member(is_declarative=True):
         (Vis.SCRIPT_LOCAL, create_id('v:count', is_declarative=False), Vis.BUILTIN, False),
         (Vis.FUNCTION_LOCAL, create_id('v:count', is_declarative=False), Vis.BUILTIN, False),
         (Vis.FUNCTION_LOCAL, create_id('count', is_declarative=False), Vis.BUILTIN, True),
-        (Vis.SCRIPT_LOCAL, create_id('localtime', is_function=True), Vis.BUILTIN, False),
+        (Vis.SCRIPT_LOCAL, create_id('localtime', is_declarative=False, is_function=True), Vis.BUILTIN, False),
 
         (Vis.SCRIPT_LOCAL, create_curlyname(is_declarative=False), Vis.UNANALYZABLE, False),
         (Vis.FUNCTION_LOCAL, create_curlyname(is_declarative=False), Vis.UNANALYZABLE, False),
@@ -268,7 +268,11 @@ def test_is_builtin_variable(id_value, is_function, expected_result):
     'node, expected_result', [
         (create_id('my_var'), ExplicityOfScopeVisibility.IMPLICIT),
         (create_id('g:my_var'), ExplicityOfScopeVisibility.EXPLICIT),
+
         (create_id('param', is_declarative=True, is_declarative_parameter=True), ExplicityOfScopeVisibility.EXPLICIT),
+
+        (create_id('localtime', is_declarative=False, is_function=True), ExplicityOfScopeVisibility.EXPLICIT),
+
         (create_curlyname(), ExplicityOfScopeVisibility.UNANALYZABLE),
     ]
 )
