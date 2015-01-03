@@ -1,22 +1,26 @@
 from vint.ast.plugin.scope_plugin.reference_reachability_tester import (
     ReferenceReachabilityTester,
-    is_reference_identifier,
-    is_declarative_identifier,
-    is_reachable_reference_identifier,
-    is_referenced_declarative_identifier,
+    is_reference_identifier as _is_reference_identifier,
+    is_declarative_identifier as _is_declarative_identifier,
+    is_reachable_reference_identifier as _is_reachable_reference_identifier,
+    is_referenced_declarative_identifier as _is_referenced_declarative_identifier,
 )
 from vint.ast.plugin.scope_plugin.scope_detector import (
     ScopeVisibility as _ScopeVisibility,
     ExplicityOfScopeVisibility as _ExplicityOfScopeVisibility,
-    detect_scope_visibility,
-    get_explicity_of_scope_visibility,
-    normalize_variable_name,
+    detect_scope_visibility as _detect_scope_visibility,
+    get_explicity_of_scope_visibility as _get_explicity_of_scope_visibility,
+    normalize_variable_name as _normalize_variable_name,
+)
+from vint.ast.plugin.scope_plugin.redir_assignment_parser import (
+    traverse as _traverse,
 )
 
 
-# Expose
+# Expose to out of ScopePlugin
 ScopeVisibility = _ScopeVisibility
 ExplicityOfScopeVisibility = _ExplicityOfScopeVisibility
+traverse = _traverse
 
 
 class ScopePlugin(object):
@@ -36,27 +40,27 @@ class ScopePlugin(object):
 
 
     def is_unreachable_reference_identifier(self, node):
-        return is_reference_identifier(node) \
-            and not is_reachable_reference_identifier(node)
+        return _is_reference_identifier(node) \
+            and not _is_reachable_reference_identifier(node)
 
 
     def is_unused_declarative_identifier(self, node):
-        return is_declarative_identifier(node) \
-            and not is_referenced_declarative_identifier(node)
+        return _is_declarative_identifier(node) \
+            and not _is_referenced_declarative_identifier(node)
 
 
     def get_objective_scope_visibility(self, node):
         link_registry = self._get_link_registry()
         context_scope = link_registry.get_context_scope_by_identifier(node)
-        scope_visibility_hint = detect_scope_visibility(node, context_scope)
+        scope_visibility_hint = _detect_scope_visibility(node, context_scope)
         return scope_visibility_hint['scope_visibility']
 
 
     def get_explicity_of_scope_visibility(self, node):
-        return get_explicity_of_scope_visibility(node)
+        return _get_explicity_of_scope_visibility(node)
 
 
     def normalize_variable_name(self, node):
         link_registry = self._get_link_registry()
         context_scope = link_registry.get_context_scope_by_identifier(node)
-        return normalize_variable_name(node, context_scope)
+        return _normalize_variable_name(node, context_scope)
