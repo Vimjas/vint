@@ -11,6 +11,7 @@ from vint.ast.plugin.scope_plugin.identifier_classifier import (
     is_function_identifier,
     is_member_identifier,
     is_autoload_identifier,
+    is_declarative_parameter,
 )
 
 
@@ -158,6 +159,12 @@ def get_explicity_of_scope_visibility(node):
     if not is_analyzable_identifier(node):
         return ExplicityOfScopeVisibility.UNANALYZABLE
 
+    # Declarative parameter do not have any explicit scope visibility prefix
+    # but we almost understand the identifier has a explicit scope visibility
+    # that is function local.
+    if is_declarative_parameter(node):
+        return ExplicityOfScopeVisibility.EXPLICIT
+
     is_explicit = _get_explicit_scope_visibility(node['value']) is not None
 
     return ExplicityOfScopeVisibility.EXPLICIT if is_explicit \
@@ -250,6 +257,14 @@ def _detect_identifier_scope_visibility(id_node, context_scope):
     if current_scope_visibility is ScopeVisibility.SCRIPT_LOCAL:
         return _create_identifier_visibility_hint(ScopeVisibility.GLOBAL_LIKE,
                                                   is_implicit=True)
+
+    # Declarative parameter do not have any explicit scope visibility prefix
+    # but we almost understand the identifier has a explicit scope visibility
+    # that is function local.
+    if is_declarative_parameter(id_node):
+        return _create_identifier_visibility_hint(ScopeVisibility.FUNCTION_LOCAL,
+                                                  is_implicit=False)
+
 
     return _create_identifier_visibility_hint(ScopeVisibility.FUNCTION_LOCAL,
                                               is_implicit=True)
