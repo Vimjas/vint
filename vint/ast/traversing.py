@@ -5,6 +5,7 @@ SKIP_CHILDREN = 'SKIP_CHILDREN'
 ChildNodeAccessor = {
     'NODE': lambda node, func: call_if_def(func, node),
     'LIST': lambda nodes, func: for_each(func, nodes),
+    'NESTED_LIST': lambda nested_list, func: for_each_deeply(func, nested_list),
 }
 
 ChildType = {
@@ -35,6 +36,14 @@ ChildType = {
     'BODY': {
         'accessor': ChildNodeAccessor['LIST'],
         'property_name': 'body',
+    },
+    'DICT_ENTRIES': {
+        'accessor': ChildNodeAccessor['NESTED_LIST'],
+        'property_name': 'value',
+    },
+    'LIST_ELEMENTS': {
+        'accessor': ChildNodeAccessor['LIST'],
+        'property_name': 'value',
     },
 
     'ELSEIF': {
@@ -153,8 +162,8 @@ ChildNodeAccessorMap = {
     NodeType.DOT: [ChildType['LEFT'], ChildType['RIGHT']],
     NodeType.NUMBER: [],
     NodeType.STRING: [],
-    NodeType.LIST: [],
-    NodeType.DICT: [],
+    NodeType.LIST: [ChildType['LIST_ELEMENTS']],
+    NodeType.DICT: [ChildType['DICT_ENTRIES']],
     NodeType.NESTING: [ChildType['LEFT']],
     NodeType.OPTION: [],
     NodeType.IDENTIFIER: [],
@@ -177,6 +186,13 @@ def for_each(func, nodes):
     """ Calls func for each the specified nodes. """
     for node in nodes:
         call_if_def(func, node)
+
+
+def for_each_deeply(func, dict_entries):
+    """ Calls func deeply for each the specified nodes. """
+    for dict_entry in dict_entries:
+        call_if_def(func, dict_entry[0])
+        call_if_def(func, dict_entry[1])
 
 
 def call_if_def(func, node):

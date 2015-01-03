@@ -9,7 +9,6 @@ from vint.ast.plugin.scope_plugin import ScopeVisibility
 class ProhibitUnusedVariable(AbstractPolicy):
     def __init__(self):
         super(ProhibitUnusedVariable, self).__init__()
-        self.description = 'Variable is unused'
         self.reference = ':help E738'
         self.level = Level.WARNING
 
@@ -40,5 +39,11 @@ class ProhibitUnusedVariable(AbstractPolicy):
         is_builtin = scope_visibility is ScopeVisibility.BUILTIN
         is_unanalyzable = scope_visibility is ScopeVisibility.UNANALYZABLE
 
+        self._make_description(identifier)
+
         # Ignore global like variables
         return is_used or is_global or is_builtin or is_unanalyzable
+
+
+    def _make_description(self, identifier):
+        self.description = str('Unused variable: ' + identifier['value'])
