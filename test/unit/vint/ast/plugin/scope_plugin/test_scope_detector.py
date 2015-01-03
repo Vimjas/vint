@@ -252,6 +252,10 @@ def test_normalize_variable_name(context_scope_visibility, node, expected_variab
         ('count', False, True),
         ('v:count', False, True),
 
+        # It is available on only map() or filter().
+        ('key', False, False),
+        ('val', False, False),
+
         ('MyFunc', True, False),
         ('localtime', True, True),
     ]

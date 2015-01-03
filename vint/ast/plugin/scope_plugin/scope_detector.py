@@ -83,7 +83,11 @@ def is_builtin_variable(id_node):
         return True
 
     # It is an implicit builtin variable such as: "count", "char"
-    return id_value in BuiltinVariables
+    return id_value in BuiltinVariables and id_value not in {
+        # These builtin variable names are available on only map() or filter().
+        'key': True,
+        'val': True,
+    }
 
 
 def is_builtin_function(id_node):
