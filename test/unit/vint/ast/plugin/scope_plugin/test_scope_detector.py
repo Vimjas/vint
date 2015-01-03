@@ -230,6 +230,7 @@ def test_detect_scope_visibility(context_scope_visibility, id_node, expected_sco
         (Vis.SCRIPT_LOCAL, create_id('v:count'), 'v:count'),
         (Vis.FUNCTION_LOCAL, create_id('v:count'), 'v:count'),
         (Vis.FUNCTION_LOCAL, create_id('count'), 'v:count'),
+        (Vis.SCRIPT_LOCAL, create_id('localtime', is_declarative=False, is_function=True), 'localtime'),
 
         (Vis.SCRIPT_LOCAL, create_env('$ENV'), '$ENV'),
         (Vis.SCRIPT_LOCAL, create_option('&OPT'), '&OPT'),
