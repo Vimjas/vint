@@ -232,7 +232,7 @@ def create_subscript_member(is_declarative=True):
         (Vis.SCRIPT_LOCAL, create_id('s:ScriptLocalFunc', is_declarative=False, is_function=True), Vis.SCRIPT_LOCAL, False),
         (Vis.FUNCTION_LOCAL, create_id('s:ScriptLocalFunc', is_declarative=False, is_function=True), Vis.SCRIPT_LOCAL, False),
 
-        (Vis.SCRIPT_LOCAL, create_id('t:InvalidScopeFunc', is_declarative=False, is_function=True), Vis.INVALID, False),
+        (Vis.SCRIPT_LOCAL, create_id('t:TabLocalFuncRef', is_declarative=False, is_function=True), Vis.GLOBAL_LIKE, False),
     ]
 )
 def test_detect_scope_visibility(context_scope_visibility, id_node, expected_scope_visibility, expected_implicity):

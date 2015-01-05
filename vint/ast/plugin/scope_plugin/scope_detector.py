@@ -34,14 +34,14 @@ class ExplicityOfScopeVisibility(enum.Enum):
     UNANALYZABLE = 2
 
 
-FunctionIdentifierScopePrefixToScopeVisibility = {
+FunctionDeclarationIdentifierScopePrefixToScopeVisibility = {
     'g:': ScopeVisibility.GLOBAL_LIKE,
     'b:': ScopeVisibility.INVALID,
     'w:': ScopeVisibility.INVALID,
     't:': ScopeVisibility.INVALID,
     's:': ScopeVisibility.SCRIPT_LOCAL,
     'l:': ScopeVisibility.INVALID,
-    'a:': ScopeVisibility.FUNCTION_LOCAL,
+    'a:': ScopeVisibility.INVALID,
     'v:': ScopeVisibility.INVALID,
 }
 
@@ -282,8 +282,8 @@ def _get_explicit_scope_visibility(id_node):
     # See :help internal-variables
     scope_prefix = id_node['value'][0:2]
 
-    if is_function_identifier(id_node):
-        return FunctionIdentifierScopePrefixToScopeVisibility.get(scope_prefix)
+    if is_function_identifier(id_node) and is_declarative_identifier(id_node):
+        return FunctionDeclarationIdentifierScopePrefixToScopeVisibility.get(scope_prefix)
     else:
         return VariableIdentifierScopePrefixToScopeVisibility.get(scope_prefix)
 
