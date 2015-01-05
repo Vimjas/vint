@@ -183,6 +183,8 @@ def create_subscript_member(is_declarative=True):
         (Vis.SCRIPT_LOCAL, create_id('s:ScriptLocalFunc', is_function=True), Vis.SCRIPT_LOCAL, False),
         (Vis.FUNCTION_LOCAL, create_id('s:ScriptLocalFunc', is_function=True), Vis.SCRIPT_LOCAL, False),
 
+        (Vis.SCRIPT_LOCAL, create_id('t:InvalidScopeFunc', is_function=True), Vis.INVALID, False),
+
         # Referencing variable test
         (Vis.SCRIPT_LOCAL, create_id('g:explicit_global', is_declarative=False), Vis.GLOBAL_LIKE, False),
         (Vis.SCRIPT_LOCAL, create_id('implicit_global', is_declarative=False), Vis.GLOBAL_LIKE, True),
@@ -229,6 +231,8 @@ def create_subscript_member(is_declarative=True):
 
         (Vis.SCRIPT_LOCAL, create_id('s:ScriptLocalFunc', is_declarative=False, is_function=True), Vis.SCRIPT_LOCAL, False),
         (Vis.FUNCTION_LOCAL, create_id('s:ScriptLocalFunc', is_declarative=False, is_function=True), Vis.SCRIPT_LOCAL, False),
+
+        (Vis.SCRIPT_LOCAL, create_id('t:InvalidScopeFunc', is_declarative=False, is_function=True), Vis.INVALID, False),
     ]
 )
 def test_detect_scope_visibility(context_scope_visibility, id_node, expected_scope_visibility, expected_implicity):
