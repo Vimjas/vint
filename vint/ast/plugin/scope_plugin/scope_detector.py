@@ -11,6 +11,7 @@ from vint.ast.plugin.scope_plugin.identifier_classifier import (
     is_function_identifier,
     is_member_identifier,
     is_autoload_identifier,
+    is_declarative_parameter,
 )
 
 
@@ -79,24 +80,35 @@ def is_builtin_variable(id_node):
         # TODO: Add unknown builtin flag
         return True
 
-    if is_function_identifier(id_node):
-        # There are defference between a function identifier and variable
-        # identifier:
-        #
-        #   let localtime = 0
-        #   echo localtime " => 0
-        #   echo localtime() " => 1420011455
-        return id_value in BuiltinFunctions
+    if is_builtin_function(id_node):
+        return True
 
     # It is an implicit builtin variable such as: "count", "char"
-    return id_value in BuiltinVariables
+    return id_value in BuiltinVariables and id_value not in {
+        # These builtin variable names are available on only map() or filter().
+        'key': True,
+        'val': True,
+    }
 
 
 def is_builtin_function(id_node):
     """ Whether the specified node is a builtin function name identifier.
     The given identifier should be a child node of NodeType.CALL.
     """
+    if not is_identifier_like_node(id_node):
+        return False
+
     id_value = id_node['value']
+
+    if not is_function_identifier(id_node):
+        return False
+
+    # There are defference between a function identifier and variable
+    # identifier:
+    #
+    #   let localtime = 0
+    #   echo localtime " => 0
+    #   echo localtime() " => 1420011455
     return id_value in BuiltinFunctions
 
 
@@ -159,6 +171,17 @@ def get_explicity_of_scope_visibility(node):
     if not is_analyzable_identifier(node):
         return ExplicityOfScopeVisibility.UNANALYZABLE
 
+    if is_declarative_parameter(node):
+        # Declarative parameter can not have any explicit scope visibility
+        # prefix, but we almost understand the identifier has an explicit scope
+        # visibility that is function local.
+        return ExplicityOfScopeVisibility.EXPLICIT
+
+    if is_builtin_function(node):
+        # Builtin functions can not have explicit scope visibility, but we
+        # almost understand the identifier has an explicit scope visibility.
+        return ExplicityOfScopeVisibility.EXPLICIT
+
     is_explicit = _get_explicit_scope_visibility(node['value']) is not None
 
     return ExplicityOfScopeVisibility.EXPLICIT if is_explicit \
@@ -197,6 +220,11 @@ def _normalize_identifier_value(id_node, context_scope):
         return id_node['value']
 
     scope_visibility = scope_visibility_hint['scope_visibility']
+
+    if scope_visibility is ScopeVisibility.BUILTIN and is_function_identifier(id_node):
+        # Builtin functions can not have explicit scope visibility.
+        return id_node['value']
+
     scope_prefix = ImplicitScopeVisibilityToIdentifierScopePrefix[scope_visibility]
 
     return scope_prefix + id_node['value']
@@ -209,21 +237,17 @@ def _detect_identifier_scope_visibility(id_node, context_scope):
     if explicit_scope_visibility is not None:
         return _create_identifier_visibility_hint(explicit_scope_visibility)
 
+    is_implicit = get_explicity_of_scope_visibility(id_node) \
+        is ExplicityOfScopeVisibility.IMPLICIT
+
     # Implicit scope variable will be resolved as a builtin variable if it
     # has a same name to Vim builtin variables.
     if is_builtin_variable(id_node):
         return _create_identifier_visibility_hint(ScopeVisibility.BUILTIN,
-                                                  is_implicit=True)
+                                                  is_implicit=is_implicit)
 
     # Only autoload functions implicity declared are always on global.
     # For example:
-    #
-    #   " in autoload/file.vim
-    #   let file#var = 0
-    #   function file#func()
-    #     return 1
-    #   endfunction
-    #
     #
     #   " in anywhere using autoload
     #   function FuncContext()
@@ -238,7 +262,7 @@ def _detect_identifier_scope_visibility(id_node, context_scope):
     #   call FuncContext()
     if is_function_identifier(id_node) or is_autoload_identifier(id_node):
         return _create_identifier_visibility_hint(ScopeVisibility.GLOBAL_LIKE,
-                                                  is_implicit=True)
+                                                  is_implicit=is_implicit)
 
     if not context_scope:
         # We cannot detect implicit scope visibility if context scope is not
@@ -250,10 +274,10 @@ def _detect_identifier_scope_visibility(id_node, context_scope):
     current_scope_visibility = context_scope['scope_visibility']
     if current_scope_visibility is ScopeVisibility.SCRIPT_LOCAL:
         return _create_identifier_visibility_hint(ScopeVisibility.GLOBAL_LIKE,
-                                                  is_implicit=True)
+                                                  is_implicit=is_implicit)
 
     return _create_identifier_visibility_hint(ScopeVisibility.FUNCTION_LOCAL,
-                                              is_implicit=True)
+                                              is_implicit=is_implicit)
 
 
 def _get_explicit_scope_visibility(id_value):

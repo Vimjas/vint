@@ -7,6 +7,7 @@ from vint.ast.plugin.scope_plugin.identifier_classifier import (
     IDENTIFIER_ATTRIBUTE_MEMBER_FLAG,
     IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG,
     IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG,
+    IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG,
 )
 from vint.ast.plugin.scope_plugin.scope_detector import (
     ScopeVisibility as Vis,
@@ -31,7 +32,8 @@ def create_scope_visibility_hint(visibility, is_implicit=False):
     }
 
 
-def create_id(id_value, is_declarative=True, is_function=False, is_autoload=False):
+def create_id(id_value, is_declarative=True, is_function=False, is_autoload=False,
+              is_declarative_parameter=False):
     return {
         'type': NodeType.IDENTIFIER.value,
         'value': id_value,
@@ -41,6 +43,7 @@ def create_id(id_value, is_declarative=True, is_function=False, is_autoload=Fals
             IDENTIFIER_ATTRIBUTE_MEMBER_FLAG: False,
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: is_function,
             IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: is_autoload,
+            IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG: is_declarative_parameter,
         },
     }
 
@@ -55,6 +58,7 @@ def create_env(env_value):
             IDENTIFIER_ATTRIBUTE_MEMBER_FLAG: False,
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
             IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: False,
+            IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG: False,
         },
     }
 
@@ -69,6 +73,7 @@ def create_option(opt_value):
             IDENTIFIER_ATTRIBUTE_MEMBER_FLAG: False,
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
             IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: False,
+            IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG: False,
         },
     }
 
@@ -83,6 +88,7 @@ def create_reg(reg_value):
             IDENTIFIER_ATTRIBUTE_MEMBER_FLAG: False,
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
             IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: False,
+            IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG: False,
         },
     }
 
@@ -111,6 +117,7 @@ def create_curlyname(is_declarative=True):
             IDENTIFIER_ATTRIBUTE_MEMBER_FLAG: False,
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
             IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: False,
+            IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG: False,
         },
     }
 
@@ -125,6 +132,7 @@ def create_subscript_member(is_declarative=True):
             IDENTIFIER_ATTRIBUTE_MEMBER_FLAG: True,
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
             IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: False,
+            IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG: False,
         },
     }
 
@@ -187,6 +195,7 @@ def create_subscript_member(is_declarative=True):
         (Vis.FUNCTION_LOCAL, create_id('l:explicit_function_local', is_declarative=False), Vis.FUNCTION_LOCAL, False),
         (Vis.FUNCTION_LOCAL, create_id('implicit_function_local', is_declarative=False), Vis.FUNCTION_LOCAL, True),
 
+        (Vis.FUNCTION_LOCAL, create_id('param', is_declarative=False, is_declarative_parameter=True), Vis.FUNCTION_LOCAL, False),
         (Vis.FUNCTION_LOCAL, create_id('a:param', is_declarative=False), Vis.FUNCTION_LOCAL, False),
         (Vis.FUNCTION_LOCAL, create_id('a:000', is_declarative=False), Vis.FUNCTION_LOCAL, False),
         (Vis.FUNCTION_LOCAL, create_id('a:1', is_declarative=False), Vis.FUNCTION_LOCAL, False),
@@ -194,6 +203,7 @@ def create_subscript_member(is_declarative=True):
         (Vis.SCRIPT_LOCAL, create_id('v:count', is_declarative=False), Vis.BUILTIN, False),
         (Vis.FUNCTION_LOCAL, create_id('v:count', is_declarative=False), Vis.BUILTIN, False),
         (Vis.FUNCTION_LOCAL, create_id('count', is_declarative=False), Vis.BUILTIN, True),
+        (Vis.SCRIPT_LOCAL, create_id('localtime', is_declarative=False, is_function=True), Vis.BUILTIN, False),
 
         (Vis.SCRIPT_LOCAL, create_curlyname(is_declarative=False), Vis.UNANALYZABLE, False),
         (Vis.FUNCTION_LOCAL, create_curlyname(is_declarative=False), Vis.UNANALYZABLE, False),
@@ -245,9 +255,12 @@ def test_detect_scope_visibility(context_scope_visibility, id_node, expected_sco
         (Vis.FUNCTION_LOCAL, create_id('implicit_function_local'), 'l:implicit_function_local'),
         (Vis.FUNCTION_LOCAL, create_id('implicit_function_local', is_declarative=False), 'l:implicit_function_local'),
 
+        (Vis.FUNCTION_LOCAL, create_id('param', is_declarative=False, is_declarative_parameter=True), 'param'),
+
         (Vis.SCRIPT_LOCAL, create_id('v:count'), 'v:count'),
         (Vis.FUNCTION_LOCAL, create_id('v:count'), 'v:count'),
         (Vis.FUNCTION_LOCAL, create_id('count'), 'v:count'),
+        (Vis.SCRIPT_LOCAL, create_id('localtime', is_declarative=False, is_function=True), 'localtime'),
 
         (Vis.SCRIPT_LOCAL, create_env('$ENV'), '$ENV'),
         (Vis.SCRIPT_LOCAL, create_option('&OPT'), '&OPT'),
@@ -268,6 +281,10 @@ def test_normalize_variable_name(context_scope_visibility, node, expected_variab
         ('count', False, True),
         ('v:count', False, True),
 
+        # It is available on only map() or filter().
+        ('key', False, False),
+        ('val', False, False),
+
         ('MyFunc', True, False),
         ('localtime', True, True),
     ]
@@ -284,6 +301,11 @@ def test_is_builtin_variable(id_value, is_function, expected_result):
     'node, expected_result', [
         (create_id('my_var'), ExplicityOfScopeVisibility.IMPLICIT),
         (create_id('g:my_var'), ExplicityOfScopeVisibility.EXPLICIT),
+
+        (create_id('param', is_declarative=True, is_declarative_parameter=True), ExplicityOfScopeVisibility.EXPLICIT),
+
+        (create_id('localtime', is_declarative=False, is_function=True), ExplicityOfScopeVisibility.EXPLICIT),
+
         (create_curlyname(), ExplicityOfScopeVisibility.UNANALYZABLE),
     ]
 )
