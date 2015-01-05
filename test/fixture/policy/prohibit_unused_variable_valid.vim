@@ -17,10 +17,13 @@ function! s:ScriptLocalFunc()
 endfunction
 call s:ScriptLocalFunc()
 
-function! g:FuncContext(param_var, param_func)
+redir => l:redit_variable
+redir END
+echo l:redit_variable
+
+function! g:FuncContext(param_var, param_func, param_member)
     " Parameter should be used
-    echo a:param_var
-    call a:param_func()
+    call a:param_func(a:param_var[a:param_member])
 
     " Function-local variables should be used
     let l:explicit_func_local_var = 106
@@ -37,6 +40,3 @@ function! g:FuncContext(param_var, param_func)
     endfunction
     call ImplicitFunctionLocalFunc()
 endfunction
-
-" redir variable should be warned
-redir => l:redit_variable

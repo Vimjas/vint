@@ -278,7 +278,7 @@ class ScopeLinker(object):
 
         def __init__(self):
             self._vars_to_declarative_ids_map = {}
-            self._ref_ids_to_scopes_map = {}
+            self._ids_to_scopes_map = {}
 
 
         def link_variable_to_declarative_identifier(self, variable, declaring_id_node):
@@ -286,9 +286,9 @@ class ScopeLinker(object):
             self._vars_to_declarative_ids_map[variable_id] = declaring_id_node
 
 
-        def link_identifier_to_context_scope(self, ref_id_node, scope):
-            node_id = id(ref_id_node)
-            self._ref_ids_to_scopes_map[node_id] = scope
+        def link_identifier_to_context_scope(self, id_node, scope):
+            node_id = id(id_node)
+            self._ids_to_scopes_map[node_id] = scope
 
 
         def get_declarative_identifier_by_variable(self, variable):
@@ -298,8 +298,7 @@ class ScopeLinker(object):
 
         def get_context_scope_by_identifier(self, identifier):
             node_id = id(identifier)
-            return self._ref_ids_to_scopes_map.get(node_id)
-
+            return self._ids_to_scopes_map.get(node_id)
 
 
     def __init__(self):

@@ -13,6 +13,7 @@ from vint.ast.plugin.scope_plugin.identifier_classifier import (
     IDENTIFIER_ATTRIBUTE_MEMBER_FLAG,
     IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG,
     IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG,
+    IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG,
 )
 
 
@@ -52,14 +53,15 @@ class TestIdentifierClassifier(unittest.TestCase):
 
 
     def create_id_attr(self, is_declarative=False, is_dynamic=False,
-                       is_member_of_subscript=False, is_function=False,
-                       is_autoload=False):
+                       is_member=False, is_function=False,
+                       is_autoload=False, is_declarative_parameter=False):
         return {
             IDENTIFIER_ATTRIBUTE_DECLARATION_FLAG: is_declarative,
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: is_dynamic,
-            IDENTIFIER_ATTRIBUTE_MEMBER_FLAG: is_member_of_subscript,
+            IDENTIFIER_ATTRIBUTE_MEMBER_FLAG: is_member,
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: is_function,
             IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: is_autoload,
+            IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG: is_declarative_parameter,
         }
 
 
@@ -124,13 +126,13 @@ class TestIdentifierClassifier(unittest.TestCase):
                 self.create_id_attr(is_declarative=False),
             'DotFunctionCall':
                 self.create_id_attr(is_declarative=False,
-                                    is_member_of_subscript=True,
+                                    is_member=True,
                                     is_function=True),
             'subscript':
                 self.create_id_attr(is_declarative=False),
             "'SubscriptFunctionCall'":
                 self.create_id_attr(is_declarative=False,
-                                    is_member_of_subscript=True,
+                                    is_member=True,
                                     is_function=True),
             'FunctionCallInExpressionContext':
                 self.create_id_attr(is_declarative=False,
@@ -205,16 +207,19 @@ class TestIdentifierClassifier(unittest.TestCase):
         expected_id_attr_map = {
             'g:dict': self.create_id_attr(is_declarative=False),
             'Function1': self.create_id_attr(is_declarative=True,
-                                             is_member_of_subscript=True,
+                                             is_member=True,
                                              is_function=True),
             "'Function2'": self.create_id_attr(is_declarative=True,
-                                               is_member_of_subscript=True,
+                                               is_member=True,
                                                is_function=True),
             'key1': self.create_id_attr(is_declarative=True,
-                                        is_member_of_subscript=True,
+                                        is_member=True,
                                         is_function=False),
             "'key2'": self.create_id_attr(is_declarative=True,
-                                          is_member_of_subscript=True,
+                                          is_member=True,
+                                          is_function=False),
+            "g:key3": self.create_id_attr(is_declarative=False,
+                                          is_member=False,
                                           is_function=False),
         }
 
@@ -235,8 +240,8 @@ class TestIdentifierClassifier(unittest.TestCase):
             'g:let_var3': self.create_id_attr(is_declarative=True),
             'g:rest': self.create_id_attr(is_declarative=True),
             'g:list': self.create_id_attr(is_declarative=False),
-            '1': self.create_id_attr(is_declarative=True, is_member_of_subscript=True),
-            'g:index_end': self.create_id_attr(is_declarative=False, is_member_of_subscript=True, is_dynamic=True),
+            '1': self.create_id_attr(is_declarative=True, is_member=True),
+            'g:index_end': self.create_id_attr(is_declarative=False, is_dynamic=True),
         }
 
         attached_ast = id_classifier.attach_identifier_attributes(ast)
@@ -251,15 +256,15 @@ class TestIdentifierClassifier(unittest.TestCase):
         expected_id_attr_map = {
             'g:FunctionWithNoParams': self.create_id_attr(is_declarative=True, is_function=True),
             'g:FunctionWithOneParam': self.create_id_attr(is_declarative=True, is_function=True),
-            'param': self.create_id_attr(is_declarative=True),
+            'param': self.create_id_attr(is_declarative=True, is_declarative_parameter=True),
             'g:FunctionWithTwoParams': self.create_id_attr(is_declarative=True, is_function=True),
-            'param1': self.create_id_attr(is_declarative=True),
-            'param2': self.create_id_attr(is_declarative=True),
+            'param1': self.create_id_attr(is_declarative=True, is_declarative_parameter=True),
+            'param2': self.create_id_attr(is_declarative=True, is_declarative_parameter=True),
             'g:FunctionWithVarParams': self.create_id_attr(is_declarative=True, is_function=True),
             'g:FunctionWithParamsAndVarParams': self.create_id_attr(is_declarative=True, is_function=True),
-            'param_var1': self.create_id_attr(is_declarative=True),
+            'param_var1': self.create_id_attr(is_declarative=True, is_declarative_parameter=True),
             'g:FunctionWithRange': self.create_id_attr(is_declarative=True, is_function=True),
-            '...': self.create_id_attr(is_declarative=True),
+            '...': self.create_id_attr(is_declarative=True, is_declarative_parameter=True),
             'g:FunctionWithDict': self.create_id_attr(is_declarative=True, is_function=True),
         }
 

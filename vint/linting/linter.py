@@ -2,9 +2,8 @@ import re
 import logging
 from pathlib import Path
 from vint.ast.parsing import Parser, EncodingDetectionError
-from vint.ast.traversing import traverse
 from vint.ast.node_type import NodeType
-from vint.ast.plugin.scope_plugin import ScopePlugin
+from vint.ast.plugin.scope_plugin import ScopePlugin, traverse
 from vint.linting.config.config_container import ConfigContainer
 from vint.linting.config.config_dict_source import ConfigDictSource
 from vint.linting.config.config_comment_source import ConfigCommentSource

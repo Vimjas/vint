@@ -12,6 +12,7 @@ IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG = 'is_dynamic'
 IDENTIFIER_ATTRIBUTE_MEMBER_FLAG = 'is_member'
 IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG = 'is_function'
 IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG = 'is_autoload'
+IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG = 'is_declarative_parameter'
 REFERENCING_IDENTIFIERS = 'VINT:referencing_identifiers'
 DECLARING_IDENTIFIERS = 'VINT:declaring_identifiers'
 
@@ -54,7 +55,10 @@ class IdentifierClassifier(object):
     - is declaring: True if the identifier is used to declare.
     - is autoload: True if the identifier is declared with autoload.
     - is function: True if the identifier is a function. Vim distinguish
-                   between function identifiers and variable identifiers.
+        between function identifiers and variable identifiers.
+    - is declarative paramter: True if the identifier is a declarative
+        parameter. For example, the identifier "param" in Func(param) is a
+        declarative paramter.
     """
 
     class IdentifierCollector(object):
@@ -101,7 +105,10 @@ class IdentifierClassifier(object):
         - is declaring: True if the identifier is used to declare.
         - is autoload: True if the identifier is declared with autoload.
         - is function: True if the identifier is a function. Vim distinguish
-                       between function identifiers and variable identifiers.
+            between function identifiers and variable identifiers.
+        - is declarative paramter: True if the identifier is a declarative
+            parameter. For example, the identifier "param" in Func(param) is a
+            declarative paramter.
         """
         redir_assignment_parser = RedirAssignmentParser()
         ast_with_parsed_redir = redir_assignment_parser.process(ast)
@@ -111,13 +118,15 @@ class IdentifierClassifier(object):
 
 
     def _set_identifier_attribute(self, node, is_declarative=None, is_dynamic=None,
-                                  is_member=None, is_function=None, is_autoload=None):
+                                  is_member=None, is_function=None, is_autoload=None,
+                                  is_declarative_parameter=None):
         id_attr = node.setdefault(IDENTIFIER_ATTRIBUTE, {
             IDENTIFIER_ATTRIBUTE_DECLARATION_FLAG: False,
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: False,
             IDENTIFIER_ATTRIBUTE_MEMBER_FLAG: False,
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
             IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: False,
+            IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG: False,
         })
 
         if is_declarative is not None:
@@ -134,6 +143,9 @@ class IdentifierClassifier(object):
 
         if is_autoload is not None:
             id_attr[IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG] = is_autoload
+
+        if is_declarative_parameter is not None:
+            id_attr[IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG] = is_declarative_parameter
 
 
     def _enter_handler(self, node):
@@ -167,10 +179,28 @@ class IdentifierClassifier(object):
                 if type(member_node) is list:
                     continue
 
+                if NodeType(member_node['type']) is NodeType.IDENTIFIER:
+                    # Only the identifier should be flagged as a member that
+                    # the variable is an accessor for a list or dictionary.
+                    # For example, the variable that is "l:end" in list[0 : l:end]
+                    # is not accessor for the symbol table of the variable "list",
+                    # but it is a variable symbol table accessor.
+                    continue
+
                 self._pre_mark_member_node(member_node)
-        else:
-            member_node = node['right']
-            self._pre_mark_member_node(member_node)
+            return
+
+        member_node = node['right']
+        if node_type is NodeType.SUBSCRIPT:
+            if NodeType(member_node['type']) is NodeType.IDENTIFIER:
+                # Only the identifier should be flagged as a member that
+                # the variable is an accessor for a list or dictionary.
+                # For example, the variable that is "l:key" in dict[l:key]
+                # is not accessor for the symbol table of the variable "dict",
+                # but it is a variable symbol table accessor.
+                return
+
+        self._pre_mark_member_node(member_node)
 
 
     def _pre_mark_member_node(self, member_node):
@@ -182,19 +212,21 @@ class IdentifierClassifier(object):
 
 
     def _enter_identifier_like_node(self, id_like_node, is_declarative=None,
-                                    is_function=None):
+                                    is_function=None, is_declarative_parameter=None):
         id_like_node_type = NodeType(id_like_node['type'])
 
         if id_like_node_type in AccessorLikeNodeTypes:
             self._enter_accessor_node(id_like_node,
                                       is_declarative=is_declarative,
-                                      is_function=is_function)
+                                      is_function=is_function,
+                                      is_declarative_parameter=is_declarative_parameter)
             return
 
         if id_like_node_type in IdentifierTerminateNodeTypes:
             self._enter_identifier_node(id_like_node,
                                         is_declarative=is_declarative,
-                                        is_function=is_function)
+                                        is_function=is_function,
+                                        is_declarative_parameter=is_declarative_parameter)
             return
 
         # Curlyname node can have a dynamic name. For example:
@@ -203,7 +235,8 @@ class IdentifierClassifier(object):
         if id_like_node_type is NodeType.CURLYNAME:
             self._enter_curlyname_node(id_like_node,
                                        is_declarative=is_declarative,
-                                       is_function=is_function)
+                                       is_function=is_function,
+                                       is_declarative_parameter=is_declarative_parameter)
             return
 
 
@@ -221,32 +254,38 @@ class IdentifierClassifier(object):
         func_param_nodes = func_node['rlist']
         for func_param_node in func_param_nodes:
             self._enter_identifier_like_node(func_param_node,
+                                             is_declarative_parameter=True,
                                              is_declarative=True)
 
 
-    def _enter_curlyname_node(self, curlyname_node, is_declarative=None, is_function=None):
+    def _enter_curlyname_node(self, curlyname_node, is_declarative=None, is_function=None,
+                              is_declarative_parameter=None):
         self._set_identifier_attribute(curlyname_node,
                                        is_dynamic=True,
                                        is_declarative=is_declarative,
-                                       is_function=is_function)
+                                       is_function=is_function,
+                                       is_declarative_parameter=is_declarative_parameter)
 
 
-    def _enter_identifier_node(self, id_node, is_declarative=None, is_function=None):
+    def _enter_identifier_node(self, id_node, is_declarative=None, is_function=None,
+                               is_declarative_parameter=None):
         is_autoload = '#' in id_node['value']
         self._set_identifier_attribute(id_node,
                                        is_declarative=is_declarative,
                                        is_autoload=is_autoload,
-                                       is_function=is_function)
+                                       is_function=is_function,
+                                       is_declarative_parameter=is_declarative_parameter)
 
 
-    def _enter_accessor_node(self, accessor_node, is_declarative=None, is_function=None):
+    def _enter_accessor_node(self, accessor_node, is_declarative=None, is_function=None, is_declarative_parameter=None):
         accessor_node_type = NodeType(accessor_node['type'])
 
         if accessor_node_type is NodeType.DOT:
             self._set_identifier_attribute(accessor_node['right'],
                                            is_declarative=is_declarative,
                                            is_dynamic=False,
-                                           is_function=is_function)
+                                           is_function=is_function,
+                                           is_declarative_parameter=is_declarative_parameter)
             return
 
         if accessor_node_type is NodeType.SUBSCRIPT:
@@ -263,7 +302,8 @@ class IdentifierClassifier(object):
                 self._set_identifier_attribute(accessor_node['right'],
                                                is_declarative=is_declarative,
                                                is_dynamic=False,
-                                               is_function=is_function)
+                                               is_function=is_function,
+                                               is_declarative_parameter=is_declarative_parameter)
             return
 
         if accessor_node_type is NodeType.SLICE:
@@ -285,7 +325,8 @@ class IdentifierClassifier(object):
                 self._set_identifier_attribute(elem_node,
                                                is_declarative=is_declarative,
                                                is_dynamic=is_dynamic,
-                                               is_function=is_function)
+                                               is_function=is_function,
+                                               is_declarative_parameter=is_declarative_parameter)
             return
 
         raise Exception()
@@ -392,3 +433,10 @@ def is_autoload_identifier(node):
         return False
 
     return node[IDENTIFIER_ATTRIBUTE][IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG]
+
+
+def is_declarative_parameter(node):
+    if not is_identifier_like_node(node):
+        return False
+
+    return node[IDENTIFIER_ATTRIBUTE][IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG]
