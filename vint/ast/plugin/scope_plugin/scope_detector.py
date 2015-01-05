@@ -236,10 +236,6 @@ def _normalize_identifier_value(id_node, context_scope):
         # Builtin functions can not have explicit scope visibility.
         return id_node['value']
 
-    if scope_visibility is ScopeVisibility.INVALID:
-        # Invalid scope visibilities are always explicit.
-        return id_node['value']
-
     scope_prefix = ImplicitScopeVisibilityToIdentifierScopePrefix[scope_visibility]
 
     return scope_prefix + id_node['value']
