@@ -156,7 +156,7 @@ def create_subscript_member(is_declarative=True):
         (Vis.FUNCTION_LOCAL, create_id('l:explicit_function_local'), Vis.FUNCTION_LOCAL, False),
         (Vis.FUNCTION_LOCAL, create_id('implicit_function_local'), Vis.FUNCTION_LOCAL, True),
 
-        # (Vis.FUNCTION_LOCAL, create_id('param', is_declarative_parameter=True), Vis.FUNCTION_LOCAL, False),
+        (Vis.FUNCTION_LOCAL, create_id('param', is_declarative=True, is_declarative_parameter=True), Vis.FUNCTION_LOCAL, False),
 
         (Vis.SCRIPT_LOCAL, create_id('v:count'), Vis.BUILTIN, False),
         (Vis.FUNCTION_LOCAL, create_id('v:count'), Vis.BUILTIN, False),
@@ -170,9 +170,14 @@ def create_subscript_member(is_declarative=True):
 
         (Vis.SCRIPT_LOCAL, create_id('g:ExplicitGlobalFunc', is_function=True), Vis.GLOBAL_LIKE, False),
         (Vis.SCRIPT_LOCAL, create_id('ImplicitGlobalFunc', is_function=True), Vis.GLOBAL_LIKE, True),
+
+        (Vis.SCRIPT_LOCAL, create_id('g:file#explicit_global_func', is_function=True, is_autoload=True), Vis.GLOBAL_LIKE, False),
         (Vis.SCRIPT_LOCAL, create_id('file#implicit_global_func', is_function=True, is_autoload=True), Vis.GLOBAL_LIKE, True),
+
         (Vis.FUNCTION_LOCAL, create_id('g:ExplicitGlobalFunc', is_function=True), Vis.GLOBAL_LIKE, False),
         (Vis.FUNCTION_LOCAL, create_id('ImplicitGlobalFunc', is_function=True), Vis.GLOBAL_LIKE, True),
+
+        (Vis.FUNCTION_LOCAL, create_id('g:file#explicit_global_func', is_function=True, is_autoload=True), Vis.GLOBAL_LIKE, False),
         (Vis.FUNCTION_LOCAL, create_id('file#implicit_global_func', is_function=True, is_autoload=True), Vis.GLOBAL_LIKE, True),
 
         (Vis.SCRIPT_LOCAL, create_id('s:ScriptLocalFunc', is_function=True), Vis.SCRIPT_LOCAL, False),
@@ -195,7 +200,6 @@ def create_subscript_member(is_declarative=True):
         (Vis.FUNCTION_LOCAL, create_id('l:explicit_function_local', is_declarative=False), Vis.FUNCTION_LOCAL, False),
         (Vis.FUNCTION_LOCAL, create_id('implicit_function_local', is_declarative=False), Vis.FUNCTION_LOCAL, True),
 
-        (Vis.FUNCTION_LOCAL, create_id('param', is_declarative=False, is_declarative_parameter=True), Vis.FUNCTION_LOCAL, False),
         (Vis.FUNCTION_LOCAL, create_id('a:param', is_declarative=False), Vis.FUNCTION_LOCAL, False),
         (Vis.FUNCTION_LOCAL, create_id('a:000', is_declarative=False), Vis.FUNCTION_LOCAL, False),
         (Vis.FUNCTION_LOCAL, create_id('a:1', is_declarative=False), Vis.FUNCTION_LOCAL, False),
@@ -213,15 +217,18 @@ def create_subscript_member(is_declarative=True):
 
         (Vis.SCRIPT_LOCAL, create_id('g:ExplicitGlobalFunc', is_declarative=False, is_function=True), Vis.GLOBAL_LIKE, False),
         (Vis.SCRIPT_LOCAL, create_id('ImplicitGlobalFunc', is_declarative=False, is_function=True), Vis.GLOBAL_LIKE, True),
-        (Vis.SCRIPT_LOCAL, create_id('file#implicit_global_func', is_function=False, is_autoload=True), Vis.GLOBAL_LIKE, True),
+
+        (Vis.SCRIPT_LOCAL, create_id('g:file#explicit_global_func', is_declarative=False, is_function=True, is_autoload=True), Vis.GLOBAL_LIKE, False),
+        (Vis.SCRIPT_LOCAL, create_id('file#implicit_global_func', is_declarative=False, is_function=False, is_autoload=True), Vis.GLOBAL_LIKE, True),
+
         (Vis.FUNCTION_LOCAL, create_id('g:ExplicitGlobalFunc', is_declarative=False, is_function=True), Vis.GLOBAL_LIKE, False),
         (Vis.FUNCTION_LOCAL, create_id('ImplicitGlobalFunc', is_declarative=False, is_function=True), Vis.GLOBAL_LIKE, True),
+
+        (Vis.FUNCTION_LOCAL, create_id('g:file#explicit_global_func', is_declarative=False, is_function=True, is_autoload=True), Vis.GLOBAL_LIKE, False),
         (Vis.FUNCTION_LOCAL, create_id('file#implicit_global_func', is_declarative=False, is_function=True, is_autoload=True), Vis.GLOBAL_LIKE, True),
 
         (Vis.SCRIPT_LOCAL, create_id('s:ScriptLocalFunc', is_declarative=False, is_function=True), Vis.SCRIPT_LOCAL, False),
         (Vis.FUNCTION_LOCAL, create_id('s:ScriptLocalFunc', is_declarative=False, is_function=True), Vis.SCRIPT_LOCAL, False),
-
-        (Vis.FUNCTION_LOCAL, create_id('file#func', is_declarative=False, is_autoload=True, is_function=True), Vis.GLOBAL_LIKE, True),
     ]
 )
 def test_detect_scope_visibility(context_scope_visibility, id_node, expected_scope_visibility, expected_implicity):
