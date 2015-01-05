@@ -34,8 +34,6 @@ class TestProhibitUnusedVariable(PolicyAssertion, unittest.TestCase):
             self.create_violation(7, 36),
             self.create_violation(11, 9),
             self.create_violation(12, 9),
-            self.create_violation(14, 15),
-            self.create_violation(17, 15),
         ]
 
         self.assertFoundViolationsEqual(PATH_INVALID_VIM_SCRIPT,
