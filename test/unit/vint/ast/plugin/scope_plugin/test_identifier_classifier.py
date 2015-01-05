@@ -137,6 +137,9 @@ class TestIdentifierClassifier(unittest.TestCase):
             'FunctionCallInExpressionContext':
                 self.create_id_attr(is_declarative=False,
                                     is_function=True),
+            'FunctionToBeDeleted':
+                self.create_id_attr(is_declarative=False,
+                                    is_function=True),
         }
 
         attached_ast = id_classifier.attach_identifier_attributes(ast)
