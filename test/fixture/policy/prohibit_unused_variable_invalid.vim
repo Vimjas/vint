@@ -10,10 +10,4 @@ function! g:FuncContext(param_var, param_func)
     " Function-local variables should be used
     let l:explicit_func_local_var = 106
     let implicit_func_local_var = 107
-
-    function! l:ExplicitFunctionLocalFunc()
-    endfunction
-
-    function! ImplicitFunctionLocalFunc()
-    endfunction
 endfunction

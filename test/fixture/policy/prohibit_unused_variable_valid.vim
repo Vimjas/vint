@@ -29,14 +29,10 @@ function! g:FuncContext(param_var, param_func)
     let implicit_func_local_var = 107
     echo implicit_func_local_var
 
-    function! l:ExplicitFunctionLocalFunc()
+    function! ImplicitGlobalFunc()
     endfunction
-    call l:ExplicitFunctionLocalFunc()
-
-    function! ImplicitFunctionLocalFunc()
-    endfunction
-    call ImplicitFunctionLocalFunc()
+    call ImplicitGlobalFunc()
 endfunction
 
-" redir variable should be warned
+" redir variable should be used
 redir => l:redit_variable

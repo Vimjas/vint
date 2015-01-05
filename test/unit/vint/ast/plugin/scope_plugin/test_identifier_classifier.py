@@ -146,9 +146,7 @@ class TestIdentifierClassifier(unittest.TestCase):
         expected_id_attr_map = {
             'FuncContext': self.create_id_attr(is_declarative=True,
                                                is_function=True),
-            'l:ExplicitFuncLocalFunc': self.create_id_attr(is_declarative=True,
-                                                           is_function=True),
-            'ImplicitFuncLocalFunc':
+            'ImplicitGlobalFunc':
                 self.create_id_attr(is_declarative=True,
                                     is_function=True),
         }

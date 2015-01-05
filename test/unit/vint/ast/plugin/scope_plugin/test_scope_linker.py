@@ -134,6 +134,7 @@ class TestScopeLinker(unittest.TestCase):
             },
             functions={
                 'g:FuncContext': [self.create_variable(is_implicit=True)],
+                'g:ImplicitGlobalFunc': [self.create_variable(is_implicit=True)],
             },
             child_scopes=[
                 self.create_scope(
@@ -150,20 +151,7 @@ class TestScopeLinker(unittest.TestCase):
                                 'a:0': [self.create_variable()],
                                 'a:000': [self.create_variable()],
                             },
-                            functions={
-                                'l:ExplicitFuncLocalFunc': [self.create_variable()],
-                                'l:ImplicitFuncLocalFunc': [self.create_variable(is_implicit=True)],
-                            },
                             child_scopes=[
-                                self.create_scope(
-                                    ScopeVisibility.FUNCTION_LOCAL,
-                                    variables={
-                                        'l:': [self.create_variable()],
-                                        'a:': [self.create_variable()],
-                                        'a:0': [self.create_variable()],
-                                        'a:000': [self.create_variable()],
-                                    }
-                                ),
                                 self.create_scope(
                                     ScopeVisibility.FUNCTION_LOCAL,
                                     variables={

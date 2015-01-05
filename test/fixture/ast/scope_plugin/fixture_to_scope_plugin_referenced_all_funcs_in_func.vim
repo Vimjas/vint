@@ -1,13 +1,14 @@
 function! FuncContext()
-    function! l:ExplicitFuncLocalFunc()
+    function! g:ExplicitGlobalFunc()
     endfunction
 
-    function! ImplicitFuncLocalFunc()
+    function! ImplicitGlobalFunc()
     endfunction
 
-    call l:ExplicitFuncLocalFunc()
-    call ExplicitFuncLocalFunc()
+    function! s:ExplicitScriptLocalFunc()
+    endfunction
 
-    call l:ImplicitFuncLocalFunc()
-    call ImplicitFuncLocalFunc()
+    call g:ExplicitGlobalFunc()
+    call ImplicitGlobalFunc()
+    call s:ExplicitScriptLocalFunc()
 endfunction

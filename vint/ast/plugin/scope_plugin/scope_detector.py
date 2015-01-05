@@ -25,6 +25,7 @@ class ScopeVisibility(enum.Enum):
     SCRIPT_LOCAL = 2
     FUNCTION_LOCAL = 3
     UNANALYZABLE = 4
+    INVALID = 5
 
 
 class ExplicityOfScopeVisibility(enum.Enum):
@@ -235,7 +236,7 @@ def _detect_identifier_scope_visibility(id_node, context_scope):
     #     echo file#var
     #   endfunction
     #   call FuncContext()
-    if is_function_identifier(id_node) and is_autoload_identifier(id_node):
+    if is_function_identifier(id_node) or is_autoload_identifier(id_node):
         return _create_identifier_visibility_hint(ScopeVisibility.GLOBAL_LIKE,
                                                   is_implicit=True)
 
