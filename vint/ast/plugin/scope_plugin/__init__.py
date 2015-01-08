@@ -12,15 +12,11 @@ from vint.ast.plugin.scope_plugin.scope_detector import (
     get_explicity_of_scope_visibility as _get_explicity_of_scope_visibility,
     normalize_variable_name as _normalize_variable_name,
 )
-from vint.ast.plugin.scope_plugin.redir_assignment_parser import (
-    traverse as _traverse,
-)
 
 
 # Expose to out of ScopePlugin
 ScopeVisibility = _ScopeVisibility
 ExplicityOfScopeVisibility = _ExplicityOfScopeVisibility
-traverse = _traverse
 
 
 class ScopePlugin(object):

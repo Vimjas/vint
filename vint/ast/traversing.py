@@ -209,10 +209,20 @@ class UnknownNodeTypeException(BaseException):
         return 'Unknown node type: `{node_type}`'.format(node_type=node_type_name)
 
 
+_traverser_extensions = []
+
+
+def register_traverser_extension(handler):
+    """ Registers the specified function to traverse into extended child nodes.
+    """
+    _traverser_extensions.append(handler)
+
+
 def traverse(node, on_enter=None, on_leave=None):
     """ Traverses the specified Vim script AST node (depth first order).
-    The on_enter/on_leave handler will be called the specified node and the
-    children.
+    The on_enter/on_leave handler will be called with the specified node and
+    the children. You can skip traversing child nodes by returning
+    SKIP_CHILDREN.
     """
     node_type = NodeType(node['type'])
 
@@ -231,6 +241,9 @@ def traverse(node, on_enter=None, on_leave=None):
 
             accessor_func(lambda child_node: traverse(child_node, on_enter, on_leave),
                           node[prop_name])
+
+        for handler in _traverser_extensions:
+            handler(node, on_enter=on_enter, on_leave=on_leave)
 
     if on_leave:
         on_leave(node)

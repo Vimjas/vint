@@ -1,6 +1,6 @@
+from vint.ast.traversing import traverse
 from vint.ast.plugin.scope_plugin.redir_assignment_parser import (
     RedirAssignmentParser,
-    traverse,
     get_redir_content,
 )
 from vint.ast.node_type import NodeType
