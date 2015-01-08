@@ -2,9 +2,31 @@ from vint.ast.node_type import NodeType
 
 SKIP_CHILDREN = 'SKIP_CHILDREN'
 
+
+def for_each(func, nodes):
+    """ Calls func for each the specified nodes. """
+    for node in nodes:
+        call_if_def(func, node)
+
+
+def for_each_deeply(func, node_lists):
+    """ Calls func for each the specified nodes. """
+    for nodes in node_lists:
+        for_each(func, nodes)
+
+
+def call_if_def(func, node):
+    """ Calls func if the node is defined.
+    VimLParser return an empty array if a child node is not defined.
+    """
+    if hasattr(node, 'type'):
+        func(node)
+
+
 ChildNodeAccessor = {
-    'NODE': lambda node, func: call_if_def(func, node),
-    'LIST': lambda nodes, func: for_each(func, nodes),
+    'NODE': call_if_def,
+    'LIST': for_each,
+    'NESTED_LIST': for_each_deeply,
 }
 
 ChildType = {
@@ -35,6 +57,18 @@ ChildType = {
     'BODY': {
         'accessor': ChildNodeAccessor['LIST'],
         'property_name': 'body',
+    },
+    'LIST_VALUES': {
+        'accessor': ChildNodeAccessor['LIST'],
+        'property_name': 'value',
+    },
+    'DICT_ENTRIES': {
+        'accessor': ChildNodeAccessor['NESTED_LIST'],
+        'property_name': 'value',
+    },
+    'CURLYNAME_VALUES': {
+        'accessor': ChildNodeAccessor['LIST'],
+        'property_name': 'value',
     },
 
     'ELSEIF': {
@@ -153,14 +187,16 @@ ChildNodeAccessorMap = {
     NodeType.DOT: [ChildType['LEFT'], ChildType['RIGHT']],
     NodeType.NUMBER: [],
     NodeType.STRING: [],
-    NodeType.LIST: [],
-    NodeType.DICT: [],
+    NodeType.LIST: [ChildType['LIST_VALUES']],
+    NodeType.DICT: [ChildType['DICT_ENTRIES']],
     NodeType.NESTING: [ChildType['LEFT']],
     NodeType.OPTION: [],
     NodeType.IDENTIFIER: [],
-    NodeType.CURLYNAME: [],
+    NodeType.CURLYNAME: [ChildType['CURLYNAME_VALUES']],
     NodeType.ENV: [],
     NodeType.REG: [],
+    NodeType.CURLYNAMEPART: [],
+    NodeType.CURLYNAMEEXPR: [],
 }
 
 
@@ -171,20 +207,6 @@ class UnknownNodeTypeException(BaseException):
     def __str__(self):
         node_type_name = self.node_type
         return 'Unknown node type: `{node_type}`'.format(node_type=node_type_name)
-
-
-def for_each(func, nodes):
-    """ Calls func for each the specified nodes. """
-    for node in nodes:
-        call_if_def(func, node)
-
-
-def call_if_def(func, node):
-    """ Calls func if the node is defined.
-    VimLParser return an empty array if a child node is not defined.
-    """
-    if hasattr(node, 'type'):
-        func(node)
 
 
 def traverse(node, on_enter=None, on_leave=None):
@@ -207,8 +229,8 @@ def traverse(node, on_enter=None, on_leave=None):
             accessor_func = property_accessor['accessor']
             prop_name = property_accessor['property_name']
 
-            accessor_func(node[prop_name],
-                          lambda child_node: traverse(child_node, on_enter, on_leave))
+            accessor_func(lambda child_node: traverse(child_node, on_enter, on_leave),
+                          node[prop_name])
 
     if on_leave:
         on_leave(node)
