@@ -9,6 +9,13 @@ from vint.ast.dictionary.abbreviations import (
 )
 
 
+SetCommandFamily = {
+    'set': True,
+    'setlocal': True,
+    'setglobal': True,
+}
+
+
 @register_policy
 class ProhibitAbbreviationOption(AbstractPolicy):
     def __init__(self):
@@ -44,14 +51,14 @@ class ProhibitAbbreviationOption(AbstractPolicy):
             return is_valid
 
         excmd_node = node
-        cmd_str = excmd_node['str']
-        matched = re.match(r':*set?\s+([a-z]+)', cmd_str)
-        is_set_cmd = bool(matched)
+        is_set_cmd = excmd_node['ea']['cmd'].get('name') in SetCommandFamily
 
         if not is_set_cmd:
             return True
 
-        option_name = matched.group(1)
+        option_expr = excmd_node['str'].split()[1]
+        # Care `:set ft=vim` and `:set cpo&vim`, ...
+        option_name = re.match(r'[a-z]+', option_expr).group(0)
 
         # After a "set" command, we can add an invert prefix "no" and "inv"
         # to options. For example, "nowrap" is an inverted option "wrap".
