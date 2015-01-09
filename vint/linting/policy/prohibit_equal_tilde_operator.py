@@ -5,6 +5,34 @@ from vint.ast.node_type import NodeType
 from vint.linting.policy_registry import register_policy
 
 
+GoodStringComparisonOperators = {
+    NodeType.EQUAL: ['==#', '==?'],
+    NodeType.NEQUAL: ['!=#', '!=?'],
+    NodeType.GREATER: ['>#', '>?'],
+    NodeType.GEQUAL: ['>=#', '>=?'],
+    NodeType.SMALLER: ['<#', '<?'],
+    NodeType.SEQUAL: ['<=#', '<=?'],
+    NodeType.MATCH: ['=~#', '=~?'],
+    NodeType.NOMATCH: ['!~#', '!~?'],
+    NodeType.IS: ['is#', 'is?'],
+    NodeType.ISNOT: ['isnot#', 'isnot?'],
+}
+
+
+BadStringComparisonOperators = {
+    NodeType.EQUAL: '==',
+    NodeType.NEQUAL: '!=',
+    NodeType.GREATER: '>',
+    NodeType.GEQUAL: '>=',
+    NodeType.SMALLER: '<',
+    NodeType.SEQUAL: '<=',
+    NodeType.MATCH: '=~',
+    NodeType.NOMATCH: '!~',
+    NodeType.IS: 'is',
+    NodeType.ISNOT: 'isnot',
+}
+
+
 @register_policy
 class ProhibitEqualTildeOperator(AbstractPolicy):
     def __init__(self):
@@ -43,11 +71,29 @@ class ProhibitEqualTildeOperator(AbstractPolicy):
         """
         node_type = NodeType(node['type'])
 
-        if node_type is NodeType.MATCH or node_type is NodeType.NOMATCH:
-            return False
-
         left_type = NodeType(node['left']['type'])
         right_type = NodeType(node['right']['type'])
 
-        is_like_string_comparison = left_type is NodeType.STRING or right_type is NodeType.STRING
-        return not is_like_string_comparison
+        is_like_string_comparison = left_type is NodeType.STRING \
+            or right_type is NodeType.STRING
+
+        is_valid = not is_like_string_comparison
+
+        if not is_valid:
+            self._make_description(node_type)
+
+        return is_valid
+
+
+    def _make_description(self, node_type):
+        good_examples = ['`' + op + '`' for op in GoodStringComparisonOperators[node_type]]
+        formatted_good_examples = ' or '.join(good_examples)
+
+        bad_example = BadStringComparisonOperators[node_type]
+
+        params = {
+            'good_example': formatted_good_examples,
+            'bad_example': bad_example,
+        }
+        self.description = ('Use robust operators {good_example} '
+                            'instead of `{bad_example}`').format(**params)
