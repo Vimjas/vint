@@ -377,6 +377,10 @@ class IdentifierClassifier(object):
 
 
     def _enter_let_node(self, let_node):
+        # Only "=" operator can be used as declaration.
+        if let_node['op'] != '=':
+            return
+
         self._enter_destructuring_assignment_node(let_node)
 
 
