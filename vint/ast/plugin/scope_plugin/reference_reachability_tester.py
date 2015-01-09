@@ -1,6 +1,7 @@
 from vint.ast.plugin.scope_plugin.scope_detector import (
     detect_scope_visibility,
     normalize_variable_name,
+    is_builtin_variable,
 )
 from vint.ast.plugin.scope_plugin.scope_linker import ScopeLinker
 from vint.ast.plugin.scope_plugin.identifier_classifier import (
@@ -116,7 +117,8 @@ class ReferenceReachabilityTester(object):
 
             scope = scope['parent_scope']
 
-        return False
+        # If it is builtin, it will be used by Vim.
+        return is_builtin_variable(ref_id_node)
 
 
 def is_reference_identifier(node):

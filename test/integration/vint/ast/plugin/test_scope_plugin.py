@@ -109,6 +109,7 @@ class TestScopePlugin(unittest.TestCase):
             'v:key': False,
             'v:val': False,
             'filter': False,
+            'g:dict': True,
         }
 
         self.assertVariablesUndeclared(expected_variables_undeclared,

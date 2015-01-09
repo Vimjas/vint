@@ -499,3 +499,10 @@ def is_declarative_parameter(node):
         return False
 
     return node[IDENTIFIER_ATTRIBUTE][IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG]
+
+
+def is_on_string_expression_context(node):
+    if not is_identifier_like_node(node):
+        return False
+
+    return node[IDENTIFIER_ATTRIBUTE][IDENTIFIER_ATTRIBUTE_STRING_EXPRESSION_CONTEXT]
