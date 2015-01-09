@@ -71,5 +71,25 @@ class TestParser(unittest.TestCase):
         self.assertEqual(expected_pos, ast['pos'])
 
 
+    def test_parse_string_expr(self):
+        parser = Parser()
+        redir_cmd_node = {
+            'type': NodeType.STRING.value,
+            'pos': {'col': 1, 'i': 1, 'lnum': 1},
+            'value': '\'v:key ==# "a"\'',
+        }
+        nodes = parser.parse_string_expr(redir_cmd_node)
+
+        expected_pos = {
+            'col': 7,
+            'i': 7,
+            'lnum': 1,
+        }
+        expected_node_type = NodeType.EQUALCS
+
+        self.assertEqual(expected_node_type, NodeType(nodes[0]['type']))
+        self.assertEqual(expected_pos, nodes[0]['pos'])
+
+
 if __name__ == '__main__':
     unittest.main()

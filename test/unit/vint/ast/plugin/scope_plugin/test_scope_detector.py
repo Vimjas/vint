@@ -8,6 +8,7 @@ from vint.ast.plugin.scope_plugin.identifier_classifier import (
     IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG,
     IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG,
     IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG,
+    IDENTIFIER_ATTRIBUTE_STRING_EXPRESSION_CONTEXT,
 )
 from vint.ast.plugin.scope_plugin.scope_detector import (
     ScopeVisibility as Vis,
@@ -33,7 +34,7 @@ def create_scope_visibility_hint(visibility, is_implicit=False):
 
 
 def create_id(id_value, is_declarative=True, is_function=False, is_autoload=False,
-              is_declarative_parameter=False):
+              is_declarative_parameter=False, is_on_str_expr_context=False):
     return {
         'type': NodeType.IDENTIFIER.value,
         'value': id_value,
@@ -44,6 +45,7 @@ def create_id(id_value, is_declarative=True, is_function=False, is_autoload=Fals
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: is_function,
             IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: is_autoload,
             IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG: is_declarative_parameter,
+            IDENTIFIER_ATTRIBUTE_STRING_EXPRESSION_CONTEXT: is_on_str_expr_context,
         },
     }
 
@@ -59,6 +61,7 @@ def create_env(env_value):
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
             IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: False,
             IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG: False,
+            IDENTIFIER_ATTRIBUTE_STRING_EXPRESSION_CONTEXT: False,
         },
     }
 
@@ -74,6 +77,7 @@ def create_option(opt_value):
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
             IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: False,
             IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG: False,
+            IDENTIFIER_ATTRIBUTE_STRING_EXPRESSION_CONTEXT: False,
         },
     }
 
@@ -89,6 +93,7 @@ def create_reg(reg_value):
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
             IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: False,
             IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG: False,
+            IDENTIFIER_ATTRIBUTE_STRING_EXPRESSION_CONTEXT: False,
         },
     }
 
@@ -118,6 +123,7 @@ def create_curlyname(is_declarative=True):
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
             IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: False,
             IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG: False,
+            IDENTIFIER_ATTRIBUTE_STRING_EXPRESSION_CONTEXT: False,
         },
     }
 
@@ -133,6 +139,7 @@ def create_subscript_member(is_declarative=True):
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
             IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: False,
             IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG: False,
+            IDENTIFIER_ATTRIBUTE_STRING_EXPRESSION_CONTEXT: False,
         },
     }
 

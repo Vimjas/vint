@@ -26,3 +26,5 @@ echo b:
 echo w:
 echo t:
 echo v:
+
+call filter(g:dict, 'v:key ==# v:val')

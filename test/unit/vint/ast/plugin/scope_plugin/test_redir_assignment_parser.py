@@ -4,10 +4,10 @@ import enum
 
 from vint.ast.parsing import Parser
 from vint.ast.node_type import NodeType
+from vint.ast.traversing import traverse
 from vint.ast.plugin.scope_plugin.redir_assignment_parser import (
     RedirAssignmentParser,
     get_redir_content,
-    traverse,
 )
 
 

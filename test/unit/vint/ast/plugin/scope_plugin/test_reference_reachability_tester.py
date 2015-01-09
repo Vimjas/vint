@@ -23,6 +23,8 @@ class Fixtures(enum.Enum):
         FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_same_name_function_and_variable.vim')
     FUNCTION_REF = Path(
         FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_function_ref.vim')
+    BUILTIN = Path(
+        FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_using_builtin.vim')
 
 
 
@@ -99,6 +101,17 @@ class TestReferenceReachabilityTester(unittest.TestCase):
         tester.process(ast)
 
         self.assertTrue(is_referenced_declarative_identifier(declarative_variable_node))
+
+
+    def test_builtin_reference_by_process(self):
+        ast = self.create_ast(Fixtures.BUILTIN)
+
+        ref_id_node = ast['body'][0]['left']['left']
+
+        tester = ReferenceReachabilityTester()
+        tester.process(ast)
+
+        self.assertTrue(is_reachable_reference_identifier(ref_id_node))
 
 
 if __name__ == '__main__':

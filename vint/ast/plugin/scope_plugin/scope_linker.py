@@ -1,7 +1,4 @@
-from vint.ast.plugin.scope_plugin.redir_assignment_parser import (
-    traverse,
-    SKIP_CHILDREN,
-)
+from vint.ast.traversing import traverse, SKIP_CHILDREN
 from vint.ast.node_type import NodeType
 from vint.ast.plugin.scope_plugin.scope_detector import (
     ScopeVisibility,

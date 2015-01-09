@@ -14,6 +14,7 @@ from vint.ast.plugin.scope_plugin.identifier_classifier import (
     IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG,
     IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG,
     IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG,
+    IDENTIFIER_ATTRIBUTE_STRING_EXPRESSION_CONTEXT,
 )
 
 
@@ -41,7 +42,9 @@ Fixtures = {
     'BUILTIN':
         Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_builtins.vim'),
     'REDIR':
-        Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_redir.vim')
+        Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_redir.vim'),
+    'MAP_FUNC':
+        Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_map_func.vim'),
 }
 
 
@@ -54,7 +57,8 @@ class TestIdentifierClassifier(unittest.TestCase):
 
     def create_id_attr(self, is_declarative=False, is_dynamic=False,
                        is_member=False, is_function=False,
-                       is_autoload=False, is_declarative_parameter=False):
+                       is_autoload=False, is_declarative_parameter=False,
+                       is_on_str_expr_context=False):
         return {
             IDENTIFIER_ATTRIBUTE_DECLARATION_FLAG: is_declarative,
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: is_dynamic,
@@ -62,6 +66,7 @@ class TestIdentifierClassifier(unittest.TestCase):
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: is_function,
             IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: is_autoload,
             IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG: is_declarative_parameter,
+            IDENTIFIER_ATTRIBUTE_STRING_EXPRESSION_CONTEXT: is_on_str_expr_context,
         }
 
 
@@ -291,6 +296,21 @@ class TestIdentifierClassifier(unittest.TestCase):
 
         expected_id_attr_map = {
             'g:var': self.create_id_attr(is_declarative=True),
+        }
+
+        attached_ast = id_classifier.attach_identifier_attributes(ast)
+
+        self.assertAttributesInIdentifiers(attached_ast, expected_id_attr_map)
+
+
+    def test_attach_identifier_attributes_with_map_func(self):
+        ast = self.create_ast(Fixtures['MAP_FUNC'])
+        id_classifier = IdentifierClassifier()
+
+        expected_id_attr_map = {
+            'v:val': self.create_id_attr(is_on_str_expr_context=True),
+            'g:pattern': self.create_id_attr(is_on_str_expr_context=True),
+            'map': self.create_id_attr(is_function=True),
         }
 
         attached_ast = id_classifier.attach_identifier_attributes(ast)
