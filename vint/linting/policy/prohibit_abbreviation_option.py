@@ -33,17 +33,41 @@ class ProhibitAbbreviationOption(AbstractPolicy):
 
         node_type = NodeType(node['type'])
 
-        if node_type is NodeType.EXCMD:
-            cmd_str = node['str']
-            matched = re.match(r':*set?\s+([a-z]+)', cmd_str)
-            is_set_cmd = bool(matched)
-
-            if not is_set_cmd:
-                return True
-
-            option_name = matched.group(1)
-            return option_name not in AbbreviationsIncludingInvertPrefix
-        else:
+        if node_type is NodeType.OPTION:
             # Remove & at head
             option_name = node['value'][1:]
-            return option_name not in Abbreviations
+            is_valid = option_name not in Abbreviations
+
+            if not is_valid:
+                self._make_description_by_option_name(option_name)
+
+            return is_valid
+
+        excmd_node = node
+        cmd_str = excmd_node['str']
+        matched = re.match(r':*set?\s+([a-z]+)', cmd_str)
+        is_set_cmd = bool(matched)
+
+        if not is_set_cmd:
+            return True
+
+        option_name = matched.group(1)
+
+        # After a "set" command, we can add an invert prefix "no" and "inv"
+        # to options. For example, "nowrap" is an inverted option "wrap".
+        is_valid = option_name not in AbbreviationsIncludingInvertPrefix
+
+        if not is_valid:
+            self._make_description_by_option_name(option_name)
+
+        return is_valid
+
+
+    def _make_description_by_option_name(self, option_name):
+        param = {
+            'good_pattern': AbbreviationsIncludingInvertPrefix[option_name],
+            'bad_pattern': option_name,
+        }
+
+        self.description = ('Use a full option name `{good_pattern}` '
+                            'instead of `{bad_pattern}`'.format(**param))
