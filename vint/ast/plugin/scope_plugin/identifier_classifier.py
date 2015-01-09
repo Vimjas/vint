@@ -3,6 +3,10 @@ from vint.ast.plugin.scope_plugin.redir_assignment_parser import (
     RedirAssignmentParser,
     get_redir_content,
 )
+from vint.ast.plugin.scope_plugin.map_and_filter_parser import (
+    MapAndFilterParser,
+    get_string_expr_content,
+)
 from vint.ast.node_type import NodeType
 
 
@@ -117,7 +121,12 @@ class IdentifierClassifier(object):
         redir_assignment_parser = RedirAssignmentParser()
         ast_with_parsed_redir = redir_assignment_parser.process(ast)
 
-        traverse(ast_with_parsed_redir, on_enter=self._enter_handler)
+        map_and_filter_parser = MapAndFilterParser()
+        ast_with_parse_map_and_filter_and_redir = \
+            map_and_filter_parser.process(ast_with_parsed_redir)
+
+        traverse(ast_with_parse_map_and_filter_and_redir,
+                 on_enter=self._enter_handler)
         return ast
 
 
@@ -226,12 +235,13 @@ class IdentifierClassifier(object):
             self._set_identifier_attribute(member_node, is_member=True)
 
 
-    def _enter_identifier_like_node(self, id_like_node, is_declarative=None,
+    def _enter_identifier_like_node(self, node, is_declarative=None,
                                     is_function=None, is_declarative_parameter=None,
                                     is_on_str_expr_context=None):
-        id_like_node_type = NodeType(id_like_node['type'])
+        node_type = NodeType(node['type'])
 
-        if id_like_node_type in AccessorLikeNodeTypes:
+        if node_type in AccessorLikeNodeTypes:
+            id_like_node = node
             self._enter_accessor_node(id_like_node,
                                       is_declarative=is_declarative,
                                       is_function=is_function,
@@ -239,7 +249,8 @@ class IdentifierClassifier(object):
                                       is_on_str_expr_context=is_on_str_expr_context)
             return
 
-        if id_like_node_type in IdentifierTerminateNodeTypes:
+        if node_type in IdentifierTerminateNodeTypes:
+            id_like_node = node
             self._enter_identifier_node(id_like_node,
                                         is_declarative=is_declarative,
                                         is_function=is_function,
@@ -250,7 +261,8 @@ class IdentifierClassifier(object):
         # Curlyname node can have a dynamic name. For example:
         #   let s:var = 'VAR'
         #   let my_{s:var} = 0
-        if id_like_node_type is NodeType.CURLYNAME:
+        if node_type is NodeType.CURLYNAME:
+            id_like_node = node
             self._enter_curlyname_node(id_like_node,
                                        is_declarative=is_declarative,
                                        is_function=is_function,
@@ -284,25 +296,29 @@ class IdentifierClassifier(object):
 
 
     def _enter_curlyname_node(self, curlyname_node, is_declarative=None, is_function=None,
-                              is_declarative_parameter=None):
+                              is_declarative_parameter=None, is_on_str_expr_context=None):
         self._set_identifier_attribute(curlyname_node,
                                        is_dynamic=True,
                                        is_declarative=is_declarative,
                                        is_function=is_function,
-                                       is_declarative_parameter=is_declarative_parameter)
+                                       is_declarative_parameter=is_declarative_parameter,
+                                       is_on_str_expr_context=is_on_str_expr_context)
 
 
     def _enter_identifier_node(self, id_node, is_declarative=None, is_function=None,
-                               is_declarative_parameter=None):
+                               is_declarative_parameter=None, is_on_str_expr_context=None):
         is_autoload = '#' in id_node['value']
         self._set_identifier_attribute(id_node,
                                        is_declarative=is_declarative,
                                        is_autoload=is_autoload,
                                        is_function=is_function,
-                                       is_declarative_parameter=is_declarative_parameter)
+                                       is_declarative_parameter=is_declarative_parameter,
+                                       is_on_str_expr_context=is_on_str_expr_context)
 
 
-    def _enter_accessor_node(self, accessor_node, is_declarative=None, is_function=None, is_declarative_parameter=None):
+    def _enter_accessor_node(self, accessor_node, is_declarative=None,
+                             is_function=None, is_declarative_parameter=None,
+                             is_on_str_expr_context=None):
         accessor_node_type = NodeType(accessor_node['type'])
 
         if accessor_node_type is NodeType.DOT:
@@ -310,7 +326,8 @@ class IdentifierClassifier(object):
                                            is_declarative=is_declarative,
                                            is_dynamic=False,
                                            is_function=is_function,
-                                           is_declarative_parameter=is_declarative_parameter)
+                                           is_declarative_parameter=is_declarative_parameter,
+                                           is_on_str_expr_context=is_on_str_expr_context)
             return
 
         if accessor_node_type is NodeType.SUBSCRIPT:
@@ -328,7 +345,8 @@ class IdentifierClassifier(object):
                                                is_declarative=is_declarative,
                                                is_dynamic=False,
                                                is_function=is_function,
-                                               is_declarative_parameter=is_declarative_parameter)
+                                               is_declarative_parameter=is_declarative_parameter,
+                                               is_on_str_expr_context=is_on_str_expr_context)
             return
 
         if accessor_node_type is NodeType.SLICE:
@@ -351,7 +369,8 @@ class IdentifierClassifier(object):
                                                is_declarative=is_declarative,
                                                is_dynamic=is_dynamic,
                                                is_function=is_function,
-                                               is_declarative_parameter=is_declarative_parameter)
+                                               is_declarative_parameter=is_declarative_parameter,
+                                               is_on_str_expr_context=is_on_str_expr_context)
             return
 
         raise Exception()
@@ -409,6 +428,9 @@ class IdentifierClassifier(object):
         left_node = call_node['left']
         self._enter_identifier_like_node(left_node, is_function=True)
 
+        # Care the 2nd argument of the map or filter function.
+        self._enter_str_expr_content_node(call_node)
+
 
     def _enter_str_expr_content_node(self, call_node):
         string_expr_content_nodes = get_string_expr_content(call_node)
@@ -416,9 +438,6 @@ class IdentifierClassifier(object):
             return
 
         def enter_handler(node):
-            if not is_identifier_like_node(node):
-                return
-
             self._enter_identifier_like_node(node, is_on_str_expr_context=True)
 
         for string_expr_content_node in string_expr_content_nodes:
