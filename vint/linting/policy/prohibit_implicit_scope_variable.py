@@ -29,7 +29,6 @@ class ProhibitImplicitScopeVariable(AbstractPolicy):
 
 
     def _make_description(self, identifier, scope_plugin):
-        self.description = 'Use explicit scope visibility: {good_pattern} instead of {bad_pattern}'.format(
-            bad_pattern=identifier['value'],
-            good_pattern=scope_plugin.normalize_variable_name(identifier)
+        self.description = 'Make the scope explicit like `{good_example}`'.format(
+            good_example=scope_plugin.normalize_variable_name(identifier)
         )
