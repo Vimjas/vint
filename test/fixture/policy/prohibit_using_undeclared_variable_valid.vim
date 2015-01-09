@@ -7,12 +7,8 @@ echo declared_on_other_var5
 echo v:declared_on_other_var6
 echo &declared_on_other_var7
 
-call g:declared_on_other_func1()
-call b:declared_on_other_func2()
-call w:declared_on_other_func3()
-call t:declared_on_other_func4()
-call declared_on_other_func5()
-call v:declared_on_other_func6()
+call g:DeclaredOnOtherFunc1()
+call DeclaredOnOtherFunc2()
 call localtime() " built-in function
 
 " Declare variables
@@ -57,12 +53,8 @@ function! MyFunc(param1, param2, ...) range
     echo v:declared_on_other_var6
     echo &declared_on_other_var7
 
-    call g:declared_on_other_func1()
-    call b:declared_on_other_func2()
-    call w:declared_on_other_func3()
-    call t:declared_on_other_func4()
-    call v:declared_on_other_func6()
-    call &declared_on_other_func7()
+    call g:DeclaredOnOtherFunc1()
+    call DeclaredOnOtherFunc2()
     call localtime() " built-in function
 endfunction
 

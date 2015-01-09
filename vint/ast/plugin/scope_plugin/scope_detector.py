@@ -10,7 +10,6 @@ from vint.ast.plugin.scope_plugin.identifier_classifier import (
     is_declarative_identifier,
     is_function_identifier,
     is_member_identifier,
-    is_autoload_identifier,
     is_declarative_parameter,
 )
 
@@ -26,6 +25,7 @@ class ScopeVisibility(enum.Enum):
     SCRIPT_LOCAL = 2
     FUNCTION_LOCAL = 3
     UNANALYZABLE = 4
+    INVALID = 5
 
 
 class ExplicityOfScopeVisibility(enum.Enum):
@@ -34,7 +34,19 @@ class ExplicityOfScopeVisibility(enum.Enum):
     UNANALYZABLE = 2
 
 
-IdentifierScopePrefixToScopeVisibility = {
+FunctionDeclarationIdentifierScopePrefixToScopeVisibility = {
+    'g:': ScopeVisibility.GLOBAL_LIKE,
+    'b:': ScopeVisibility.INVALID,
+    'w:': ScopeVisibility.INVALID,
+    't:': ScopeVisibility.INVALID,
+    's:': ScopeVisibility.SCRIPT_LOCAL,
+    'l:': ScopeVisibility.INVALID,
+    'a:': ScopeVisibility.INVALID,
+    'v:': ScopeVisibility.INVALID,
+}
+
+
+VariableIdentifierScopePrefixToScopeVisibility = {
     'g:': ScopeVisibility.GLOBAL_LIKE,
     'b:': ScopeVisibility.GLOBAL_LIKE,
     'w:': ScopeVisibility.GLOBAL_LIKE,
@@ -181,7 +193,7 @@ def get_explicity_of_scope_visibility(node):
         # almost understand the identifier has an explicit scope visibility.
         return ExplicityOfScopeVisibility.EXPLICIT
 
-    is_explicit = _get_explicit_scope_visibility(node['value']) is not None
+    is_explicit = _get_explicit_scope_visibility(node) is not None
 
     return ExplicityOfScopeVisibility.EXPLICIT if is_explicit \
         else ExplicityOfScopeVisibility.IMPLICIT
@@ -230,9 +242,7 @@ def _normalize_identifier_value(id_node, context_scope):
 
 
 def _detect_identifier_scope_visibility(id_node, context_scope):
-    id_value = id_node['value']
-
-    explicit_scope_visibility = _get_explicit_scope_visibility(id_value)
+    explicit_scope_visibility = _get_explicit_scope_visibility(id_node)
     if explicit_scope_visibility is not None:
         return _create_identifier_visibility_hint(explicit_scope_visibility)
 
@@ -245,21 +255,10 @@ def _detect_identifier_scope_visibility(id_node, context_scope):
         return _create_identifier_visibility_hint(ScopeVisibility.BUILTIN,
                                                   is_implicit=is_implicit)
 
-    # Only autoload functions implicity declared are always on global.
-    # For example:
-    #
-    #   " in anywhere using autoload
-    #   function FuncContext()
-    #     " ok
-    #     echo g:file#func()
-    #     echo g:file#var
-    #     echo file#func()
-    #
-    #     " ng
-    #     echo file#var
-    #   endfunction
-    #   call FuncContext()
-    if is_function_identifier(id_node) and is_autoload_identifier(id_node):
+    if is_function_identifier(id_node):
+        # Functions can have the scope visibility only explicit global or
+        # implicit global or explicit script local. So a function have implicit
+        # scope visibility is always global function.
         return _create_identifier_visibility_hint(ScopeVisibility.GLOBAL_LIKE,
                                                   is_implicit=is_implicit)
 
@@ -279,10 +278,14 @@ def _detect_identifier_scope_visibility(id_node, context_scope):
                                               is_implicit=is_implicit)
 
 
-def _get_explicit_scope_visibility(id_value):
+def _get_explicit_scope_visibility(id_node):
     # See :help internal-variables
-    scope_prefix = id_value[0:2]
-    return IdentifierScopePrefixToScopeVisibility.get(scope_prefix, None)
+    scope_prefix = id_node['value'][0:2]
+
+    if is_function_identifier(id_node) and is_declarative_identifier(id_node):
+        return FunctionDeclarationIdentifierScopePrefixToScopeVisibility.get(scope_prefix)
+    else:
+        return VariableIdentifierScopePrefixToScopeVisibility.get(scope_prefix)
 
 
 def _create_identifier_visibility_hint(visibility, is_implicit=False):

@@ -98,9 +98,6 @@ class TestIdentifierClassifier(unittest.TestCase):
 
         expected_id_attr_map = {
             'g:ExplicitGlobalFunc': self.create_id_attr(is_declarative=True, is_function=True),
-            'b:BufferLocalFunc': self.create_id_attr(is_declarative=True, is_function=True),
-            'w:WindowLocalFunc': self.create_id_attr(is_declarative=True, is_function=True),
-            't:TabLocalFunc': self.create_id_attr(is_declarative=True, is_function=True),
             's:ScriptLocalFunc': self.create_id_attr(is_declarative=True, is_function=True),
             'ImplicitGlobalFunc': self.create_id_attr(is_declarative=True, is_function=True),
         }
@@ -137,6 +134,9 @@ class TestIdentifierClassifier(unittest.TestCase):
             'FunctionCallInExpressionContext':
                 self.create_id_attr(is_declarative=False,
                                     is_function=True),
+            'FunctionToBeDeleted':
+                self.create_id_attr(is_declarative=False,
+                                    is_function=True),
         }
 
         attached_ast = id_classifier.attach_identifier_attributes(ast)
@@ -151,9 +151,7 @@ class TestIdentifierClassifier(unittest.TestCase):
         expected_id_attr_map = {
             'FuncContext': self.create_id_attr(is_declarative=True,
                                                is_function=True),
-            'l:ExplicitFuncLocalFunc': self.create_id_attr(is_declarative=True,
-                                                           is_function=True),
-            'ImplicitFuncLocalFunc':
+            'ImplicitGlobalFunc':
                 self.create_id_attr(is_declarative=True,
                                     is_function=True),
         }

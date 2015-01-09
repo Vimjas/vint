@@ -121,9 +121,6 @@ class TestScopePlugin(unittest.TestCase):
 
         expected_variables_undeclared = {
             'g:ExplicitGlobalFunc': False,
-            'b:BufferLocalFunc': False,
-            'w:WindowLocalFunc': False,
-            't:TabLocalFunc': False,
             's:ScriptLocalFunc': False,
             'ImplicitGlobalFunc': False,
             'g:ImplicitGlobalFunc': False,
@@ -142,9 +139,6 @@ class TestScopePlugin(unittest.TestCase):
 
         expected_variables_unused = {
             'g:ExplicitGlobalFunc': False,
-            'b:BufferLocalFunc': False,
-            'w:WindowLocalFunc': False,
-            't:TabLocalFunc': False,
             's:ScriptLocalFunc': False,
             'ImplicitGlobalFunc': False,
         }
@@ -161,11 +155,9 @@ class TestScopePlugin(unittest.TestCase):
         scope_plugin.process(ast)
 
         expected_variables_undeclared = {
-            'l:ExplicitFuncLocalFunc': False,
-            'ExplicitFuncLocalFunc': False,
-
-            'l:ImplicitFuncLocalFunc': False,
-            'ImplicitFuncLocalFunc': False,
+            'g:ExplicitGlobalFunc': False,
+            'ImplicitGlobalFunc': False,
+            's:ExplicitScriptLocalFunc': False,
         }
 
         self.assertVariablesUndeclared(expected_variables_undeclared,
@@ -181,8 +173,9 @@ class TestScopePlugin(unittest.TestCase):
 
         expected_variables_unused = {
             'FuncContext': True,
-            'l:ExplicitFuncLocalFunc': False,
-            'ImplicitFuncLocalFunc': False,
+            'g:ExplicitGlobalFunc': False,
+            'ImplicitGlobalFunc': False,
+            's:ExplicitScriptLocalFunc': False,
         }
 
         self.assertVariablesUnused(expected_variables_unused,
@@ -296,24 +289,6 @@ class TestScopePlugin(unittest.TestCase):
                                        ast)
 
 
-    def test_reference_reachability_with_unreferenced_func_in_func(self):
-        ast = self.create_ast(Fixtures.UNREFERENCED_FUNC_IN_FUNC)
-
-        scope_plugin = ScopePlugin()
-        scope_plugin.process(ast)
-
-        expected_variables_undeclared = {
-            'l:ExplicitFuncLocalFunc': True,
-            'ExplicitFuncLocalFunc': True,
-            'l:ImplicitFuncLocalFunc': True,
-            'ImplicitFuncLocalFunc': True,
-        }
-
-        self.assertVariablesUndeclared(expected_variables_undeclared,
-                                       scope_plugin,
-                                       ast)
-
-
     def test_declarative_identifiers_referenced_with_unreferenced_func_in_func(self):
         ast = self.create_ast(Fixtures.UNREFERENCED_FUNC_IN_FUNC)
 
@@ -322,8 +297,9 @@ class TestScopePlugin(unittest.TestCase):
 
         expected_variables_unused = {
             'FuncContext': True,
-            'l:ExplicitFuncLocalFunc': True,
-            'ImplicitFuncLocalFunc': True,
+            'g:ExplicitGlobalFunc': True,
+            'ImplicitGlobalFunc': True,
+            's:ExplicitScriptLocalFunc': True,
         }
 
         self.assertVariablesUnused(expected_variables_unused,

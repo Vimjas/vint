@@ -43,15 +43,18 @@ class Parser(object):
         """ Parse vim script file and return the AST. """
         with file_path.open(mode='rb') as f:
             bytes_seq = f.read()
-            encoding_hint = chardet.detect(bytes_seq)
 
+            is_empty = len(bytes_seq) == 0
+            if is_empty:
+                return self.parse('')
+
+            encoding_hint = chardet.detect(bytes_seq)
             encoding = encoding_hint['encoding']
             if not encoding:
                 # Falsey means we cannot detect the encoding of the file.
                 raise EncodingDetectionError(file_path)
 
             decoded = bytes_seq.decode(encoding)
-
             decoded_and_lf_normalized = decoded.replace('\r\n', '\n')
 
             return self.parse(decoded_and_lf_normalized)

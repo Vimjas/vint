@@ -39,11 +39,15 @@ class ProhibitUnusedVariable(AbstractPolicy):
         is_builtin = scope_visibility is ScopeVisibility.BUILTIN
         is_unanalyzable = scope_visibility is ScopeVisibility.UNANALYZABLE
 
-        self._make_description(identifier)
+        # Ignore global like variables.
+        is_valid = is_used or is_global or is_builtin or is_unanalyzable
 
-        # Ignore global like variables
-        return is_used or is_global or is_builtin or is_unanalyzable
+        if not is_valid:
+            self._make_description(identifier)
+
+        return is_valid
 
 
     def _make_description(self, identifier):
-        self.description = str('Unused variable: ' + identifier['value'])
+        self.description = 'Unused variable: {var_name}'.format(
+            var_name=identifier['value'])

@@ -164,6 +164,10 @@ class IdentifierClassifier(object):
         if node_type is NodeType.CALL:
             self._enter_call_node(node)
 
+        if node_type is NodeType.DELFUNCTION:
+            self._enter_delfunction_node(node)
+            return
+
 
     def _pre_mark_accessor_children(self, node):
         node_type = NodeType(node['type'])
@@ -256,6 +260,12 @@ class IdentifierClassifier(object):
             self._enter_identifier_like_node(func_param_node,
                                              is_declarative_parameter=True,
                                              is_declarative=True)
+
+
+    def _enter_delfunction_node(self, delfunc_node):
+        func_name_node = delfunc_node['left']
+        self._enter_identifier_like_node(func_name_node,
+                                         is_function=True)
 
 
     def _enter_curlyname_node(self, curlyname_node, is_declarative=None, is_function=None,
