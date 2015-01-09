@@ -64,6 +64,8 @@ policies:
     enabled: true
 ```
 
+You can see all policy names on [Vint linting policy summary](https://github.com/Kuniwak/vint/wiki/Vint-linting-policy-summary).
+
 
 ### Project config
 
@@ -86,6 +88,8 @@ policies:
   ProhibitSomethingBad:
     enabled: true
 ```
+
+You can see all policy names on [Vint linting policy summary](https://github.com/Kuniwak/vint/wiki/Vint-linting-policy-summary).
 
 
 ### Command line config
@@ -115,7 +119,9 @@ let &cpo = s:save_cpo
 unlet s:save_cpo
 ```
 
-This syntax is: `" vint: [+-]<PolicyName> [+-]<PolicyName> ...`
+This syntax is: `" vint: [+-]<PolicyName> [+-]<PolicyName> ...`.
+
+You can see all policy names on [Vint linting policy summary](https://github.com/Kuniwak/vint/wiki/Vint-linting-policy-summary).
 
 
 Code health
