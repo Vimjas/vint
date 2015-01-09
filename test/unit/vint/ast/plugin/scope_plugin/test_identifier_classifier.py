@@ -41,7 +41,9 @@ Fixtures = {
     'BUILTIN':
         Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_builtins.vim'),
     'REDIR':
-        Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_redir.vim')
+        Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_redir.vim'),
+    'ARITHMETIC_ASSIGNMENT':
+        Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_arithmetic_assignment.vim'),
 }
 
 
@@ -297,6 +299,18 @@ class TestIdentifierClassifier(unittest.TestCase):
 
         self.assertAttributesInIdentifiers(attached_ast, expected_id_attr_map)
 
+
+    def test_attach_identifier_attributes_with_arithmetic_assignment(self):
+        ast = self.create_ast(Fixtures['ARITHMETIC_ASSIGNMENT'])
+        id_classifier = IdentifierClassifier()
+
+        expected_id_attr_map = {
+            'g:variable_defined': self.create_id_attr(),
+        }
+
+        attached_ast = id_classifier.attach_identifier_attributes(ast)
+
+        self.assertAttributesInIdentifiers(attached_ast, expected_id_attr_map)
 
 
 if __name__ == '__main__':
