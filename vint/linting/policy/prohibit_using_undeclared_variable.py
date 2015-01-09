@@ -41,4 +41,14 @@ class ProhibitUsingUndeclaredVariable(AbstractPolicy):
         is_unanalyzable = scope_visibility is ScopeVisibility.UNANALYZABLE
 
         # Ignore global like variables
-        return is_reachable or is_global or is_builtin or is_unanalyzable
+        is_valid = is_reachable or is_global or is_builtin or is_unanalyzable
+
+        if not is_valid:
+            self._make_description(identifier)
+
+        return is_valid
+
+
+    def _make_description(self, identifier):
+        self.description = 'Undefined variable: {var_name}'.format(
+            var_name=identifier['value'])
