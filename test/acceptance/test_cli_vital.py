@@ -12,21 +12,12 @@ class TestVintDoNotDiedWhenLintingVital(unittest.TestCase):
         except subprocess.CalledProcessError as err:
             got_output = err.output
 
-        unexpected_keyword = r'^Traceback'
-        self.assertNotRegex(got_output, unexpected_keyword)
+        unexpected_keyword = 'Traceback'
+        self.assertFalse(unexpected_keyword in got_output,
+                         'vint was died when linting vital.vim: ' + got_output)
 
 
-    def assertNotRegex(self, string, pattern):
-        assertNotRegexpMatches = getattr(self, 'assertNotRegexpMatches', None)
-        if assertNotRegexpMatches:
-            assertNotRegexpMatches(string, pattern)
-            return
-
-        super(TestVintDoNotDiedWhenLintingVital, self).assertNotRegex(string, pattern)
-
-
-
-    def test_not_died_when_linting_vital(self):
+    def test_survive_after_linting(self):
         vital_dir = str(Path('test', 'fixture', 'cli', 'vital.vim'))
         cmd = ['vint', vital_dir]
 

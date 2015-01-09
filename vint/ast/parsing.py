@@ -100,3 +100,32 @@ class Parser(object):
             return redir_cmd_ast
 
         return None
+
+
+    def parse_string_expr(self, string_expr_node):
+        """ Parse a command :redir content. """
+        string_expr_str = string_expr_node['value'][1:-1]
+        start_pos = string_expr_node['pos']
+
+        # NOTE: This is a hack to parse expr1. See :help expr1
+        raw_ast = self.parse('echo ' + string_expr_str)
+
+        # We need the left node of ECHO node
+        parsed_string_expr_nodes = raw_ast['body'][0]['list']
+
+        def adjust_position(node):
+            pos = node['pos']
+
+            # Care 1-based index and the length of "echo ".
+            pos['col'] += start_pos['col'] - 1 - 5
+
+            # Care the length of "echo ".
+            pos['i'] += start_pos['i'] - 5
+
+            # Care 1-based index
+            pos['lnum'] += start_pos['lnum'] - 1
+
+        for parsed_string_expr_node in parsed_string_expr_nodes:
+            traverse(parsed_string_expr_node, on_enter=adjust_position)
+
+        return parsed_string_expr_nodes

@@ -5,12 +5,12 @@ from vint.ast.dictionary.builtins import (
     BuiltinFunctions,
 )
 from vint.ast.plugin.scope_plugin.identifier_classifier import (
-    is_identifier_like_node,
     is_dynamic_identifier,
     is_declarative_identifier,
     is_function_identifier,
     is_member_identifier,
     is_declarative_parameter,
+    is_on_string_expression_context,
 )
 
 
@@ -82,10 +82,12 @@ IdentifierLikeNodeTypes = {
 
 def is_builtin_variable(id_node):
     """ Whether the specified node is a builtin identifier. """
-    if not is_identifier_like_node(id_node):
+    # Builtin variables are always IDENTIFIER.
+    if NodeType(id_node['type']) is not NodeType.IDENTIFIER:
         return False
 
     id_value = id_node['value']
+
     if id_value.startswith('v:'):
         # It is an explicit builtin variable such as: "v:count", "v:char"
         # TODO: Add unknown builtin flag
@@ -94,19 +96,20 @@ def is_builtin_variable(id_node):
     if is_builtin_function(id_node):
         return True
 
-    # It is an implicit builtin variable such as: "count", "char"
-    return id_value in BuiltinVariables and id_value not in {
+    if id_value in ['key', 'val']:
         # These builtin variable names are available on only map() or filter().
-        'key': True,
-        'val': True,
-    }
+        return is_on_string_expression_context(id_node)
+
+    # It is an implicit builtin variable such as: "count", "char"
+    return id_value in BuiltinVariables
 
 
 def is_builtin_function(id_node):
     """ Whether the specified node is a builtin function name identifier.
     The given identifier should be a child node of NodeType.CALL.
     """
-    if not is_identifier_like_node(id_node):
+    # Builtin functions are always IDENTIFIER.
+    if NodeType(id_node['type']) is not NodeType.IDENTIFIER:
         return False
 
     id_value = id_node['value']
