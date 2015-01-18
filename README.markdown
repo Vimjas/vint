@@ -7,7 +7,7 @@
 [![Build Status](https://travis-ci.org/Kuniwak/vint.svg?branch=master)](https://travis-ci.org/Kuniwak/vint)
 
 Vint is a Vim script Language Lint.
-The goal to reach for vint is:
+The goal to reach for Vint is:
 
 - Highly extensible lint
 - Highly customizable lint
@@ -23,11 +23,13 @@ You can install with [pip](https://pip.pypa.io/en/latest/).
 
 	$ pip install vim-vint
 
+You can use Vint with [scrooloose/syntastic](https://github.com/scrooloose/syntastic) by [todesking/vint-syntastic](https://github.com/todesking/vint-syntastic).
+
 
 Configure
 ---------
 
-vint will read config files on the following priority order:
+Vint will read config files on the following priority order:
 
 - [User config](#user-config):
   - e.g. `~/.vintrc.yaml`
@@ -44,7 +46,7 @@ vint will read config files on the following priority order:
 
 ### User config
 
-You can configure global vint config by `~/.vintrc.yaml` as following:
+You can configure global Vint config by `~/.vintrc.yaml` as following:
 
 ```yaml
 cmdargs:
@@ -69,7 +71,7 @@ You can see all policy names on [Vint linting policy summary](https://github.com
 
 ### Project config
 
-You can configure project local vint config by `.vintrc.yaml` as following:
+You can configure project local Vint config by `.vintrc.yaml` as following:
 
 ```yaml
 cmdargs:

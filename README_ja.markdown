@@ -24,6 +24,10 @@ pip でインストールします。
 	$ pip install vim-vint
 
 
+Vint を [scrooloose/syntastic](https://github.com/scrooloose/syntastic) で使うことができます。
+[todesking/vint-syntastic](https://github.com/todesking/vint-syntastic) を利用してください。
+
+
 設定
 ----
 
