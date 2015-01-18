@@ -17,7 +17,7 @@ class TestProhibitImplicitScopeVariable(PolicyAssertion, unittest.TestCase):
     def create_violation(self, line, column):
         return {
             'name': 'ProhibitImplicitScopeVariable',
-            'level': Level.WARNING,
+            'level': Level.STYLE_PROBLEM,
             'position': {
                 'line': line,
                 'column': column,

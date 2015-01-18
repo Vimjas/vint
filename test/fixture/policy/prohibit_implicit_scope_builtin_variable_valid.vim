@@ -1,6 +1,9 @@
-" Allow explicit scope variables on declaring and referencing
+" Allow variables that is not builtin variable and do not have imlicit scope.
 let g:explicit_global_var = 101
 echo g:explicit_global_var
+
+let implicit_global_var = 101
+echo implicit_global_var
 
 let b:buffer_local_var = 102
 echo b:buffer_local_var
@@ -47,6 +50,12 @@ function! g:FuncContext(param)
     " Allow symbol tables
     echo a:
     echo l:
+
+    let l:explicit_func_local_var = 110
+    echo l:explicit_func_local_var
+
+    let implicit_func_local_var = 111
+    echo implicit_func_local_var
 endfunction
 
 

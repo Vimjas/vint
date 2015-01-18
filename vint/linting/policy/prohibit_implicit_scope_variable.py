@@ -10,7 +10,7 @@ class ProhibitImplicitScopeVariable(AbstractPolicy):
     def __init__(self):
         super(ProhibitImplicitScopeVariable, self).__init__()
         self.reference = 'Anti-pattern of vimrc (Scope of variable)'
-        self.level = Level.WARNING
+        self.level = Level.STYLE_PROBLEM
 
 
     def listen_node_types(self):
