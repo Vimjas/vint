@@ -59,6 +59,15 @@ BuiltinVariables = {
 }
 
 
+BuiltinVariablesCanHaveImplicitScope = {
+    'count': True,
+    'errmsg': True,
+    'shell_error': True,
+    'this_session': True,
+    'version': True,
+}
+
+
 BuiltinFunctions = {
     'abs': True,
     'acos': True,
