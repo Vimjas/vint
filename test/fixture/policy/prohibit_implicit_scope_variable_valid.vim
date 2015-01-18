@@ -30,21 +30,14 @@ function! g:ExplicitGlobalFunc()
 endfunction
 call g:ExplicitGlobalFunc()
 
-function! b:BufferLocalFunc()
-endfunction
-call b:BufferLocalFunc()
-
-function! w:WindowLocalFunc()
-endfunction
-call w:WindowLocalFunc()
-
-function! t:TabLocalFunc()
-endfunction
-call t:TabLocalFunc()
-
 function! s:ScriptLocalFunc()
 endfunction
 call s:ScriptLocalFunc()
+
+" We can call buffer/window/tab local function references
+call b:BufferLocalFunc()
+call w:WindowLocalFunc()
+call t:TabLocalFunc()
 
 function! g:FuncContext(param)
     echo a:0
