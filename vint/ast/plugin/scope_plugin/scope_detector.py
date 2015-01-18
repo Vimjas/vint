@@ -1,7 +1,7 @@
 import enum
 from vint.ast.node_type import NodeType
 from vint.ast.dictionary.builtins import (
-    BuiltinVariables,
+    BuiltinVariablesCanHaveImplicitScope,
     BuiltinFunctions,
 )
 from vint.ast.plugin.scope_plugin.identifier_classifier import (
@@ -101,7 +101,7 @@ def is_builtin_variable(id_node):
         return is_on_string_expression_context(id_node)
 
     # It is an implicit builtin variable such as: "count", "char"
-    return id_value in BuiltinVariables
+    return id_value in BuiltinVariablesCanHaveImplicitScope
 
 
 def is_builtin_function(id_node):

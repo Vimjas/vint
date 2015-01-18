@@ -20,6 +20,9 @@ echo s:script_local_var
 let v:count = 110
 echo v:count
 
+let char = 110
+echo char
+
 let &opt_var = 109
 echo &opt_var
 
