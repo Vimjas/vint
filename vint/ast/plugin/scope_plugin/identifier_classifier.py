@@ -351,6 +351,11 @@ class IdentifierClassifier(object):
 
         if accessor_node_type is NodeType.SLICE:
             for elem_node in accessor_node['rlist']:
+                if type(elem_node) is list:
+                    # In VimLParser spec, an empty array means null.
+                    #   list[1:] => {rlist: [node, []]}
+                    continue
+
                 elem_node_type = NodeType(elem_node['type'])
 
                 # We can do static analysis NodeType.SLICE such as:
