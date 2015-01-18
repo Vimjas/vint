@@ -1183,13 +1183,11 @@ class VimLParser:
                     varnode.pos = token.pos
                     varnode.value = token.value
                     viml_add(node.rlist, varnode)
-                    pc = self.reader.p(0)
-                    ppos = self.reader.getpos()
+                    # XXX: Vim doesn't skip white space before comma.  F(a ,b) => E475
+                    if iswhite(self.reader.p(0)) and tokenizer.peek().type == TOKEN_COMMA:
+                        raise VimLParserException(Err("E475: Invalid argument: White space is not allowed before comma", self.reader.getpos()))
                     token = tokenizer.get()
                     if token.type == TOKEN_COMMA:
-                        # XXX: Vim doesn't skip white space before comma.  F(a ,b) => E475
-                        if iswhite(pc):
-                            raise VimLParserException(Err("E475: Invalid argument: White space is not allowed before comma", ppos))
                         # XXX: Vim allows last comma.  F(a, b, ) => OK
                         if tokenizer.peek().type == TOKEN_PCLOSE:
                             tokenizer.get()
@@ -2673,7 +2671,7 @@ class StringReader:
                             skip = 0
                     else:
                         viml_add(self.buf, c)
-                        viml_add(self.pos, [lnum + 1, col + 1])
+                        viml_add(self.pos, [lnum + 2, col + 1])
                     col += viml_len(c)
                 lnum += 1
             viml_add(self.buf, "<EOL>")
