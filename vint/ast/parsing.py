@@ -104,14 +104,22 @@ class Parser(object):
 
     def parse_string_expr(self, string_expr_node):
         """ Parse a command :redir content. """
-        string_expr_str = string_expr_node['value'][1:-1]
-        start_pos = string_expr_node['pos']
+        string_expr_node_value = string_expr_node['value']
+        string_expr_str = string_expr_node_value[1:-1]
+
+        # Care escaped string literals
+        if string_expr_node_value[0] == "'":
+            string_expr_str = string_expr_str.replace("''", "'")
+        else:
+            string_expr_str = string_expr_str.replace('\\"', '"')
 
         # NOTE: This is a hack to parse expr1. See :help expr1
         raw_ast = self.parse('echo ' + string_expr_str)
 
         # We need the left node of ECHO node
         parsed_string_expr_nodes = raw_ast['body'][0]['list']
+
+        start_pos = string_expr_node['pos']
 
         def adjust_position(node):
             pos = node['pos']
