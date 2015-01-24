@@ -19,5 +19,7 @@ script:
 after_success:
   - if test "$TOXENV" = "coverage"; then coveralls; fi
 
+sudo: false
+
 notifications:
   email: false
