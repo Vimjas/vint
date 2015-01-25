@@ -62,7 +62,7 @@ class ConfigCmdargsSource(ConfigSource):
         #   1. error
         #   2. warning
         #   3. style problem
-        if env_cmdargs.get('style', False):
+        if env_cmdargs.get('style_problem', False):
             config_dict_cmdargs['severity'] = Level.STYLE_PROBLEM
 
         if env_cmdargs.get('warning', False):
