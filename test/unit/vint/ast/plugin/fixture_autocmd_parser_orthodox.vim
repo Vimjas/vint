@@ -1,0 +1,1 @@
+autocmd! bufwritepost vimrc 
