@@ -248,3 +248,26 @@ def traverse(node, on_enter=None, on_leave=None):
 
     if on_leave:
         on_leave(node)
+
+
+def find_first(node_type, node_to_find):
+    """ Returns a first node by the specified node type. """
+    all_nodes = find_all(node_type, node_to_find)
+
+    if len(all_nodes) > 0:
+        return all_nodes[0]
+
+    return None
+
+
+def find_all(node_type, node_to_find):
+    """ Returns all nodes by the specified node type. """
+
+    nodes = []
+
+    def node_collector(node):
+        if NodeType(node['type']) is node_type:
+            nodes.append(node)
+
+    traverse(node_to_find, on_enter=node_collector)
+    return nodes
