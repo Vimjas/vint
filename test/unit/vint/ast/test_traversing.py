@@ -7,11 +7,11 @@ from vint.ast.parsing import Parser
 from vint.ast.node_type import NodeType, is_node_type_of
 from vint.ast.traversing import traverse, SKIP_CHILDREN, find_all, find_first
 
-FIXTURE_FILE = get_fixture_path('fixture_to_traverse.vim')
 
 
 class Fixtures(enum.Enum):
     FIND_ALL = get_fixture_path('fixture_traversing_find_all.vim')
+    TRAVERSING = get_fixture_path('fixture_to_traverse.vim')
 
 
 class TestTraverse(unittest.TestCase):
@@ -20,13 +20,9 @@ class TestTraverse(unittest.TestCase):
         return parser.parse_file(filepath.value)
 
 
-    def setUp(self):
-        # TODO: Remove that
-        parser = Parser()
-        self.ast = parser.parse_file(FIXTURE_FILE)
-
-
     def test_traverse(self):
+        ast = self.create_ast(Fixtures.TRAVERSING)
+
         expected_order_of_events = [
             {'node_type': NodeType.TOPLEVEL, 'handler': 'enter'},
             {'node_type': NodeType.LET, 'handler': 'enter'},
@@ -62,7 +58,7 @@ class TestTraverse(unittest.TestCase):
 
         # Records visit node type name in order
         actual_order_of_events = []
-        traverse(self.ast,
+        traverse(ast,
                  on_enter=lambda node: actual_order_of_events.append({
                      'node_type': NodeType(node['type']),
                      'handler': 'enter',
@@ -77,6 +73,8 @@ class TestTraverse(unittest.TestCase):
 
 
     def test_traverse_ignoring_while_children(self):
+        ast = self.create_ast(Fixtures.TRAVERSING)
+
         expected_order_of_events = [
             {'node_type': NodeType.TOPLEVEL, 'handler': 'enter'},
             {'node_type': NodeType.LET, 'handler': 'enter'},
@@ -99,10 +97,9 @@ class TestTraverse(unittest.TestCase):
             if NodeType(node['type']) is NodeType.WHILE:
                 return SKIP_CHILDREN
 
-
         # Records visit node type name in order
         actual_order_of_events = []
-        traverse(self.ast,
+        traverse(ast,
                  on_enter=on_enter,
                  on_leave=lambda node: actual_order_of_events.append({
                      'node_type': NodeType(node['type']),
