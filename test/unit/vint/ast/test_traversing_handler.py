@@ -1,9 +1,10 @@
 import unittest
+from compat.unittest import mock
 import enum
 from pathlib import Path
 
 from vint.ast.node_type import get_node_type, NodeType
-from vint.ast.traversing_handler import traverse_by_handler
+from vint.ast.traversing_handler import traverse_by_handler, compose_handlers
 from vint.ast.parsing import Parser
 
 
@@ -37,7 +38,7 @@ class TestTraversingHandler(unittest.TestCase):
         parser = Parser()
         return parser.parse_file(filepath.value)
 
-    def test_traverse(self):
+    def test_traverse_by_handler(self):
         ast = self.create_ast(Fixtures.TRAVERSING)
         spy = TraversingHandlerSpy()
 
@@ -77,6 +78,23 @@ class TestTraversingHandler(unittest.TestCase):
         ]
         self.maxDiff = 2000
         self.assertEqual(spy.handled_events, expected_order_of_events)
+
+
+    def test_compose_handlers(self):
+        mockA = mock.Mock()
+        stub_node_type = NodeType.IDENTIFIER
+        stub_node = {'type': stub_node_type}
+
+        handlerA = {stub_node_type: mockA}
+
+        mockB = mock.Mock()
+        handlerB = {stub_node_type: mockB}
+
+        composed_handler = compose_handlers(handlerA, handlerB)
+        composed_handler[stub_node_type](stub_node)
+
+        self.assertEqual(mockA.call_count, 1)
+        self.assertEqual(mockB.call_count, 1)
 
 
 if __name__ == '__main__':

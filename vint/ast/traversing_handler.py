@@ -2,12 +2,19 @@ from vint.ast.node_type import get_node_type, NodeType
 from vint.ast.traversing import traverse
 
 
+def _combine(funcs):
+    def combined_funcs(node):
+        for method in funcs:
+            method(node)
+    return combined_funcs
+
+
 def compose_handlers(*handlers):
     composed_handler = {}
 
     for node_type in NodeType:
-        composed_handler[node_type] = [handler for handler in handlers
-                                       if node_type in handler]
+        funcs = [handler[node_type] for handler in handlers if node_type in handler]
+        composed_handler[node_type] = _combine(funcs)
 
     return composed_handler
 
