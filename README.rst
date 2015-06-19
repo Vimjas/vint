@@ -150,13 +150,13 @@ Acknowledgement
 -  `Anti-pattern of
    vimrc <http://rbtnn.hateblo.jp/entry/2014/12/28/010913>`__
 
-.. |Development Status| image:: https://pypip.in/status/vim-vint/badge.svg
+.. |Development Status| image:: https://img.shields.io/pypi/status/vim-vint.svg
    :target: https://pypi.python.org/pypi/vim-vint/
-.. |Latest Version| image:: https://pypip.in/version/vim-vint/badge.svg
+.. |Latest Version| image:: https://img.shields.io/pypi/v/vim-vint.svg
    :target: https://pypi.python.org/pypi/vim-vint/
-.. |Supported Python versions| image:: https://pypip.in/py_versions/vim-vint/badge.svg
+.. |Supported Python versions| image:: https://img.shields.io/pypi/pyversions/vim-vint.svg
    :target: https://pypi.python.org/pypi/vim-vint/
-.. |Supported Python implementations| image:: https://pypip.in/implementation/vim-vint/badge.svg
+.. |Supported Python implementations| image:: https://img.shields.io/pypi/implementation/vim-vint.svg
    :target: https://pypi.python.org/pypi/vim-vint/
 .. |Build Status| image:: https://travis-ci.org/Kuniwak/vint.svg?branch=master
    :target: https://travis-ci.org/Kuniwak/vint
