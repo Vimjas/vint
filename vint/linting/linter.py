@@ -116,6 +116,7 @@ class Linter(object):
             'root_node': root_ast,
             'stack_trace': [],
             'plugins': self._plugins,
+            'config': self._config.get_config_dict(),
         }
 
         traverse(root_ast,
