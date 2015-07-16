@@ -20,15 +20,12 @@ class ProhibitImplicitScopeVariable(AbstractPolicy):
     def is_valid(self, identifier, lint_context):
         """ Whether the identifier has a scope prefix. """
 
-        linter_config = lint_context['config']
         scope_plugin = lint_context['plugins']['scope']
         explicity = scope_plugin.get_explicity_of_scope_visibility(identifier)
         is_autoload = scope_plugin.is_autoload_identifier(identifier)
 
-        try:
-            suppress_autoload = linter_config['policies'][self.name]['suppress_autoload']
-        except KeyError:
-            suppress_autoload = False
+        config_dict = lint_context['config']
+        suppress_autoload = self.get_policy_option(config_dict, 'suppress_autoload', False)
 
         is_valid = (explicity is not ExplicityOfScopeVisibility.IMPLICIT or
                     is_autoload and suppress_autoload)
