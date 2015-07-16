@@ -39,3 +39,9 @@ class AbstractPolicy(object):
             return None
 
         return self.create_violation_report(node, lint_context)
+
+
+    def get_policy_option(self, config_dict, name, default=None):
+        policy_section = config_dict.get('policies', {})
+        policy_options = policy_section.get(self.name, {})
+        return policy_options.get(name, default)
