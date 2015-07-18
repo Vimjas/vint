@@ -3,6 +3,7 @@ from pathlib import Path
 from pprint import pprint
 from compat.itertools import zip_longest
 from vint.linting.linter import Linter
+from vint.linting.config.config_default_source import ConfigDefaultSource
 
 
 class PolicyAssertion(unittest.TestCase):
@@ -22,11 +23,18 @@ class PolicyAssertion(unittest.TestCase):
     class StubConfigContainer(object):
         def __init__(self, policy_names_to_enable):
 
-            policy_enabling_map = dict((policy_name, {'enabled': True})
-                                       for policy_name in policy_names_to_enable)
+            default_config_dict = ConfigDefaultSource(None).get_config_dict()
+            policy_options = default_config_dict.get('policies', {})
+
+            for policy, options in policy_options.items():
+                options['enabled'] = False
+
+            for policy in policy_names_to_enable:
+                options = policy_options.setdefault(policy, {})
+                options['enabled'] = True
 
             self._config_dict = {
-                'policies': policy_enabling_map
+                'policies': policy_options,
             }
 
 
