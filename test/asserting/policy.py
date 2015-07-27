@@ -47,16 +47,19 @@ class PolicyAssertion(unittest.TestCase):
             return self._config_dict
 
 
-    def assertFoundNoViolations(self, path, Policy):
-        self.assertFoundViolationsEqual(path, Policy, [])
+    def assertFoundNoViolations(self, path, Policy, policy_options=None):
+        self.assertFoundViolationsEqual(path, Policy, [], policy_options)
 
 
-    def assertFoundViolationsEqual(self, path, Policy, expected_violations):
+    def assertFoundViolationsEqual(self, path, Policy, expected_violations, policy_options=None):
         policy_to_test = Policy()
         policy_name = Policy.__name__
 
         policy_set = PolicyAssertion.StubPolicySet(policy_to_test)
         config = PolicyAssertion.StubConfigContainer(policy_name)
+
+        if policy_options is not None:
+            config.get_config_dict()['policies'][policy_name].update(policy_options)
 
         linter = Linter(policy_set, config.get_config_dict())
         violations = linter.lint_file(path)
