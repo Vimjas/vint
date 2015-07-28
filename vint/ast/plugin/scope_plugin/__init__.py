@@ -12,6 +12,9 @@ from vint.ast.plugin.scope_plugin.scope_detector import (
     get_explicity_of_scope_visibility as _get_explicity_of_scope_visibility,
     normalize_variable_name as _normalize_variable_name,
 )
+from vint.ast.plugin.scope_plugin.identifier_classifier import (
+    is_autoload_identifier as _is_autoload_identifier,
+)
 
 
 # Expose to out of ScopePlugin
@@ -43,6 +46,10 @@ class ScopePlugin(object):
     def is_unused_declarative_identifier(self, node):
         return _is_declarative_identifier(node) \
             and not _is_referenced_declarative_identifier(node)
+
+
+    def is_autoload_identifier(self, node):
+        return _is_autoload_identifier(node)
 
 
     def get_objective_scope_visibility(self, node):

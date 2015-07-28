@@ -42,6 +42,33 @@ class TestAbstractPolicy(unittest.TestCase):
             policy.create_violation_report(node, env),
             expected_violation)
 
+    def test_get_policy_options(self):
+        policy = ConcretePolicy()
+
+        expected_options = {}
+        lint_context = {
+            'config': {},
+        }
+        self.assertEqual(
+            policy.get_policy_options(lint_context),
+            expected_options)
+
+        expected_options = {}
+        lint_context = {
+            'config': {'policies': {}},
+        }
+        self.assertEqual(
+            policy.get_policy_options(lint_context),
+            expected_options)
+
+        expected_options = {'someoption': True}
+        lint_context = {
+            'config': {'policies': {'ConcretePolicy': expected_options}},
+        }
+        self.assertEqual(
+            policy.get_policy_options(lint_context),
+            expected_options)
+
 
 if __name__ == '__main__':
     unittest.main()

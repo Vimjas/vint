@@ -34,6 +34,10 @@ function! s:ScriptLocalFunc()
 endfunction
 call s:ScriptLocalFunc()
 
+function! g:autoload#AutoloadFunc()
+endfunction
+call g:autoload#AutoloadFunc()
+
 " We can call buffer/window/tab local function references
 call b:BufferLocalFunc()
 call w:WindowLocalFunc()

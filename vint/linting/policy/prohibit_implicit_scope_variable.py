@@ -9,7 +9,7 @@ from vint.ast.plugin.scope_plugin import ExplicityOfScopeVisibility
 class ProhibitImplicitScopeVariable(AbstractPolicy):
     def __init__(self):
         super(ProhibitImplicitScopeVariable, self).__init__()
-        self.reference = 'Anti-pattern of vimrc (Scope of variable)'
+        self.reference = 'Anti-pattern of vimrc (Scope of identifier)'
         self.level = Level.STYLE_PROBLEM
 
 
@@ -22,10 +22,18 @@ class ProhibitImplicitScopeVariable(AbstractPolicy):
 
         scope_plugin = lint_context['plugins']['scope']
         explicity = scope_plugin.get_explicity_of_scope_visibility(identifier)
+        is_autoload = scope_plugin.is_autoload_identifier(identifier)
 
-        self._make_description(identifier, scope_plugin)
+        policy_options = self.get_policy_options(lint_context)
+        suppress_autoload = policy_options['suppress_autoload']
 
-        return explicity is not ExplicityOfScopeVisibility.IMPLICIT
+        is_valid = (explicity is not ExplicityOfScopeVisibility.IMPLICIT or
+                    is_autoload and suppress_autoload)
+
+        if not is_valid:
+            self._make_description(identifier, scope_plugin)
+
+        return is_valid
 
 
     def _make_description(self, identifier, scope_plugin):

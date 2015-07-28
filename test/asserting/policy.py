@@ -3,6 +3,7 @@ from pathlib import Path
 from pprint import pprint
 from compat.itertools import zip_longest
 from vint.linting.linter import Linter
+from vint.linting.config.config_default_source import ConfigDefaultSource
 
 
 class PolicyAssertion(unittest.TestCase):
@@ -22,11 +23,18 @@ class PolicyAssertion(unittest.TestCase):
     class StubConfigContainer(object):
         def __init__(self, policy_names_to_enable):
 
-            policy_enabling_map = dict((policy_name, {'enabled': True})
-                                       for policy_name in policy_names_to_enable)
+            default_config_dict = ConfigDefaultSource(None).get_config_dict()
+            policy_options = default_config_dict.get('policies', {})
+
+            for policy, options in policy_options.items():
+                options['enabled'] = False
+
+            for policy in policy_names_to_enable:
+                options = policy_options.setdefault(policy, {})
+                options['enabled'] = True
 
             self._config_dict = {
-                'policies': policy_enabling_map
+                'policies': policy_options,
             }
 
 
@@ -39,16 +47,19 @@ class PolicyAssertion(unittest.TestCase):
             return self._config_dict
 
 
-    def assertFoundNoViolations(self, path, Policy):
-        self.assertFoundViolationsEqual(path, Policy, [])
+    def assertFoundNoViolations(self, path, Policy, policy_options=None):
+        self.assertFoundViolationsEqual(path, Policy, [], policy_options)
 
 
-    def assertFoundViolationsEqual(self, path, Policy, expected_violations):
+    def assertFoundViolationsEqual(self, path, Policy, expected_violations, policy_options=None):
         policy_to_test = Policy()
         policy_name = Policy.__name__
 
         policy_set = PolicyAssertion.StubPolicySet(policy_to_test)
         config = PolicyAssertion.StubConfigContainer(policy_name)
+
+        if policy_options is not None:
+            config.get_config_dict()['policies'][policy_name].update(policy_options)
 
         linter = Linter(policy_set, config.get_config_dict())
         violations = linter.lint_file(path)
