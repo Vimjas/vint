@@ -20,6 +20,7 @@ class ConfigCmdargsSource(ConfigSource):
         config_dict = self._normalize_verbose(env, config_dict)
         config_dict = self._normalize_severity(env, config_dict)
         config_dict = self._normalize_max_violations(env, config_dict)
+        config_dict = self._normalize_format(env, config_dict)
 
         return config_dict
 
@@ -52,6 +53,10 @@ class ConfigCmdargsSource(ConfigSource):
 
     def _normalize_max_violations(self, env, config_dict):
         return self._pass_config_by_key('max-violations', env, config_dict)
+
+
+    def _normalize_format(self, env, config_dict):
+        return self._pass_config_by_key('format', env, config_dict)
 
 
     def _normalize_severity(self, env, config_dict):
