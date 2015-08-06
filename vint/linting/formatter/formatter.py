@@ -23,12 +23,12 @@ class Formatter(object):
         else:
             cmdargs = {}
 
-        if 'format' in cmdargs:
+        if 'format' in cmdargs and cmdargs['format'] is not None:
             self._format = cmdargs['format']
         else:
             self._format = DEFAULT_FORMAT
 
-        if 'color' in cmdargs:
+        if 'color' in cmdargs and cmdargs['color'] is not None:
             self._should_be_colorized = cmdargs['color']
         else:
             self._should_be_colorized = False
