@@ -20,6 +20,12 @@ def compose_handlers(*handlers):
 
 
 def traverse_by_handler(ast, on_enter=None, on_leave=None):
+    """ Traverse the specified AST by NodeType-to-function dictionary.
+
+    USAGE:
+        traverse_by_handler(ast, on_enter={ NodeType.ECHO: handlerFn })
+    """
+
     def create_caller(handler):
         if handler is None:
             return None

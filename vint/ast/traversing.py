@@ -215,6 +215,7 @@ _traverser_extensions = []
 
 def register_traverser_extension(handler):
     """ Registers the specified function to traverse into extended child nodes.
+    You should register your traverser extension if you extend AST.
     """
     _traverser_extensions.append(handler)
 
