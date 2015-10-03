@@ -27,7 +27,8 @@ class ProhibitImplicitScopeVariable(AbstractPolicy):
         policy_options = self.get_policy_options(lint_context)
         suppress_autoload = policy_options['suppress_autoload']
 
-        is_valid = (explicity is not ExplicityOfScopeVisibility.IMPLICIT or
+        is_valid = scope_plugin.is_function_identifier(identifier) or (
+                    explicity is not ExplicityOfScopeVisibility.IMPLICIT or
                     is_autoload and suppress_autoload)
 
         if not is_valid:
