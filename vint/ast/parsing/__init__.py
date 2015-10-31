@@ -1,17 +1,6 @@
-import extlib.vimlparser
-import chardet
 import re
 from vint.ast.traversing import traverse
-
-
-class EncodingDetectionError(Exception):
-    def __init__(self, file_path):
-        self.file_path = file_path
-
-
-    def __str__(self):
-        return 'Cannot detect encoding (binary file?): {file_path}'.format(
-            file_path=str(self.file_path))
+from vint.ast.parsing.low_level import parse, parse_file
 
 
 class Parser(object):
@@ -23,15 +12,7 @@ class Parser(object):
 
 
     def parse(self, string):
-        """ Parse vim script string and return the AST. """
-        lines = string.split('\n')
-
-        reader = extlib.vimlparser.StringReader(lines)
-        parser = extlib.vimlparser.VimLParser()
-        ast = parser.parse(reader)
-
-        # TOPLEVEL does not have a pos, but we need pos for all nodes
-        ast['pos'] = {'col': 1, 'i': 0, 'lnum': 1}
+        ast = parse(string)
 
         for plugin in self.plugins:
             plugin.process(ast)
@@ -40,24 +21,12 @@ class Parser(object):
 
 
     def parse_file(self, file_path):
-        """ Parse vim script file and return the AST. """
-        with file_path.open(mode='rb') as f:
-            bytes_seq = f.read()
+        ast = parse_file(file_path)
 
-            is_empty = len(bytes_seq) == 0
-            if is_empty:
-                return self.parse('')
+        for plugin in self.plugins:
+            plugin.process(ast)
 
-            encoding_hint = chardet.detect(bytes_seq)
-            encoding = encoding_hint['encoding']
-            if not encoding:
-                # Falsey means we cannot detect the encoding of the file.
-                raise EncodingDetectionError(file_path)
-
-            decoded = bytes_seq.decode(encoding)
-            decoded_and_lf_normalized = decoded.replace('\r\n', '\n')
-
-            return self.parse(decoded_and_lf_normalized)
+        return ast
 
 
     def parse_redir(self, redir_cmd):

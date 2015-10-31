@@ -1,7 +1,8 @@
 import re
 import logging
 from pathlib import Path
-from vint.ast.parsing import Parser, EncodingDetectionError
+from vint.encoding import EncodingDetectionError
+from vint.ast.parsing import Parser
 from vint.ast.node_type import NodeType
 from vint.ast.traversing import traverse
 from vint.ast.plugin.scope_plugin import ScopePlugin
