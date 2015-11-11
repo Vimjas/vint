@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+import sys
 import os.path
 from setuptools import setup, find_packages
 
@@ -9,7 +9,11 @@ def load_requires_from_file(filepath):
 
 
 def install_requires():
-    return load_requires_from_file('requirements.txt')
+    requires = load_requires_from_file('requirements.txt')
+    if sys.version_info < (3, 4):
+        # To enable Enum in Python < 3.4
+        requires.append('enum34 == 1.0.4')
+    return requires
 
 
 def test_requires():
