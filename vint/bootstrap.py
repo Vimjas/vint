@@ -35,7 +35,7 @@ def import_all_policies():
 
     pkg_path = str(Path(_get_vint_root(), *pkg_path_list).resolve())
 
-    for loader, module_name, is_pkg in pkgutil.iter_modules([pkg_path]):
+    for _, module_name, is_pkg in pkgutil.iter_modules([pkg_path]):
         if not is_pkg:
             module_fqn = pkg_name + '.' + module_name
             logging.debug('Loading the policy module: `{fqn}`'.format(fqn=module_fqn))
