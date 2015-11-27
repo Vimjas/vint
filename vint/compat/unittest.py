@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 try:
     # 3.3 and later
     import unittest.mock as mock

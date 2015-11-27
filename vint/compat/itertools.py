@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 try:
     # 3.0 and later
     from itertools import zip_longest
