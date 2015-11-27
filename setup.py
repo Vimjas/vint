@@ -13,6 +13,8 @@ def install_requires():
     if sys.version_info < (3, 4):
         # To enable Enum in Python < 3.4
         requires.append('enum34 == 1.0.4')
+        # To enable pathlib in Python < 3.4
+        requires.append('pathlib == 1.0.1')
     return requires
 
 
