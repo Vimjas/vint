@@ -1,5 +1,5 @@
 import unittest
-from compat.unittest import mock
+from vint.compat.unittest import mock
 
 from vint.linting.cli import CLI
 from vint.bootstrap import import_all_policies

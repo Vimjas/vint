@@ -1,5 +1,6 @@
 from unittest import main, TestCase
-from compat.unittest import mock
+from vint.compat.unittest import mock
+
 from pprint import pprint
 from vint.linting.policy_set import PolicySet
 from vint.linting.level import Level

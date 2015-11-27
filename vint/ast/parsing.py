@@ -1,6 +1,6 @@
-import extlib.vimlparser
 import chardet
 import re
+from vint._bundles import vimlparser
 from vint.ast.traversing import traverse
 
 
@@ -26,8 +26,8 @@ class Parser(object):
         """ Parse vim script string and return the AST. """
         lines = string.split('\n')
 
-        reader = extlib.vimlparser.StringReader(lines)
-        parser = extlib.vimlparser.VimLParser()
+        reader = vimlparser.StringReader(lines)
+        parser = vimlparser.VimLParser()
         ast = parser.parse(reader)
 
         # TOPLEVEL does not have a pos, but we need pos for all nodes

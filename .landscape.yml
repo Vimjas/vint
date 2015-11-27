@@ -1,3 +1,3 @@
 ignore-paths:
-  - extlib
+  - vint/_bundles
 max-line-length: 100

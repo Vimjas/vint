@@ -1,7 +1,7 @@
 import unittest
 from pathlib import Path
 from pprint import pprint
-from compat.itertools import zip_longest
+from vint.compat.itertools import zip_longest
 from vint.linting.linter import Linter
 from vint.linting.config.config_default_source import ConfigDefaultSource
 

@@ -1,6 +1,7 @@
 import re
 import logging
 from pathlib import Path
+from vint._bundles import vimlparser
 from vint.ast.parsing import Parser, EncodingDetectionError
 from vint.ast.node_type import NodeType
 from vint.ast.traversing import traverse
@@ -9,7 +10,6 @@ from vint.linting.config.config_container import ConfigContainer
 from vint.linting.config.config_dict_source import ConfigDictSource
 from vint.linting.config.config_comment_source import ConfigCommentSource
 from vint.linting.level import Level
-from extlib.vimlparser import VimLParserException
 
 
 class Linter(object):
@@ -99,7 +99,7 @@ class Linter(object):
 
         try:
             root_ast = self._parser.parse_file(path)
-        except VimLParserException as exception:
+        except vimlparser.VimLParserException as exception:
             parse_error = self._create_parse_error(path, str(exception))
             return [parse_error]
         except EncodingDetectionError as exception:
