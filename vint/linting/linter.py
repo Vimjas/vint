@@ -9,7 +9,7 @@ from vint.linting.config.config_container import ConfigContainer
 from vint.linting.config.config_dict_source import ConfigDictSource
 from vint.linting.config.config_comment_source import ConfigCommentSource
 from vint.linting.level import Level
-from extlib.vimlparser import VimLParserException
+from vint._bundles.vimlparser import VimLParserException
 
 
 class Linter(object):
