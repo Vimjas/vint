@@ -19,7 +19,11 @@ def install_requires():
 
 
 def test_requires():
-    return load_requires_from_file('test-requirements.txt')
+    requires = load_requires_from_file('test-requirements.txt')
+    if sys.version_info < (3, 3):
+        # To enable mock in Python < 3.3
+        requires.append('mock == 1.0.1')
+    return requires
 
 
 def get_version():
