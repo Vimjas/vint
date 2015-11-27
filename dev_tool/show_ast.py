@@ -1,14 +1,15 @@
-#! /usr/bin/env python
-import sys
-from pprint import pprint
-from pathlib import Path
+#!/usr/bin/env python
 
-vint_root = Path(__file__).parent.parent
+import sys
+from pathlib import Path
+from pprint import pprint
+
+vint_root = Path(__file__).resolve().parent.parent
 sys.path.append(str(vint_root))
 
 from vint.ast.node_type import NodeType
-from vint.ast.parsing import Parser
 from vint.ast.traversing import traverse
+from vint.ast.parsing import Parser
 
 
 def prettify_node_type(node):
@@ -16,9 +17,7 @@ def prettify_node_type(node):
 
 
 if __name__ == '__main__':
-    parser = Parser()
-
-    ast = parser.parse_file(Path(sys.argv[1]))
+    ast = Parser().parse_file(Path(sys.argv[1]))
 
     traverse(ast, on_enter=prettify_node_type)
 
