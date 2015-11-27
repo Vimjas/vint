@@ -39,7 +39,7 @@ setup(
     download_url='https://github.com/Kuniwak/vint/archive/v{version}.tar.gz'.format(version=VERSION),
     install_requires=install_requires(),
     tests_require=test_requires(),
-    packages=find_packages(),
+    packages=find_packages(exclude=['dev_tool', 'test']),
     package_data={
         'vint': [
             'asset/default_config.yaml',
