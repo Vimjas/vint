@@ -17,3 +17,7 @@ function! autoload#ImplicitGlobalAutoloadFunc(param)
     echo autoload#AnotherImplicitGlobalAutoloadFunc(param)
 endfunction
 call autoload#ImplicitGlobalAutoloadFunc(1)
+
+" implicit global variable 'i'
+for i in [1, 2, 3]
+endfor
