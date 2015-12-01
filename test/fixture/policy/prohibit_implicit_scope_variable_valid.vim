@@ -60,3 +60,12 @@ echo b:
 echo w:
 echo t:
 echo v:
+
+" Allow to omit g: from function names (#136)
+function! ImplicitGlobalFunc()
+endfunction
+call ImplicitGlobalFunc()
+
+function! autoload#ImplicitGlobalAutoloadFunc()
+endfunction
+call autoload#ImplicitGlobalAutoloadFunc()

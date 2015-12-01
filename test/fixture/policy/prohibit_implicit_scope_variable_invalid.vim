@@ -8,12 +8,10 @@ redir END
 let count = 110
 
 function! ImplicitGlobalFunc(param)
-    " Make fix missing a: easy
+    " Make it easy to fix missing a:
     echo param
 endfunction
-call ImplicitGlobalFunc(0)
 
-function! autoload#ImplicitGlobalAutoloadFunc(param)
-    echo autoload#AnotherImplicitGlobalAutoloadFunc(param)
-endfunction
-call autoload#ImplicitGlobalAutoloadFunc(1)
+" Implicit global variable 'i'
+for i in [1, 2, 3]
+endfor

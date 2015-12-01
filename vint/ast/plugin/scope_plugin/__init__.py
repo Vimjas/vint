@@ -14,6 +14,7 @@ from vint.ast.plugin.scope_plugin.scope_detector import (
 )
 from vint.ast.plugin.scope_plugin.identifier_classifier import (
     is_autoload_identifier as _is_autoload_identifier,
+    is_function_identifier as _is_function_identifier,
 )
 
 
@@ -51,6 +52,9 @@ class ScopePlugin(object):
     def is_autoload_identifier(self, node):
         return _is_autoload_identifier(node)
 
+
+    def is_function_identifier(self, node):
+        return _is_function_identifier(node)
 
     def get_objective_scope_visibility(self, node):
         link_registry = self._get_link_registry()
