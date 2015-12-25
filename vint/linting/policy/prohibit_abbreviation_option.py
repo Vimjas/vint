@@ -20,7 +20,7 @@ SetCommandFamily = {
 class ProhibitAbbreviationOption(AbstractPolicy):
     def __init__(self):
         super(ProhibitAbbreviationOption, self).__init__()
-        self.description = 'Use a full option name instead of the abbreviation'
+        self.description = 'Use the full option name instead of the abbreviation'
         self.reference = ':help option-summary'
         self.level = Level.STYLE_PROBLEM
 
@@ -76,5 +76,5 @@ class ProhibitAbbreviationOption(AbstractPolicy):
             'bad_pattern': option_name,
         }
 
-        self.description = ('Use a full option name `{good_pattern}` '
+        self.description = ('Use the full option name `{good_pattern}` '
                             'instead of `{bad_pattern}`'.format(**param))

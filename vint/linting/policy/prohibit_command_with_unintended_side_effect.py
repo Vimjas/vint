@@ -17,7 +17,7 @@ class ProhibitCommandWithUnintendedSideEffect(AbstractPolicy):
     def __init__(self):
         super(ProhibitCommandWithUnintendedSideEffect, self).__init__()
         self.level = Level.WARNING
-        self.description = 'Do not use the command that has unintended side effect'
+        self.description = 'Do not use a command that has unintended side effects'
         self.reference = get_reference_source('DANGEROUS')
 
 

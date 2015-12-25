@@ -9,7 +9,7 @@ from vint.linting.policy_registry import register_policy
 class ProhibitEncodingOptionAfterScriptEncoding(AbstractPolicy):
     def __init__(self):
         super(ProhibitEncodingOptionAfterScriptEncoding, self).__init__()
-        self.description = 'Encoding option should be place before scriptencoding'
+        self.description = 'Set encoding before setting scriptencoding'
         self.reference = ':help :scriptencoding'
         self.level = Level.WARNING
 
@@ -24,7 +24,7 @@ class ProhibitEncodingOptionAfterScriptEncoding(AbstractPolicy):
     def is_valid(self, excmd_node, lint_context):
         """ Whether the specified node is valid.
 
-        This policy prohibit encoding option after scriptencoding.
+        This policy prohibits encoding option after scriptencoding.
         """
 
         cmd_str = excmd_node['str']
