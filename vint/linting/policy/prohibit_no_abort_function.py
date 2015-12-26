@@ -9,7 +9,7 @@ from vint.linting.policy_registry import register_policy
 class ProhibitNoAbortFunction(AbstractPolicy):
     def __init__(self):
         super(ProhibitNoAbortFunction, self).__init__()
-        self.description = 'Use abort attribute for functions in autoload/'
+        self.description = 'Use the abort attribute for functions in autoload'
         self.reference = get_reference_source('FUNCTIONS')
         self.level = Level.WARNING
 
@@ -21,7 +21,7 @@ class ProhibitNoAbortFunction(AbstractPolicy):
     def is_valid(self, node, lint_context):
         """ Whether the specified node is valid.
 
-        This policy prohibit that a function in autoload/ have no 'abort' or bang
+        This policy prohibits functions in autoload that have no 'abort' or bang
         """
 
         if 'autoload' not in lint_context['path'].parts:

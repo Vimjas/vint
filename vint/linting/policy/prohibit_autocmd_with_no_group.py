@@ -10,7 +10,7 @@ from vint.ast.dictionary.autocmd_events import AutoCmdEvents
 class ProhibitAutocmdWithNoGroup(AbstractPolicy):
     def __init__(self):
         super(ProhibitAutocmdWithNoGroup, self).__init__()
-        self.description = 'autocmd should execute in augroup or execute with a group'
+        self.description = 'autocmd should execute in an augroup or execute with a group'
         self.reference = ':help :autocmd'
         self.level = Level.WARNING
 
