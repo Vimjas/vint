@@ -49,7 +49,8 @@ class PolicySet(object):
         prior_policy_enabling_map = config_dict['policies']
 
         for policy_name, policy in prior_policy_enabling_map.items():
-            policy_enabling_map[policy_name] = policy['enabled']
+            if 'enabled' in policy:
+                policy_enabling_map[policy_name] = policy['enabled']
 
         return policy_enabling_map
 
