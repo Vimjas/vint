@@ -5,7 +5,6 @@ cmdargs:
 
 policies:
   ProhibitImplicitScopeVariable:
-    enabled: yes
     suppress_autoload: no
 
   # Experimental
