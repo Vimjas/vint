@@ -2,6 +2,9 @@ cmdargs:
   verbose: no
   severity: warning
   error-limit: 50
+  stat: no
+  color: no
+  json: no
   env:
     neovim: no
 

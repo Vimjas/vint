@@ -18,7 +18,12 @@ class ConfigFileSource(ConfigSource):
             return {}
 
         if 'cmdargs' in yaml_dict:
+            # Care empty hash, because it becomes None.
+            if yaml_dict['cmdargs'] is None:
+                yaml_dict['cmdargs'] = {}
+
             cmdargs_dict = yaml_dict['cmdargs']
+
             if 'severity' in cmdargs_dict:
                 severity_name = cmdargs_dict['severity'].upper()
                 severity = getattr(Level, severity_name, None)
