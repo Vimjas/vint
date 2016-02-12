@@ -1,6 +1,8 @@
 .. figure:: https://raw.githubusercontent.com/Kuniwak/vint/logo/logo.png
    :alt: logo
 
+----
+
 |Development Status| |Latest Version| |Supported Python versions|
 |Supported Python implementations| |Build Status|
 
