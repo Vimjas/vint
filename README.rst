@@ -1,6 +1,8 @@
 .. figure:: https://raw.githubusercontent.com/Kuniwak/vint/logo/logo.png
    :alt: logo
 
+----
+
 |Development Status| |Latest Version| |Supported Python versions|
 |Supported Python implementations| |Build Status|
 
@@ -43,6 +45,9 @@ Vint will read config files on the following priority order:
 -  `Comment config <#comment-config>`__ (highest priority):
 -  e.g. ``" vint: -ProhibitAbbreviationOption +ProhibitSetNoCompatible``
 
+You can see all options on `Wiki <https://github.com/Kuniwak/vint/wiki/Config>`__.
+
+
 User config
 ~~~~~~~~~~~
 
@@ -56,6 +61,10 @@ You can configure global Vint config by ``~/.vintrc.yaml`` as following:
 
       # Enable coloring
       color: true
+
+      # Enable Neovim syntax
+      env:
+        neovim: true
 
     policies:
       # Disable a violation
@@ -83,6 +92,10 @@ following:
 
       # Enable coloring
       color: true
+
+      # Enable Neovim syntax
+      env:
+        neovim: true
 
     policies:
       # Disable a violation
