@@ -21,6 +21,7 @@ class ConfigCmdargsSource(ConfigSource):
         config_dict = self._normalize_severity(env, config_dict)
         config_dict = self._normalize_max_violations(env, config_dict)
         config_dict = self._normalize_format(env, config_dict)
+        config_dict = self._normalize_env(env, config_dict)
 
         return config_dict
 
@@ -75,5 +76,15 @@ class ConfigCmdargsSource(ConfigSource):
 
         if env_cmdargs.get('error', False):
             config_dict_cmdargs['severity'] = Level.ERROR
+
+        return config_dict
+
+
+    def _normalize_env(self, env, config_dict):
+        env_cmdargs = env['cmdargs']
+        config_dict_cmdargs = config_dict['cmdargs']
+
+        if 'enable_neovim' in env_cmdargs:
+            config_dict_cmdargs['env'] = {'neovim': True}
 
         return config_dict
