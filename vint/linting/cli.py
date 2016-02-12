@@ -74,6 +74,7 @@ class CLI(object):
         parser.add_argument('-c', '--color', action='store_true', help='colorize output when possible')
         parser.add_argument('-j', '--json', action='store_true', help='output json style')
         parser.add_argument('-t', '--stat', action='store_true', help='output statistic info')
+        parser.add_argument('--enable-neovim', action='store_true', help='Enable Neovim syntax')
         parser.add_argument('-f', '--format', help='set output format')
         parser.add_argument('files', nargs='*', help='file or directory path to lint')
 

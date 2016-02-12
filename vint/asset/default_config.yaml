@@ -2,6 +2,8 @@ cmdargs:
   verbose: no
   severity: warning
   error-limit: 50
+  env:
+    neovim: no
 
 policies:
   ProhibitImplicitScopeVariable:

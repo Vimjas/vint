@@ -31,18 +31,22 @@ class Linter(object):
         self._plugins = {
             'scope': ScopePlugin(),
         }
-        self._parser = self.build_parser()
         self._policy_set = policy_set
 
         self._config_comment_source = ConfigCommentSource()
         self._config = self._decorate_config(config_dict_global,
                                              self._config_comment_source)
 
+        self._parser = self.build_parser()
+
         self._listeners_map = {}
 
 
     def build_parser(self):
-        parser = Parser(self._plugins)
+        config_dict = self._config.get_config_dict()
+        enable_neovim = config_dict['cmdargs']['env']['neovim']
+
+        parser = Parser(self._plugins, enable_neovim=enable_neovim)
         return parser
 
 

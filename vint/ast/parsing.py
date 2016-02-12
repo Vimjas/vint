@@ -15,11 +15,12 @@ class EncodingDetectionError(Exception):
 
 
 class Parser(object):
-    def __init__(self, plugins=None):
+    def __init__(self, plugins=None, enable_neovim=False):
         """ Initialize Parser with the specified plugins.
         The plugins can add attributes to the AST.
         """
         self.plugins = plugins.values() if plugins else []
+        self._enable_neovim = enable_neovim
 
 
     def parse(self, string):
@@ -27,7 +28,7 @@ class Parser(object):
         lines = string.split('\n')
 
         reader = vimlparser.StringReader(lines)
-        parser = vimlparser.VimLParser()
+        parser = vimlparser.VimLParser(self._enable_neovim)
         ast = parser.parse(reader)
 
         # TOPLEVEL does not have a pos, but we need pos for all nodes
