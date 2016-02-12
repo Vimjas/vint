@@ -84,7 +84,7 @@ class ConfigCmdargsSource(ConfigSource):
         env_cmdargs = env['cmdargs']
         config_dict_cmdargs = config_dict['cmdargs']
 
-        if 'enable_neovim' in env_cmdargs:
+        if 'enable_neovim' in env_cmdargs and env_cmdargs['enable_neovim'] == True:
             config_dict_cmdargs['env'] = {'neovim': True}
 
         return config_dict
