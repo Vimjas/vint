@@ -9,6 +9,7 @@ from vint.ast.plugin.scope_plugin import ScopePlugin
 from vint.linting.config.config_container import ConfigContainer
 from vint.linting.config.config_dict_source import ConfigDictSource
 from vint.linting.config.config_comment_source import ConfigCommentSource
+from vint.linting.config.config_util import get_config_value
 from vint.linting.level import Level
 
 
@@ -44,7 +45,7 @@ class Linter(object):
 
     def build_parser(self):
         config_dict = self._config.get_config_dict()
-        enable_neovim = config_dict['cmdargs']['env']['neovim']
+        enable_neovim = get_config_value(config_dict, ['cmdargs', 'env', 'neovim'], False)
 
         parser = Parser(self._plugins, enable_neovim=enable_neovim)
         return parser
