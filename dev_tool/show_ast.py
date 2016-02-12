@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import sys
+from argparse import ArgumentParser
 from pathlib import Path
 from pprint import pprint
 
@@ -17,8 +18,17 @@ def prettify_node_type(node):
 
 
 if __name__ == '__main__':
-    ast = Parser().parse_file(Path(sys.argv[1]))
+    arg_parser = ArgumentParser(prog='show_ast', description='Show AST')
+    arg_parser.add_argument('--enable-neovim', action='store_true', help='Enable Neovim syntax')
+    arg_parser.add_argument('files', nargs='*', help='File to parse')
+    namespace = vars(arg_parser.parse_args(sys.argv[1:]))
 
-    traverse(ast, on_enter=prettify_node_type)
+    filepaths = map(Path, namespace['files'])
+    enable_neovim = namespace['enable_neovim']
 
-    pprint(ast)
+    parser = Parser(enable_neovim=enable_neovim)
+
+    for filepath in filepaths:
+        ast = parser.parse_file(filepath)
+        traverse(ast, on_enter=prettify_node_type)
+        pprint(ast)
