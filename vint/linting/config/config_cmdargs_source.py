@@ -30,7 +30,7 @@ class ConfigCmdargsSource(ConfigSource):
         env_cmdargs = env['cmdargs']
         config_dict_cmdargs = config_dict['cmdargs']
 
-        if key in env_cmdargs:
+        if key in env_cmdargs and env_cmdargs[key] is not None:
             config_dict_cmdargs[key] = env_cmdargs[key]
 
         return config_dict
