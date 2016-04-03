@@ -25,8 +25,9 @@ You can install with `pip <https://pip.pypa.io/en/latest/>`__.
     $ pip install vim-vint
 
 You can use Vint with
-`scrooloose/syntastic <https://github.com/scrooloose/syntastic>`__ by
-`todesking/vint-syntastic <https://github.com/todesking/vint-syntastic>`__.
+`scrooloose/syntastic <https://github.com/scrooloose/syntastic>`__::
+
+    let g:syntastic_vim_checkers = ['vint']
 
 Configure
 ---------
