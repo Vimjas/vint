@@ -9,9 +9,6 @@ cmdargs:
     neovim: no
 
 policies:
-  ProhibitImplicitScopeVariable:
-    suppress_autoload: no
-
   # Experimental
   ProhibitUnusedVariable:
     enabled: no
