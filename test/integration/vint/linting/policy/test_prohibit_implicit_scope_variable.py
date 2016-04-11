@@ -40,19 +40,5 @@ class TestProhibitImplicitScopeVariable(PolicyAssertion, unittest.TestCase):
                                         expected_violations)
 
 
-    def test_get_violation_if_found_when_autoloads_are_suppressed(self):
-        expected_violations = [
-            self.create_violation(2, 5),
-            self.create_violation(4, 10),
-            self.create_violation(8, 5),
-            self.create_violation(12, 10),
-            self.create_violation(16, 5),
-        ]
-
-        self.assertFoundViolationsEqual(PATH_INVALID_VIM_SCRIPT,
-                                        ProhibitImplicitScopeVariable,
-                                        expected_violations,
-                                        {'suppress_autoload': True})
-
 if __name__ == '__main__':
     unittest.main()
