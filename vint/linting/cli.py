@@ -72,6 +72,7 @@ class CLI(object):
         parser.add_argument('-s', '--style-problem', action='store_const', const=True, help='report errors, warnings and style problems')
         parser.add_argument('-m', '--max-violations', type=int, help='limit max violations count')
         parser.add_argument('-c', '--color', action='store_const', const=True, help='colorize output when possible')
+        parser.add_argument('--no-color', action='store_const', const=True, help='do not colorize output')
         parser.add_argument('-j', '--json', action='store_const', const=True, help='output json style')
         parser.add_argument('-t', '--stat', action='store_const', const=True, help='output statistic info')
         parser.add_argument('--enable-neovim', action='store_const', const=True, help='Enable Neovim syntax')
