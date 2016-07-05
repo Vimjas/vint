@@ -2,6 +2,15 @@ from vint.linting.config.config_source import ConfigSource
 from vint.linting.level import Level
 
 
+class ConflictedOptionsError(Exception):
+    def __init__(self, conflicted_option_names):
+        self.conflicted_option_names = conflicted_option_names
+
+    def __str__(self):
+        option_names = ', '.join(self.conflicted_option_names)
+        return 'These options are conflicted: {0}'.format(option_names)
+
+
 class ConfigCmdargsSource(ConfigSource):
     def __init__(self, env):
         self._config_dict = self._build_config_dict(env)
@@ -45,7 +54,21 @@ class ConfigCmdargsSource(ConfigSource):
 
 
     def _normalize_color(self, env, config_dict):
-        return self._pass_config_by_key('color', env, config_dict)
+        env_cmdargs = env['cmdargs']
+
+        should_colorize = 'color' in env_cmdargs and env_cmdargs['color'] is not None
+        should_not_colorize = 'no_color' in env_cmdargs and env_cmdargs['no_color'] is not None
+
+        if should_colorize and should_not_colorize:
+            raise ConflictedOptionsError(['color', 'no_color'])
+
+        if should_colorize:
+            config_dict['cmdargs']['color'] = True
+
+        if should_not_colorize:
+            config_dict['cmdargs']['color'] = False
+
+        return config_dict
 
 
     def _normalize_verbose(self, env, config_dict):
