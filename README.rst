@@ -124,7 +124,7 @@ Comment config
 
 You can enable/disable linting policies by a comment as following:
 
-.. code:: viml
+..
 
     " vint: -ProhibitAbbreviationOption
 
