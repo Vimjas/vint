@@ -8,7 +8,7 @@ from vint.linting.config.config_project_source import ConfigProjectSource
 class TestConfigProjectSource(ConfigSourceAssertion, unittest.TestCase):
     def test_get_config_dict(self):
         env = {
-            'cwd': get_fixture_path('project')
+            'cwd': get_fixture_path('project_with_long_extname')
         }
 
         expected_type = {
@@ -25,7 +25,41 @@ class TestConfigProjectSource(ConfigSourceAssertion, unittest.TestCase):
 
     def test_get_config_dict_on_sub_directory(self):
         env = {
-            'cwd': get_fixture_path(Path('project') / 'sub' / 'subsub')
+            'cwd': get_fixture_path(Path('project_with_long_extname') / 'sub' / 'subsub')
+        }
+
+        expected_type = {
+            'cmdargs': {
+                'verbose': bool,
+                'error-limit': int,
+                'severity': Enum,
+            }
+        }
+
+        config_source = self.initialize_config_source_with_env(ConfigProjectSource, env)
+        self.assertConfigValueType(config_source, expected_type)
+
+
+    def test_get_config_dict_for_short_extname(self):
+        env = {
+            'cwd': get_fixture_path('project_with_short_extname')
+        }
+
+        expected_type = {
+            'cmdargs': {
+                'verbose': bool,
+                'error-limit': int,
+                'severity': Enum,
+            }
+        }
+
+        config_source = self.initialize_config_source_with_env(ConfigProjectSource, env)
+        self.assertConfigValueType(config_source, expected_type)
+
+
+    def test_get_config_dict_for_no_extname(self):
+        env = {
+            'cwd': get_fixture_path('project_with_no_extname')
         }
 
         expected_type = {
