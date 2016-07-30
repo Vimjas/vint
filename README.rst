@@ -35,10 +35,10 @@ Configure
 Vint will read config files on the following priority order:
 
 -  `User config <#user-config>`__:
--  e.g. ``~/.vintrc.yaml``
+-  e.g. ``~/.vintrc.yaml`` (the filename can be ``.vintrc.yml`` or ``.vintrc``)
 
 -  `Project config <#project-config>`__:
--  e.g. ``path/to/proj/.vintrc.yaml``
+-  e.g. ``path/to/proj/.vintrc.yaml`` (the filename can be ``.vintrc.yml`` or ``.vintrc``)
 
 -  `Command line config <#command-line-config>`__:
 -  e.g. ``$ vint --error``, ``$ vint --max-violations 10``
