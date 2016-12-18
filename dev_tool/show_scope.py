@@ -27,10 +27,16 @@ if __name__ == '__main__':
     filepaths = map(Path, namespace['files'])
     enable_neovim = namespace['enable_neovim']
 
-    plugins = { 'scope': ScopePlugin() }
-    parser = Parser(plugins=plugins, enable_neovim=enable_neovim)
+    scope_plugin = ScopePlugin()
+    parser = Parser(plugins={'scope': scope_plugin}, enable_neovim=enable_neovim)
 
     for filepath in filepaths:
         ast = parser.parse_file(filepath)
         traverse(ast, on_enter=prettify_node_type)
+
+        print("////////// AST //////////\n")
         pprint(ast)
+        print("\n\n")
+
+        print("////////// SCOPE TREE //////////\n")
+        pprint(scope_plugin._ref_tester._scope_tree)
