@@ -21,7 +21,6 @@ class ConfigProjectSource(ConfigFileSource):
                 proj_conf_path_tmp = project_path / basename
 
                 if proj_conf_path_tmp.is_file():
-                    proj_conf_path = proj_conf_path_tmp
-                    break
+                    return proj_conf_path_tmp
 
         return proj_conf_path
