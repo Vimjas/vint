@@ -9,9 +9,9 @@ from vint.ast.plugin.scope_plugin import (
 
 
 @register_policy
-class ProhibitImplicitScopeBuitlinVariable(AbstractPolicy):
+class ProhibitImplicitScopeBuiltinVariable(AbstractPolicy):
     def __init__(self):
-        super(ProhibitImplicitScopeBuitlinVariable, self).__init__()
+        super(ProhibitImplicitScopeBuiltinVariable, self).__init__()
         self.reference = ':help local-variable'
         self.level = Level.WARNING
 
@@ -21,8 +21,8 @@ class ProhibitImplicitScopeBuitlinVariable(AbstractPolicy):
 
 
     def is_valid(self, identifier, lint_context):
-        """ Implicit scope buitlin variables are prohibited.
-        Because it will make unexpected variable name conflict between buitlin
+        """ Implicit scope builtin variables are prohibited.
+        Because it will make unexpected variable name conflict between builtin
         and imlicit global/function local. For example:
 
             " This variable is not global variable but builtin variable.
