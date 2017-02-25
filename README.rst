@@ -160,7 +160,7 @@ Acknowledgement
 
 -  `ynkdir/vim-vimlparser <https://github.com/ynkdir/vim-vimlparser>`__
 -  `Google Vimscript Style
-   Guide <http://google-styleguide.googlecode.com/svn/trunk/vimscriptguide.xml?showone=Catching_Exceptions#Catching_Exceptions>`__
+   Guide <https://google.github.io/styleguide/vimscriptguide.xml>`__
 -  `Anti-pattern of
    vimrc <http://rbtnn.hateblo.jp/entry/2014/12/28/010913>`__
 
