@@ -29,12 +29,10 @@ class ProhibitMissingScriptEncoding(AbstractPolicy):
         """
         traverse(node, on_enter=self._check_scriptencoding)
 
-        has_scriptencoding = self.has_scriptencoding
-        if has_scriptencoding:
+        if self.has_scriptencoding:
             return True
 
-        has_multibyte_char = self._check_script_has_multibyte_char(lint_context)
-        return not has_multibyte_char
+        return not self._check_script_has_multibyte_char(lint_context)
 
 
     def _check_scriptencoding(self, node):
@@ -54,8 +52,4 @@ class ProhibitMissingScriptEncoding(AbstractPolicy):
         # TODO: Use cache to make performance efficiency
         with lint_context['path'].open(mode='br') as f:
             byte_seq = f.read()
-        if not len(byte_seq):
-            return False
-
-        encoding_hint = chardet.detect(byte_seq)
-        return encoding_hint['encoding'] != 'ascii'
+        return len(byte_seq) and chardet.detect(byte_seq)['encoding'] != 'ascii'
