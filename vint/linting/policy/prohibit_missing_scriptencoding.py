@@ -54,6 +54,8 @@ class ProhibitMissingScriptEncoding(AbstractPolicy):
         # TODO: Use cache to make performance efficiency
         with lint_context['path'].open(mode='br') as f:
             byte_seq = f.read()
+        if not len(byte_seq):
+            return False
 
         encoding_hint = chardet.detect(byte_seq)
         return encoding_hint['encoding'] != 'ascii'
