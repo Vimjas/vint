@@ -10,10 +10,8 @@ from vint.ast.plugin.scope_plugin import (
 
 @register_policy
 class ProhibitImplicitScopeVariable(AbstractPolicy):
-    def __init__(self):
-        super(ProhibitImplicitScopeVariable, self).__init__()
-        self.reference = 'Anti-pattern of vimrc (Scope of identifier)'
-        self.level = Level.STYLE_PROBLEM
+    reference = 'Anti-pattern of vimrc (Scope of identifier)'
+    level = Level.STYLE_PROBLEM
 
 
     def listen_node_types(self):

@@ -7,14 +7,12 @@ from vint.linting.policy_registry import register_policy
 
 @register_policy
 class ProhibitEncodingOptionAfterScriptEncoding(AbstractPolicy):
-    def __init__(self):
-        super(ProhibitEncodingOptionAfterScriptEncoding, self).__init__()
-        self.description = 'Set encoding before setting scriptencoding'
-        self.reference = ':help :scriptencoding'
-        self.level = Level.WARNING
+    description = 'Set encoding before setting scriptencoding'
+    reference = ':help :scriptencoding'
+    level = Level.WARNING
 
-        self.was_scriptencoding_found = False
-        self.has_encoding_opt_after_scriptencoding = False
+    was_scriptencoding_found = False
+    has_encoding_opt_after_scriptencoding = False
 
 
     def listen_node_types(self):

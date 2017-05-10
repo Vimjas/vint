@@ -35,11 +35,9 @@ BadStringComparisonOperators = {
 
 @register_policy
 class ProhibitEqualTildeOperator(AbstractPolicy):
-    def __init__(self):
-        super(ProhibitEqualTildeOperator, self).__init__()
-        self.level = Level.WARNING
-        self.description = 'Use the =~# or =~? operator families over the =~ family.'
-        self.reference = get_reference_source('MATCHING')
+    level = Level.WARNING
+    description = 'Use the =~# or =~? operator families over the =~ family.'
+    reference = get_reference_source('MATCHING')
 
 
     def listen_node_types(self):

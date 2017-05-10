@@ -16,11 +16,9 @@ CommandsShouldBeWithBang = {
 
 @register_policy
 class ProhibitCommandRelyOnUser(AbstractPolicy):
-    def __init__(self):
-        super(ProhibitCommandRelyOnUser, self).__init__()
-        self.description = 'Avoid commands that rely on user settings'
-        self.reference = get_reference_source('FRAGILE')
-        self.level = Level.WARNING
+    description = 'Avoid commands that rely on user settings'
+    reference = get_reference_source('FRAGILE')
+    level = Level.WARNING
 
 
     def listen_node_types(self):

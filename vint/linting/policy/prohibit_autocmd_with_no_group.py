@@ -8,13 +8,11 @@ from vint.ast.dictionary.autocmd_events import AutoCmdEvents
 
 @register_policy
 class ProhibitAutocmdWithNoGroup(AbstractPolicy):
-    def __init__(self):
-        super(ProhibitAutocmdWithNoGroup, self).__init__()
-        self.description = 'autocmd should execute in an augroup or execute with a group'
-        self.reference = ':help :autocmd'
-        self.level = Level.WARNING
+    description = 'autocmd should execute in an augroup or execute with a group'
+    reference = ':help :autocmd'
+    level = Level.WARNING
 
-        self.is_inside_of_augroup = False
+    is_inside_of_augroup = False
 
 
     def listen_node_types(self):

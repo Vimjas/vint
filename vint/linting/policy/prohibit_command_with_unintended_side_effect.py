@@ -14,11 +14,9 @@ PROHIBITED_COMMAND_PATTERNS = ('substitute',
 
 @register_policy
 class ProhibitCommandWithUnintendedSideEffect(AbstractPolicy):
-    def __init__(self):
-        super(ProhibitCommandWithUnintendedSideEffect, self).__init__()
-        self.level = Level.WARNING
-        self.description = 'Do not use a command that has unintended side effects'
-        self.reference = get_reference_source('DANGEROUS')
+    level = Level.WARNING
+    description = 'Do not use a command that has unintended side effects'
+    reference = get_reference_source('DANGEROUS')
 
 
     def listen_node_types(self):

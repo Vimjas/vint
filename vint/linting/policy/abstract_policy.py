@@ -1,10 +1,11 @@
 class AbstractPolicy(object):
+    description = None
+    reference = None
+    level = None
+
+
     def __init__(self):
         self.name = self.__class__.__name__
-        self.description = None
-        self.reference = None
-        self.level = None
-
 
     def listen_node_types(self):
         """ Listening node type.

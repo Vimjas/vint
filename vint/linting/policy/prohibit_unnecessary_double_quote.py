@@ -29,11 +29,9 @@ _special_char_matcher = re.compile(
 
 @register_policy
 class ProhibitUnnecessaryDoubleQuote(AbstractPolicy):
-    def __init__(self):
-        super(ProhibitUnnecessaryDoubleQuote, self).__init__()
-        self.description = 'Prefer single quoted strings'
-        self.reference = get_reference_source('STRINGS')
-        self.level = Level.WARNING
+    description = 'Prefer single quoted strings'
+    reference = get_reference_source('STRINGS')
+    level = Level.WARNING
 
 
     def listen_node_types(self):
