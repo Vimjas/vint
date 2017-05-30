@@ -39,6 +39,8 @@ setup(
     name='vim-vint',
     version=VERSION,
     description='Lint tool for Vim script Language',
+    setup_requires=['setuptools-markdown'],
+    long_description_markdown_filename='README.markdown',
     author='Kuniwak',
     author_email='orga.chem.job+vint@gmail.com',
     url='https://github.com/Kuniwak/vint',
