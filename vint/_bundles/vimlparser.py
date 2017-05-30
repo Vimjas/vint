@@ -7,7 +7,7 @@ import inspect
 
 def main():
     use_neovim = sys.argv[1] == '--neovim'
-     
+
     r = StringReader(viml_readfile(sys.argv[-1]))
     p = VimLParser(use_neovim)
     c = Compiler()
@@ -2493,16 +2493,16 @@ class ExprParser:
             savepos = self.reader.tell()
             nodepos = token.pos
             token = self.tokenizer.get()
-            lambda = token.type == TOKEN_ARROW
-            if not lambda and not (token.type == TOKEN_SQUOTE or token.type == TOKEN_DQUOTE):
+            lambda_ = token.type == TOKEN_ARROW
+            if not lambda_ and not (token.type == TOKEN_SQUOTE or token.type == TOKEN_DQUOTE):
                 # if the token type is stirng, we cannot peek next token and we can
-                # assume it's not lambda.
+                # assume it's not lambda_.
                 token2 = self.tokenizer.peek()
-                lambda = token2.type == TOKEN_ARROW or token2.type == TOKEN_COMMA
+                lambda_ = token2.type == TOKEN_ARROW or token2.type == TOKEN_COMMA
             # fallback to dict or {expr} if true
             fallback = FALSE
-            if lambda:
-                # lambda {token,...} {->...} {token->...}
+            if lambda_:
+                # lambda_ {token,...} {->...} {token->...}
                 node = Node(NODE_LAMBDA)
                 node.pos = nodepos
                 node.rlist = []
