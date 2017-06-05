@@ -45,20 +45,42 @@ class Parser(object):
         with file_path.open(mode='rb') as f:
             bytes_seq = f.read()
 
-            is_empty = len(bytes_seq) == 0
-            if is_empty:
-                return self.parse('')
+        len_bytes = len(bytes_seq)
+        is_empty = len_bytes == 0
+        if is_empty:
+            return self.parse('')
 
-            encoding_hint = chardet.detect(bytes_seq)
-            encoding = encoding_hint['encoding']
-            if not encoding:
-                # Falsey means we cannot detect the encoding of the file.
-                raise EncodingDetectionError(file_path)
+        decoded_and_lf_normalized = ''
+        encoding = None
+        offset = 0
+        while True:
+            next_encoding = bytes_seq.find(b'scriptencoding', offset)
 
-            decoded = bytes_seq.decode(encoding)
-            decoded_and_lf_normalized = decoded.replace('\r\n', '\n')
+            if next_encoding == -1 or next_encoding > offset:
+                hunk = bytes_seq[offset:next_encoding]
+                if encoding is None:
+                    encoding_hint = chardet.detect(hunk)
+                    encoding = encoding_hint['encoding']
+                    if not encoding:
+                        raise EncodingDetectionError(file_path)
+                decoded = hunk.decode(encoding)
+                decoded_and_lf_normalized += decoded.replace('\r\n', '\n')
 
-            return self.parse(decoded_and_lf_normalized)
+                if next_encoding == -1:
+                    break
+
+            encoding = ''
+            i = next_encoding + 14
+            while bytes_seq[i] == 32:
+                i += 1
+            while bytes_seq[i] not in [13, 10, 32]:
+                encoding += chr(bytes_seq[i])
+                i += 1
+            decoded_and_lf_normalized += bytes_seq[next_encoding:i].decode('ascii')
+            hunk = bytes_seq[offset:next_encoding]
+            offset = i
+
+        return self.parse(decoded_and_lf_normalized)
 
 
     def parse_redir(self, redir_cmd):
