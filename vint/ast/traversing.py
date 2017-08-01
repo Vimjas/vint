@@ -197,6 +197,7 @@ ChildNodeAccessorMap = {
     NodeType.REG: [],
     NodeType.CURLYNAMEPART: [],
     NodeType.CURLYNAMEEXPR: [],
+    NodeType.LAMBDA: [],
 }
 
 
