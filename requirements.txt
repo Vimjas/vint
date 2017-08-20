@@ -1,3 +1,4 @@
 PyYAML ~= 3.11
 ansicolor ~= 0.2.4
 chardet >= 2.3.0
+typing >= 3.6.2

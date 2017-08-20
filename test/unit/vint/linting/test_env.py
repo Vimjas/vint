@@ -11,6 +11,7 @@ class TestEnv(unittest.TestCase):
     def test_build_environment(self):
         cwd = Path('path', 'to', 'cwd')
         home = Path('/', 'home', 'user')
+        xdg_config_home = Path('/', 'home', 'user', '.config')
 
         cmdargs = {
             'verbose': True,
@@ -33,6 +34,7 @@ class TestEnv(unittest.TestCase):
                 Path(FIXTURE_PATH, 'sub', '4.vim'),
             ]),
             'home_path': home,
+            'xdg_config_home': xdg_config_home,
             'cwd': cwd,
         }
 
@@ -42,7 +44,9 @@ class TestEnv(unittest.TestCase):
 
             with mock.patch('os.path.expanduser') as mocked_expanduser:
                 mocked_expanduser.return_value = str(home)
-                env = build_environment(cmdargs)
+
+                with mock.patch.dict('os.environ', {'XDG_CONFIG_HOME': '/home/user/.config'}):
+                    env = build_environment(cmdargs)
 
         self.maxDiff = 1000
         self.assertEqual(env, expected_env)
