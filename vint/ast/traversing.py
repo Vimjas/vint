@@ -1,21 +1,25 @@
+from typing import Dict, Any, Callable, List
 from vint.ast.node_type import NodeType
 
 SKIP_CHILDREN = 'SKIP_CHILDREN'
 
 
 def for_each(func, nodes):
+    # type: (Callable[[Dict[str, Any]], None], List[Dict[str, Any]]) -> None
     """ Calls func for each the specified nodes. """
     for node in nodes:
         call_if_def(func, node)
 
 
 def for_each_deeply(func, node_lists):
+    # type: (Callable[[Dict[str, Any]], None], List[List[Dict[str, Any]]]) -> None
     """ Calls func for each the specified nodes. """
     for nodes in node_lists:
         for_each(func, nodes)
 
 
 def call_if_def(func, node):
+    # type: (Callable[[Dict[str, Any]], None], Dict[str, Any]) -> None
     """ Calls func if the node is defined.
     VimLParser return an empty array if a child node is not defined.
     """
@@ -23,13 +27,13 @@ def call_if_def(func, node):
         func(node)
 
 
-ChildNodeAccessor = {
+ChildNodeAccessor = {  # type: Dict[str, Callable[[Callable[[Dict[str, Any]], None], Any], None]]
     'NODE': call_if_def,
     'LIST': for_each,
     'NESTED_LIST': for_each_deeply,
 }
 
-ChildType = {
+ChildType = {  # type: Dict[str, Dict[str, Callable[[Callable[[Dict[str, Any]], None], Any], None]]]
     'LEFT': {
         'accessor': ChildNodeAccessor['NODE'],
         'property_name': 'left',
@@ -219,6 +223,7 @@ def register_traverser_extension(handler):
 
 
 def traverse(node, on_enter=None, on_leave=None):
+    # type: (Dict[str, Any], Callable[[Dict[str, Any]], None],  Callable[[Dict[str, Any]], None]) -> None
     """ Traverses the specified Vim script AST node (depth first order).
     The on_enter/on_leave handler will be called with the specified node and
     the children. You can skip traversing child nodes by returning

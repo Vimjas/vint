@@ -1,4 +1,6 @@
-BuiltinVariables = {
+from typing import Dict
+
+BuiltinVariables = {  # type: Dict[str, bool]
     'beval_bufnr': True,
     'beval_col': True,
     'beval_lnum': True,
@@ -59,7 +61,7 @@ BuiltinVariables = {
 }
 
 
-BuiltinVariablesCanHaveImplicitScope = {
+BuiltinVariablesCanHaveImplicitScope = {  # type: Dict[str, bool]
     'count': True,
     'errmsg': True,
     'shell_error': True,
@@ -68,7 +70,7 @@ BuiltinVariablesCanHaveImplicitScope = {
 }
 
 
-BuiltinFunctions = {
+BuiltinFunctions = {  # type: Dict[str, bool]
     'abs': True,
     'acos': True,
     'add': True,

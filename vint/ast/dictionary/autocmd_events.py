@@ -1,4 +1,6 @@
-AutoCmdEvents = {
+from typing import Dict
+
+AutoCmdEvents = {  # type: Dict[str, bool]
     'BufAdd': True,
     'BufCreate': True,
     'BufDelete': True,
