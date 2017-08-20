@@ -32,7 +32,7 @@ def _get_file_paths(cmdargs):
 
 
 def _get_xdg_config_home():
-    if os.environ["XDG_CONFIG_HOME"] is not None:
-        return os.environ["XDG_CONFIG_HOME"]
-    else:
-        return _get_home_path().joinpath(".config")
+    return Path(os.environ.get(
+        "XDG_CONFIG_HOME",
+        str(_get_home_path().joinpath(".config"))
+    ))
