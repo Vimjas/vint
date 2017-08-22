@@ -15,6 +15,11 @@ def install_requires():
         requires.append('enum34 >= 1.0.4')
         # To enable pathlib in Python < 3.4
         requires.append('pathlib == 1.0.1')
+
+    if sys.version_info < (3, 6):
+        # To enable typing in Python < 3.6
+        requires.append('typing >= 3.6.2')
+
     return requires
 
 
