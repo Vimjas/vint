@@ -56,5 +56,10 @@ class TestCLI(unittest.TestCase):
         self.assertExitWithFailure(argv)
 
 
+    @mock.patch('sys.stdin', open('test/fixture/cli/valid1.vim'))
+    def test_passing_code_to_stdin_lints_the_code_from_stdin(self):
+        argv = ['bin/vint', '-']
+        self.assertExitWithSuccess(argv)
+
 if __name__ == '__main__':
     unittest.main()

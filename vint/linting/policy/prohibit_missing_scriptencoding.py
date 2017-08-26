@@ -1,4 +1,5 @@
 import chardet
+import sys
 
 from vint.ast.node_type import NodeType
 from vint.ast.traversing import traverse, SKIP_CHILDREN
@@ -49,6 +50,26 @@ class ProhibitMissingScriptEncoding(AbstractPolicy):
 
 
     def _check_script_has_multibyte_char(self, lint_context):
+        if self._is_from_stdin(lint_context):
+            return self._check_stdin_has_multibyte_char()
+        else:
+            return self._check_file_has_multibyte_char(lint_context)
+
+
+    def _is_from_stdin(self, lint_context):
+        return lint_context['path'] == 'stdin'
+
+
+    def _check_stdin_has_multibyte_char(self):
+        sys.stdin.seek(0)
+
+        try:
+            sys.stdin.read().encode('ascii')
+            return False
+        except UnicodeError:
+            return True
+
+    def _check_file_has_multibyte_char(self, lint_context):
         # TODO: Use cache to make performance efficiency
         with lint_context['path'].open(mode='br') as f:
             byte_seq = f.read()
