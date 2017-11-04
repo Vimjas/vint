@@ -45,8 +45,8 @@ class Decoder(object):
         return ComposedDecodingStrategy([
             DecodingStrategyForEmpty(),
             DecodingStrategyByScriptencoding(),
-            DecodingStrategyByChardet(),
             DecodingStrategyForUTF8(),
+            DecodingStrategyByChardet(),
         ])
 
 
