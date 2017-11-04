@@ -1,6 +1,6 @@
 import chardet
 from typing import Optional, Dict, Any
-from vint.encodings.decoding_strategy.abstract import DecodingStrategy
+from vint.encodings.decoding_strategy.abstract_strategy import DecodingStrategy
 
 
 class DecodingStrategyByChardet(DecodingStrategy):

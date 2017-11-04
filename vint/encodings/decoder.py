@@ -2,12 +2,12 @@ import sys
 from typing import Dict, Any
 from pprint import pformat
 from pathlib import Path
-from vint.encodings.decoding_strategy.abstract import DecodingStrategy
-from vint.encodings.decoding_strategy.scriptencoding import DecodingStrategyByScriptencoding
-from vint.encodings.decoding_strategy.utf8 import DecodingStrategyForUTF8
-from vint.encodings.decoding_strategy.composed import ComposedDecodingStrategy
-from vint.encodings.decoding_strategy.empty import DecodingStrategyForEmpty
-from vint.encodings.decoding_strategy.chardet import DecodingStrategyByChardet
+from vint.encodings.decoding_strategy.abstract_strategy import DecodingStrategy
+from vint.encodings.decoding_strategy.scriptencoding_strategy import DecodingStrategyByScriptencoding
+from vint.encodings.decoding_strategy.utf8_strategy import DecodingStrategyForUTF8
+from vint.encodings.decoding_strategy.composed_strategy import ComposedDecodingStrategy
+from vint.encodings.decoding_strategy.empty_strategy import DecodingStrategyForEmpty
+from vint.encodings.decoding_strategy.chardet_strategy import DecodingStrategyByChardet
 
 
 SCRIPTENCODING_PREFIX = bytearray('scriptencoding', encoding='ascii')
@@ -51,7 +51,7 @@ default_decoding_strategy = ComposedDecodingStrategy([
 
 
 def _split_by_scriptencoding(bytes_seq):
-    # type: (bytes, Dict[str, str]) -> [(str, bytes)]
+    # type: (bytes) -> [(str, bytes)]
     max_end_index = len(bytes_seq)
     start_index = 0
     bytes_seq_and_loc_list = []
