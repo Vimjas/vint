@@ -23,12 +23,17 @@ class Decoder(object):
 
         with file_path.open(mode='rb') as f:
             bytes_seq = f.read()
-            string = self.strategy.decode(bytes_seq, debug_hint=self.debug_hint)
+            strings = []
 
-            if string is None:
-                raise EncodingDetectionError(self.debug_hint)
+            for hunk in split_by_scriptencoding(bytes_seq, self.debug_hint):
+                string = self.strategy.decode(hunk, debug_hint=self.debug_hint)
 
-            return string
+                if string is None:
+                    raise EncodingDetectionError(self.debug_hint)
+
+                strings.append(string)
+
+            return ''.join(strings)
 
 
     @classmethod
@@ -41,6 +46,29 @@ class Decoder(object):
             DecodingStrategyForUTF8(),
         ])
 
+
+def split_by_scriptencoding(bytes_seq, debug_hint):
+    # type: (bytes, Dict[str, str]) -> [bytes]
+    max_end_index = len(bytes_seq) - 1
+    start_index = 0
+    bytes_seq_list = []
+    debug_hint_of_boundaries = []
+
+    while True:
+        end_index = bytes_seq.find(SCRIPTENCODING_PREFIX, start_index + 1)
+
+        if end_index < 0:
+            end_index = max_end_index
+
+        bytes_seq_list.append(bytes_seq[start_index:end_index])
+        debug_hint_of_boundaries.append('{start}:{end}'.format(start=start_index, end=end_index))
+
+        if end_index < max_end_index:
+            start_index = end_index
+            continue
+
+        debug_hint['scriptencoding_boundaries'] = ', '.join(debug_hint_of_boundaries)
+        return bytes_seq_list
 
 
 class DecodingStrategy(object):
