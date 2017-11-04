@@ -4,6 +4,7 @@ from vint.ast.traversing import traverse
 from vint.encodings.decoder import Decoder
 from typing import Dict, Any
 from pathlib import Path
+from pprint import pprint
 
 
 class Parser(object):
@@ -38,7 +39,11 @@ class Parser(object):
         decoded = decoder.read(file_path)
         decoded_and_lf_normalized = decoded.replace('\r\n', '\n')
 
-        return self.parse(decoded_and_lf_normalized)
+        try:
+            return self.parse(decoded_and_lf_normalized)
+        except vimlparser.VimLParserException:
+            pprint(decoder.debug_hint)
+            raise
 
     def parse_redir(self, redir_cmd):
         # type: (Dict[str, any]) -> Dict[str, any] | None
