@@ -122,7 +122,7 @@ class DecodingStrategyForUTF8(DecodingStrategy):
             debug_hint['utf-8'] = 'success'
             return string
 
-        except RuntimeError as e:
+        except Exception as e:
             debug_hint['utf-8'] = 'failed: {}'.format(str(e))
 
             return None
