@@ -177,18 +177,26 @@ class DecodingStrategyByScriptencoding(DecodingStrategy):
                     encoding_part_end_index_candidate_by_comment = bytes_seq.index(
                         COMMENT_START_TOKEN, encoding_part_start_index)
 
-                    # Case for :scriptencoding foo "foo
+                    # Case for :scriptencoding foo "foo\n
                     encoding_part_end_index = min(
                         encoding_part_end_index_candidate_by_line_break,
                         encoding_part_end_index_candidate_by_comment
                     )
 
                 except ValueError:
-                    # Case for :scriptencoding foo
+                    # Case for :scriptencoding foo\n
                     encoding_part_end_index = encoding_part_end_index_candidate_by_line_break
 
             except ValueError:
-                encoding_part_end_index = len(bytes_seq) - 1
+                try:
+                    # Case for :scriptencoding foo "foo<EOF>
+                    encoding_part_end_index_candidate_by_comment = bytes_seq.index(
+                        COMMENT_START_TOKEN, encoding_part_start_index)
+                    encoding_part_end_index = encoding_part_end_index_candidate_by_comment
+
+                except ValueError:
+                    encoding_part_end_index = len(bytes_seq) - 1
+                # Case for :scriptencoding foo<EOF>
 
             encoding_part_candidate = bytes_seq[encoding_part_start_index:encoding_part_end_index]
             return encoding_part_candidate.strip()
