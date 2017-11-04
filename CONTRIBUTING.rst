@@ -104,7 +104,7 @@ How to Add New Policy
 
    ::
 
-       $ pyenv local 2.7.8 3.4.1 pypy-2.4.0
+       $ pyenv local 2.7.8 3.4.1
        $ tox
 
    If you want to test by py.test, you should add ``vint/bin`` to
