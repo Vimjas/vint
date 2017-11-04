@@ -3,12 +3,11 @@ import sys
 from typing import Optional, Dict
 from pprint import pformat
 from pathlib import Path
-from vint.compat.bytes import bytes_compat
 
 
-SCRIPTENCODING_PREFIX = bytes_compat('scriptencoding', encoding='ascii')
-COMMENT_START_TOKEN = bytes_compat('"', encoding='ascii')
-LF = bytes_compat("\n", encoding='ascii')
+SCRIPTENCODING_PREFIX = bytearray('scriptencoding', encoding='ascii')
+COMMENT_START_TOKEN = bytearray('"', encoding='ascii')
+LF = bytearray("\n", encoding='ascii')
 
 
 
@@ -67,7 +66,7 @@ class ComposedDecodingStrategy(DecodingStrategy):
             if string_candidate is None:
                 continue
 
-            debug_hint['composed_selected_strategy'] = type(strategy).__name__
+            debug_hint['selected_strategy'] = type(strategy).__name__
 
             return string_candidate
 
