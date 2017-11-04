@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
 from argparse import ArgumentParser
@@ -6,7 +6,7 @@ from pathlib import Path
 from pprint import pprint
 
 vint_root = Path(__file__).resolve().parent.parent
-sys.path.append(str(vint_root))
+sys.path.insert(0, str(vint_root))
 
 from vint.ast.node_type import NodeType
 from vint.ast.traversing import traverse
