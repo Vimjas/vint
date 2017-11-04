@@ -133,7 +133,7 @@ class DecodingStrategyByScriptencoding(DecodingStrategy):
 
 
     @classmethod
-    def parse_script_encoding(self, bytes_seq, debug_hint):
+    def parse_script_encoding(cls, bytes_seq, debug_hint):
         # type: (bytes, Dict[str, str]) -> Optional[bytes]
         try:
             start_index = bytes_seq.index(SCRIPTENCODING_PREFIX)
