@@ -1,6 +1,4 @@
-from typing import Dict
-
-BuiltinIdentifierMap = {  # type: Dict[str, bool]
+BuiltinIdentifierMap = {
     'abs': True,
     'acos': True,
     'add': True,

@@ -15,8 +15,8 @@ class Parser(object):
         self.plugins = plugins.values() if plugins else []
         self._enable_neovim = enable_neovim
 
+
     def parse(self, string):
-        # type: (str) -> Dict[str, Any]
         """ Parse vim script string and return the AST. """
         lines = string.split('\n')
 
@@ -32,8 +32,8 @@ class Parser(object):
 
         return ast
 
+
     def parse_file(self, file_path):
-        # type: (Path) -> Dict[str, Any]
         """ Parse vim script file and return the AST. """
         decoder = Decoder(Decoder.default_strategy())
         decoded = decoder.read(file_path)
@@ -45,8 +45,8 @@ class Parser(object):
             pprint(decoder.debug_hint)
             raise
 
+
     def parse_redir(self, redir_cmd):
-        # type: (Dict[str, any]) -> Dict[str, any] | None
         """ Parse a command :redir content. """
         redir_cmd_str = redir_cmd['str']
 
@@ -87,8 +87,8 @@ class Parser(object):
 
         return None
 
+
     def parse_string_expr(self, string_expr_node):
-        # type: (Dict[str, any]) -> Dict[str, any]
         """ Parse a command :redir content. """
         string_expr_node_value = string_expr_node['value']
         string_expr_str = string_expr_node_value[1:-1]
