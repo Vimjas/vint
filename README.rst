@@ -4,7 +4,7 @@
 ----
 
 |Development Status| |Latest Version| |Supported Python versions|
-|Supported Python implementations| |Build Status| |Copr Status|
+|Supported Python implementations| |Build Status|
 
 Vint is a Vim script Language Lint. The goal to reach for Vint is:
 
@@ -174,8 +174,6 @@ Acknowledgement
    :target: https://pypi.python.org/pypi/vim-vint/
 .. |Build Status| image:: https://travis-ci.org/Kuniwak/vint.svg?branch=master
    :target: https://travis-ci.org/Kuniwak/vint
-.. |Copr Status| image:: https://copr.fedorainfracloud.org/coprs/fszymanski/vint/package/vint/status_image/last_build.png
-   :target: https://copr.fedorainfracloud.org/coprs/fszymanski/vint/
 .. |Coverage Status| image:: https://img.shields.io/coveralls/Kuniwak/vint.svg
    :target: https://coveralls.io/r/Kuniwak/vint
 .. |Code Health| image:: https://landscape.io/github/Kuniwak/vint/master/landscape.png
