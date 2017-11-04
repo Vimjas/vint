@@ -1,5 +1,8 @@
+from typing import Dict
+
+
 # See :help option-summary
-Abbreviations = {
+Abbreviations = {  # type: Dict[str, str]
     'acd': 'autochdir',
     'ai': 'autoindent',
     'akm': 'altkeymap',
