@@ -1,6 +1,6 @@
 import chardet
 import sys
-from typing import Optional, Dict
+from typing import Optional, Dict, Any
 from pprint import pformat
 from pathlib import Path
 
@@ -25,8 +25,11 @@ class Decoder(object):
             bytes_seq = f.read()
             strings = []
 
-            for hunk in split_by_scriptencoding(bytes_seq, self.debug_hint):
-                string = self.strategy.decode(hunk, debug_hint=self.debug_hint)
+            for (loc, hunk) in split_by_scriptencoding(bytes_seq):
+                debug_hint_for_the_loc = dict()
+                self.debug_hint[loc] = debug_hint_for_the_loc
+
+                string = self.strategy.decode(hunk, debug_hint=debug_hint_for_the_loc)
 
                 if string is None:
                     raise EncodingDetectionError(self.debug_hint)
@@ -47,12 +50,11 @@ class Decoder(object):
         ])
 
 
-def split_by_scriptencoding(bytes_seq, debug_hint):
-    # type: (bytes, Dict[str, str]) -> [bytes]
+def split_by_scriptencoding(bytes_seq):
+    # type: (bytes, Dict[str, str]) -> [(str, bytes)]
     max_end_index = len(bytes_seq) - 1
     start_index = 0
-    bytes_seq_list = []
-    debug_hint_of_boundaries = []
+    bytes_seq_and_loc_list = []
 
     while True:
         end_index = bytes_seq.find(SCRIPTENCODING_PREFIX, start_index + 1)
@@ -60,15 +62,16 @@ def split_by_scriptencoding(bytes_seq, debug_hint):
         if end_index < 0:
             end_index = max_end_index
 
-        bytes_seq_list.append(bytes_seq[start_index:end_index])
-        debug_hint_of_boundaries.append('{start}:{end}'.format(start=start_index, end=end_index))
+        bytes_seq_and_loc_list.append((
+            "{start_index}:{end_index}".format(start_index=start_index, end_index=end_index),
+            bytes_seq[start_index:end_index]
+        ))
 
         if end_index < max_end_index:
             start_index = end_index
             continue
 
-        debug_hint['scriptencoding_boundaries'] = ', '.join(debug_hint_of_boundaries)
-        return bytes_seq_list
+        return bytes_seq_and_loc_list
 
 
 class DecodingStrategy(object):
@@ -84,7 +87,7 @@ class ComposedDecodingStrategy(DecodingStrategy):
 
 
     def decode(self, bytes_seq, debug_hint):
-        # type: (bytes, Dict[str, str]) -> Optional[str]
+        # type: (bytes, Dict[str, Any]) -> Optional[str]
 
         debug_hint['composed_strategies'] = [type(strategy).__name__ for strategy in self.strategies]
 
@@ -101,7 +104,7 @@ class ComposedDecodingStrategy(DecodingStrategy):
 
 class DecodingStrategyForEmpty(DecodingStrategy):
     def decode(self, bytes_seq, debug_hint):
-        # type: (bytes, Dict[str, str]) -> Optional[str]
+        # type: (bytes, Dict[str, Any]) -> Optional[str]
         if len(bytes_seq) <= 0:
             debug_hint['empty'] = 'true'
             return ''
@@ -112,7 +115,7 @@ class DecodingStrategyForEmpty(DecodingStrategy):
 
 class DecodingStrategyForUTF8(DecodingStrategy):
     def decode(self, bytes_seq, debug_hint):
-        # type: (bytes, Dict[str, str]) -> Optional[str]
+        # type: (bytes, Dict[str, Any]) -> Optional[str]
         try:
             string = bytes_seq.decode('utf8')
 
@@ -127,7 +130,7 @@ class DecodingStrategyForUTF8(DecodingStrategy):
 
 class DecodingStrategyByChardet(DecodingStrategy):
     def decode(self, bytes_seq, debug_hint):
-        # type: (bytes, Dict[str, str]) -> Optional[str]
+        # type: (bytes, Dict[str, Any]) -> Optional[str]
         encoding_hint = chardet.detect(bytearray(bytes_seq))
         encoding = encoding_hint['encoding']
 
@@ -144,7 +147,7 @@ class DecodingStrategyByChardet(DecodingStrategy):
 
 class DecodingStrategyByScriptencoding(DecodingStrategy):
     def decode(self, bytes_seq, debug_hint):
-        # type: (bytes, Dict[str, str]) -> Optional[str]
+        # type: (bytes, Dict[str, Any]) -> Optional[str]
         encoding_part = DecodingStrategyByScriptencoding.parse_script_encoding(bytes_seq, debug_hint)
 
         if encoding_part is None:
@@ -162,7 +165,7 @@ class DecodingStrategyByScriptencoding(DecodingStrategy):
 
     @classmethod
     def parse_script_encoding(cls, bytes_seq, debug_hint):
-        # type: (bytes, Dict[str, str]) -> Optional[bytes]
+        # type: (bytes, Dict[str, Any]) -> Optional[bytes]
         try:
             start_index = bytes_seq.index(SCRIPTENCODING_PREFIX)
             encoding_part_start_index = start_index + len(SCRIPTENCODING_PREFIX)
@@ -199,7 +202,7 @@ class DecodingStrategyByScriptencoding(DecodingStrategy):
 
 class EncodingDetectionError(Exception):
     def __init__(self, debug_hint):
-        # type: (Dict[str, str]) -> None
+        # type: (Dict[str, Any]) -> None
         self.debug_hint = debug_hint
 
 
