@@ -1,9 +1,7 @@
 import re
 from vint._bundles import vimlparser
 from vint.ast.traversing import traverse
-from vint.encodings.decoder import Decoder
-from typing import Dict, Any
-from pathlib import Path
+from vint.encodings.decoder import Decoder, default_decoding_strategy
 from pprint import pprint
 
 
@@ -35,7 +33,7 @@ class Parser(object):
 
     def parse_file(self, file_path):
         """ Parse vim script file and return the AST. """
-        decoder = Decoder(Decoder.default_strategy())
+        decoder = Decoder(default_decoding_strategy)
         decoded = decoder.read(file_path)
         decoded_and_lf_normalized = decoded.replace('\r\n', '\n')
 
