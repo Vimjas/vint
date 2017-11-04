@@ -52,7 +52,7 @@ class Decoder(object):
 
 def split_by_scriptencoding(bytes_seq):
     # type: (bytes, Dict[str, str]) -> [(str, bytes)]
-    max_end_index = len(bytes_seq) - 1
+    max_end_index = len(bytes_seq)
     start_index = 0
     bytes_seq_and_loc_list = []
 
