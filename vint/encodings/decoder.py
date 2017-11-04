@@ -139,17 +139,12 @@ class DecodingStrategyByScriptencoding(DecodingStrategy):
             start_index = bytes_seq.index(SCRIPTENCODING_PREFIX)
             encoding_part_start_index = start_index + len(SCRIPTENCODING_PREFIX)
 
-            print("start_index={}".format(start_index))
-            print("encoding_part_start_index={}".format(encoding_part_start_index))
-
             try:
                 encoding_part_end_index_candidate_by_line_break = bytes_seq.index(LF, encoding_part_start_index)
-                print("encoding_part_end_index_candidate_by_line_break={}".format(encoding_part_end_index_candidate_by_line_break))
 
                 try:
                     encoding_part_end_index_candidate_by_comment = bytes_seq.index(
                         COMMENT_START_TOKEN, encoding_part_start_index)
-                    print("encoding_part_end_index_candidate_by_comment={}".format(encoding_part_end_index_candidate_by_comment))
 
                     # Case for :scriptencoding foo "foo
                     encoding_part_end_index = min(
