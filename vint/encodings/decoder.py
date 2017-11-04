@@ -157,8 +157,7 @@ class DecodingStrategyByScriptencoding(DecodingStrategy):
                     encoding_part_end_index = encoding_part_end_index_candidate_by_line_break
 
             except ValueError:
-                debug_hint['scriptencoding_error'] = '`scriptencoding` is found, but end token is not found'
-                return None
+                encoding_part_end_index = len(bytes_seq) - 1
 
             encoding_part_candidate = bytes_seq[encoding_part_start_index:encoding_part_end_index]
             return encoding_part_candidate.strip()
