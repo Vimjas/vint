@@ -1,18 +1,8 @@
-import chardet
 import re
 from vint._bundles import vimlparser
 from vint.ast.traversing import traverse
 from typing import Dict, Any
 from pathlib import Path
-
-
-class EncodingDetectionError(Exception):
-    def __init__(self, file_path):
-        self.file_path = file_path
-
-    def __str__(self):
-        return 'Cannot detect encoding (binary file?): {file_path}'.format(
-            file_path=str(self.file_path))
 
 
 class Parser(object):
