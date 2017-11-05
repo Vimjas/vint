@@ -1,10 +1,66 @@
+import chardet
 from typing import Optional, Dict, Any
-from vint.encodings.decoding_strategy.abstract_strategy import DecodingStrategy
 
 
 SCRIPTENCODING_PREFIX = bytearray('scriptencoding', encoding='ascii')
 COMMENT_START_TOKEN = bytearray('"', encoding='ascii')
 LF = bytearray("\n", encoding='ascii')
+
+
+class DecodingStrategy(object):
+    def decode(self, bytes_seq, debug_hint):
+        # type: (bytes, Dict[str, str]) -> Optional[str]
+        raise NotImplementedError
+
+
+class DecodingStrategyByChardet(DecodingStrategy):
+    def decode(self, bytes_seq, debug_hint):
+        # type: (bytes, Dict[str, Any]) -> Optional[str]
+        encoding_hint = chardet.detect(bytearray(bytes_seq))
+        encoding = encoding_hint['encoding']
+
+        debug_hint['chardet_encoding'] = encoding_hint['encoding']
+        debug_hint['chardet_confidence'] = encoding_hint['confidence']
+
+        try:
+            return bytes_seq.decode(encoding)
+
+        except Exception as e:
+            debug_hint['chardet_error'] = str(e)
+            return None
+
+
+class ComposedDecodingStrategy(DecodingStrategy):
+    def __init__(self, strategies):
+        # type: ([DecodingStrategy]) -> None
+        self.strategies = strategies
+
+
+    def decode(self, bytes_seq, debug_hint):
+        # type: (bytes, Dict[str, Any]) -> Optional[str]
+
+        debug_hint['composed_strategies'] = [type(strategy).__name__ for strategy in self.strategies]
+
+        for strategy in self.strategies:
+            string_candidate = strategy.decode(bytes_seq, debug_hint)
+
+            if string_candidate is None:
+                continue
+
+            debug_hint['selected_strategy'] = type(strategy).__name__
+
+            return string_candidate
+
+
+class DecodingStrategyForEmpty(DecodingStrategy):
+    def decode(self, bytes_seq, debug_hint):
+        # type: (bytes, Dict[str, Any]) -> Optional[str]
+        if len(bytes_seq) <= 0:
+            debug_hint['empty'] = 'true'
+            return ''
+
+        debug_hint['empty'] = 'false'
+        return None
 
 
 class DecodingStrategyByScriptencoding(DecodingStrategy):
@@ -66,3 +122,26 @@ class DecodingStrategyByScriptencoding(DecodingStrategy):
         except ValueError:
             debug_hint['scriptencoding_error'] = '`scriptencoding` is not found'
             return None
+
+
+class DecodingStrategyForUTF8(DecodingStrategy):
+    def decode(self, bytes_seq, debug_hint):
+        # type: (bytes, Dict[str, Any]) -> Optional[str]
+        try:
+            string = bytes_seq.decode('utf8')
+
+            debug_hint['utf-8'] = 'success'
+            return string
+
+        except Exception as e:
+            debug_hint['utf-8'] = 'failed: {}'.format(str(e))
+
+            return None
+
+
+default_decoding_strategy = ComposedDecodingStrategy([
+    DecodingStrategyForEmpty(),
+    DecodingStrategyByScriptencoding(),
+    DecodingStrategyForUTF8(),
+    DecodingStrategyByChardet(),
+])

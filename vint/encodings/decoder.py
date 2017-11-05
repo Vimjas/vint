@@ -2,12 +2,7 @@ import sys
 from typing import Dict, Any
 from pprint import pformat
 from pathlib import Path
-from vint.encodings.decoding_strategy.abstract_strategy import DecodingStrategy
-from vint.encodings.decoding_strategy.scriptencoding_strategy import DecodingStrategyByScriptencoding
-from vint.encodings.decoding_strategy.utf8_strategy import DecodingStrategyForUTF8
-from vint.encodings.decoding_strategy.composed_strategy import ComposedDecodingStrategy
-from vint.encodings.decoding_strategy.empty_strategy import DecodingStrategyForEmpty
-from vint.encodings.decoding_strategy.chardet_strategy import DecodingStrategyByChardet
+from vint.encodings.decoding_strategy import DecodingStrategy
 
 
 SCRIPTENCODING_PREFIX = bytearray('scriptencoding', encoding='ascii')
@@ -40,14 +35,6 @@ class Decoder(object):
                 strings.append(string)
 
             return ''.join(strings)
-
-
-default_decoding_strategy = ComposedDecodingStrategy([
-    DecodingStrategyForEmpty(),
-    DecodingStrategyByScriptencoding(),
-    DecodingStrategyForUTF8(),
-    DecodingStrategyByChardet(),
-])
 
 
 def _split_by_scriptencoding(bytes_seq):

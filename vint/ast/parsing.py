@@ -1,7 +1,8 @@
 import re
 from vint._bundles import vimlparser
 from vint.ast.traversing import traverse
-from vint.encodings.decoder import Decoder, default_decoding_strategy
+from vint.encodings.decoder import Decoder
+from vint.encodings.decoding_strategy import default_decoding_strategy
 from pprint import pprint
 
 
