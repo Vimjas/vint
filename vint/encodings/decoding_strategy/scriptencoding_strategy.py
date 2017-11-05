@@ -57,8 +57,8 @@ class DecodingStrategyByScriptencoding(DecodingStrategy):
                     encoding_part_end_index = encoding_part_end_index_candidate_by_comment
 
                 except ValueError:
-                    encoding_part_end_index = len(bytes_seq) - 1
                     # Case for :scriptencoding foo<EOF>
+                    encoding_part_end_index = len(bytes_seq) - 1
 
             encoding_part_candidate = bytes_seq[encoding_part_start_index:encoding_part_end_index]
             return encoding_part_candidate.strip()
