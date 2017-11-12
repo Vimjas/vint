@@ -36,13 +36,20 @@ def parse_autocmd(autocmd_node):
         'pat': None,
         'nested': False,
         'cmd': None,
+        'bang': False
     }
 
+    # type: str
     autocmd_str = autocmd_node.get('str')
 
     # This tokens may be broken, because the cmd part can have
     # whitespaces.
+    # type: [str]
     tokens = autocmd_str.split(None, 2)
+
+    if len(tokens) > 0:
+        autocmd_info['bang'] = tokens[0].endswith('!')
+
     if len(tokens) == 1:
         # Examples:
         #   :au[tocmd][!]
@@ -167,12 +174,3 @@ def _parse_events(token):
 
 def is_autocmd_event_like(token):
     return all([is_autocmd_event(part) for part in token.split(',')])
-
-
-@register_traverser_extension
-def traverse_autocmd(node, on_enter=None, on_leave=None):
-    autocmd_content = get_autocmd_content(node)
-    if autocmd_content is None:
-        return
-
-    traverse(autocmd_content, on_enter=on_enter, on_leave=on_leave)

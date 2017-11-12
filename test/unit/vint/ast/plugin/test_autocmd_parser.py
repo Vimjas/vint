@@ -20,6 +20,7 @@ class TestAutocmdParser(unittest.TestCase):
                 'pat': None,
                 'nested': False,
                 'cmd': None,
+                'bang': False,
             }),
             (create_autocmd_node('autocmd!'), {
                 'group': None,
@@ -27,6 +28,7 @@ class TestAutocmdParser(unittest.TestCase):
                 'pat': None,
                 'nested': False,
                 'cmd': None,
+                'bang': True,
             }),
             (create_autocmd_node('autocmd FileType'), {
                 'group': None,
@@ -34,6 +36,7 @@ class TestAutocmdParser(unittest.TestCase):
                 'pat': None,
                 'nested': False,
                 'cmd': None,
+                'bang': False,
             }),
             (create_autocmd_node('autocmd BufNew,BufRead'), {
                 'group': None,
@@ -41,6 +44,7 @@ class TestAutocmdParser(unittest.TestCase):
                 'pat': None,
                 'nested': False,
                 'cmd': None,
+                'bang': False,
             }),
             (create_autocmd_node('autocmd! FileType'), {
                 'group': None,
@@ -48,6 +52,7 @@ class TestAutocmdParser(unittest.TestCase):
                 'pat': None,
                 'nested': False,
                 'cmd': None,
+                'bang': True,
             }),
             (create_autocmd_node('autocmd FileType *'), {
                 'group': None,
@@ -55,6 +60,7 @@ class TestAutocmdParser(unittest.TestCase):
                 'pat': '*',
                 'nested': False,
                 'cmd': None,
+                'bang': False,
             }),
             (create_autocmd_node('autocmd! FileType *'), {
                 'group': None,
@@ -62,6 +68,7 @@ class TestAutocmdParser(unittest.TestCase):
                 'pat': '*',
                 'nested': False,
                 'cmd': None,
+                'bang': True,
             }),
             (create_autocmd_node('autocmd FileType * nested :echo'), {
                 'group': None,
@@ -69,6 +76,7 @@ class TestAutocmdParser(unittest.TestCase):
                 'pat': '*',
                 'nested': True,
                 'cmd': create_echo_cmd_node(),
+                'bang': False,
             }),
             (create_autocmd_node('autocmd! FileType * nested :echo'), {
                 'group': None,
@@ -76,6 +84,7 @@ class TestAutocmdParser(unittest.TestCase):
                 'pat': '*',
                 'nested': True,
                 'cmd': create_echo_cmd_node(),
+                'bang': True,
             }),
             (create_autocmd_node('autocmd Group'), {
                 'group': 'Group',
@@ -83,6 +92,7 @@ class TestAutocmdParser(unittest.TestCase):
                 'pat': None,
                 'nested': False,
                 'cmd': None,
+                'bang': False,
             }),
             (create_autocmd_node('autocmd! Group'), {
                 'group': 'Group',
@@ -90,6 +100,7 @@ class TestAutocmdParser(unittest.TestCase):
                 'pat': None,
                 'nested': False,
                 'cmd': None,
+                'bang': True,
             }),
             (create_autocmd_node('autocmd Group *'), {
                 'group': 'Group',
@@ -97,6 +108,7 @@ class TestAutocmdParser(unittest.TestCase):
                 'pat': None,
                 'nested': False,
                 'cmd': None,
+                'bang': False,
             }),
             (create_autocmd_node('autocmd! Group *'), {
                 'group': 'Group',
@@ -104,6 +116,7 @@ class TestAutocmdParser(unittest.TestCase):
                 'pat': None,
                 'nested': False,
                 'cmd': None,
+                'bang': True,
             }),
             (create_autocmd_node('autocmd Group FileType'), {
                 'group': 'Group',
@@ -111,6 +124,7 @@ class TestAutocmdParser(unittest.TestCase):
                 'pat': None,
                 'nested': False,
                 'cmd': None,
+                'bang': False,
             }),
             (create_autocmd_node('autocmd! Group FileType'), {
                 'group': 'Group',
@@ -118,6 +132,7 @@ class TestAutocmdParser(unittest.TestCase):
                 'pat': None,
                 'nested': False,
                 'cmd': None,
+                'bang': True,
             }),
             (create_autocmd_node('autocmd Group FileType *'), {
                 'group': 'Group',
@@ -125,6 +140,7 @@ class TestAutocmdParser(unittest.TestCase):
                 'pat': '*',
                 'nested': False,
                 'cmd': None,
+                'bang': False,
             }),
             (create_autocmd_node('autocmd! Group FileType *'), {
                 'group': 'Group',
@@ -132,6 +148,7 @@ class TestAutocmdParser(unittest.TestCase):
                 'pat': '*',
                 'nested': False,
                 'cmd': None,
+                'bang': True,
             }),
             (create_autocmd_node('autocmd Group FileType * nested :echo'), {
                 'group': 'Group',
@@ -139,6 +156,7 @@ class TestAutocmdParser(unittest.TestCase):
                 'pat': '*',
                 'nested': True,
                 'cmd': create_echo_cmd_node(),
+                'bang': False,
             }),
             (create_autocmd_node('autocmd! Group FileType * nested :echo'), {
                 'group': 'Group',
@@ -146,6 +164,7 @@ class TestAutocmdParser(unittest.TestCase):
                 'pat': '*',
                 'nested': True,
                 'cmd': create_echo_cmd_node(),
+                'bang': True,
             }),
         ]
 

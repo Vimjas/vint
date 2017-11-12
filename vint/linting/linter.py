@@ -7,6 +7,7 @@ from vint.ast.parsing import Parser
 from vint.ast.node_type import NodeType
 from vint.ast.traversing import traverse
 from vint.ast.plugin.scope_plugin import ScopePlugin
+from vint.ast.plugin.autocmd_parser import AutocmdParser
 from vint.linting.config.config_container import ConfigContainer
 from vint.linting.config.config_dict_source import ConfigDictSource
 from vint.linting.config.config_comment_source import ConfigCommentSource
@@ -32,6 +33,7 @@ class Linter(object):
     def __init__(self, policy_set, config_dict_global):
         self._plugins = {
             'scope': ScopePlugin(),
+            'autocmd': AutocmdParser(),
         }
         self._policy_set = policy_set
 
