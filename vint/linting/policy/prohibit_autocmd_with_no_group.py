@@ -3,7 +3,7 @@ from vint.ast.node_type import NodeType
 from vint.linting.level import Level
 from vint.linting.policy.abstract_policy import AbstractPolicy
 from vint.linting.policy_registry import register_policy
-from vint.ast.dictionary.autocmd_events import AutoCmdEvents
+from vint.ast.dictionary.autocmd_events import AutocmdEvents
 
 
 @register_policy
@@ -38,7 +38,7 @@ class ProhibitAutocmdWithNoGroup(AbstractPolicy):
                 # Looks like autocmd with a bang
                 return True
 
-            has_no_group = matched.group(1) in AutoCmdEvents
+            has_no_group = matched.group(1) in AutocmdEvents
             return not has_no_group
 
         is_augroup = cmd_name == 'augroup'
