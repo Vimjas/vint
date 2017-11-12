@@ -1,5 +1,5 @@
 import unittest
-from compat.unittest import mock
+from vint.compat.unittest import mock
 import enum
 from pathlib import Path
 

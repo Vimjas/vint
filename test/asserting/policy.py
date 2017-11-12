@@ -65,7 +65,7 @@ class PolicyAssertion(unittest.TestCase):
         violations = linter.lint_file(path)
 
         pprint(violations)
-        assert len(violations) == len(expected_violations)
+        self.assertEqual(len(violations), len(expected_violations))
 
         for violation, expected_violation in zip_longest(violations, expected_violations):
             self.assertViolation(violation, expected_violation)
@@ -77,9 +77,9 @@ class PolicyAssertion(unittest.TestCase):
 
         pprint(actual_violation)
 
-        assert actual_violation['name'] == expected_violation['name']
-        assert actual_violation['position'] == expected_violation['position']
-        assert actual_violation['level'] == expected_violation['level']
+        self.assertEqual(actual_violation['name'], expected_violation['name'], 'name')
+        self.assertEqual(actual_violation['position'], expected_violation['position'], 'position')
+        self.assertEqual(actual_violation['level'], expected_violation['level'], 'level')
 
         self.assertIsInstance(actual_violation['description'], str)
 
