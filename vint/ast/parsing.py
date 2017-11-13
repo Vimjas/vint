@@ -3,7 +3,6 @@ from vint._bundles import vimlparser
 from vint.ast.traversing import traverse
 from vint.encodings.decoder import Decoder
 from vint.encodings.decoding_strategy import default_decoding_strategy
-from pprint import pprint
 
 
 class Parser(object):
@@ -38,11 +37,7 @@ class Parser(object):
         decoded = decoder.read(file_path)
         decoded_and_lf_normalized = decoded.replace('\r\n', '\n')
 
-        try:
-            return self.parse(decoded_and_lf_normalized)
-        except vimlparser.VimLParserException:
-            pprint(decoder.debug_hint)
-            raise
+        return self.parse(decoded_and_lf_normalized)
 
 
     def parse_redir(self, redir_cmd):
