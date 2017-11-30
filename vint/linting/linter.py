@@ -72,7 +72,7 @@ class Linter(object):
             'name': 'SyntaxError',
             'level': Level.ERROR,
             'description': parser_error['description'],
-            'reference': 'ynkdir/vim-vimlparser',
+            'reference': 'vim-jp/vim-vimlparser',
             'position': {
                 'line': int(parser_error['line_number']),
                 'column': int(parser_error['column_number']),

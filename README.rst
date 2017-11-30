@@ -158,7 +158,7 @@ License
 Acknowledgement
 ---------------
 
--  `ynkdir/vim-vimlparser <https://github.com/ynkdir/vim-vimlparser>`__
+-  `vim-jp/vim-vimlparser <https://github.com/vim-jp/vim-vimlparser>`__
 -  `Google Vimscript Style
    Guide <https://google.github.io/styleguide/vimscriptguide.xml>`__
 -  `Anti-pattern of
