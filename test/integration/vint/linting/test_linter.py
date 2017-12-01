@@ -154,7 +154,7 @@ class TestLinterIntegral(unittest.TestCase):
                 'name': 'SyntaxError',
                 'level': Level.ERROR,
                 'description': 'unexpected token: ==',
-                'reference': 'ynkdir/vim-vimlparser',
+                'reference': 'vim-jp/vim-vimlparser',
                 'position': {
                     'line': 1,
                     'column': 6,
