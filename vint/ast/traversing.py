@@ -77,7 +77,7 @@ ChildType = {
     },
     'ELSE': {
         'accessor': ChildNodeAccessor['NODE'],
-        'property_name': '_else',
+        'property_name': 'else_',
     },
     'ENDIF': {
         'accessor': ChildNodeAccessor['NODE'],
@@ -97,7 +97,7 @@ ChildType = {
     },
     'FINALLY': {
         'accessor': ChildNodeAccessor['NODE'],
-        'property_name': '_finally',
+        'property_name': 'finally_',
     },
     'ENDTRY': {
         'accessor': ChildNodeAccessor['NODE'],
