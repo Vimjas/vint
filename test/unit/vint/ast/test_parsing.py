@@ -49,6 +49,7 @@ class TestParser(unittest.TestCase):
             'col': 8,
             'i': 7,
             'lnum': 1,
+            'offset': 5
         }
         expected_node_type = NodeType.IDENTIFIER
 
@@ -71,6 +72,7 @@ class TestParser(unittest.TestCase):
             'col': 16,
             'i': 15,
             'lnum': 1,
+            'offset': 11,
         }
         expected_node_type = NodeType.DOT
 
@@ -91,6 +93,7 @@ class TestParser(unittest.TestCase):
             'col': 7,
             'i': 7,
             'lnum': 1,
+            'offset': 11,
         }
         expected_node_type = NodeType.EQUALCS
 
