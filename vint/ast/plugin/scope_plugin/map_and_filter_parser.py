@@ -30,7 +30,13 @@ class MapAndFilterParser(object):
             if not is_map_or_function_call:
                 return
 
-            string_expr_node = node['rlist'][1]
+            args = node['rlist']
+
+            # Prevent crash. See https://github.com/Kuniwak/vint/issues/256.
+            if len(args) < 2:
+                return
+
+            string_expr_node = args[1]
 
             # We can analyze only STRING nodes by static analyzing.
             if NodeType(string_expr_node['type']) is not NodeType.STRING:
