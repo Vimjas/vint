@@ -30,9 +30,6 @@ class MapAndFilterParser(object):
             if not is_map_or_function_call:
                 return
 
-            import pprint
-            pprint.pprint(node)
-
             args = node['rlist']
 
             # Prevent crash. See https://github.com/Kuniwak/vint/issues/256.
