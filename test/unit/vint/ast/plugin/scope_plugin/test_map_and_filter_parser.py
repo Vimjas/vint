@@ -16,8 +16,8 @@ FIXTURE_BASE_PATH = Path('test', 'fixture', 'ast', 'scope_plugin')
 
 
 class Fixtures(enum.Enum):
-    MAP_AND_FILTER_VARIABLE = Path(FIXTURE_BASE_PATH,
-                                   'fixture_to_scope_plugin_map_and_filter.vim')
+    MAP_AND_FILTER_VARIABLE = Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_map_and_filter.vim')
+    ISSUE_256 = Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_issue_256.vim')
 
 
 class TestMapAndFilterParser(unittest.TestCase):
@@ -65,6 +65,13 @@ class TestMapAndFilterParser(unittest.TestCase):
 
         self.assertTrue(all(is_map_and_filter_content_visited.values()))
 
+
+    def test_issue_256(self):
+        ast = self.create_ast(Fixtures.ISSUE_256)
+        parser = MapAndFilterParser()
+        got_ast = parser.process(ast)
+
+        self.assertIsNotNone(got_ast)
 
 
 if __name__ == '__main__':
