@@ -20,3 +20,4 @@ echo "'"
 
 " String literal should not be prohibited
 echo map([], '""')
+echo map([], 'map(v:val, "x")')
