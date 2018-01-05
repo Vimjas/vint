@@ -55,9 +55,12 @@ class MapAndFilterParser(object):
         string_expr_content_nodes = parser.parse_string_expr(string_expr_node)
 
         def enter_handler(node):
-            node[STRING_EXPR_CONTEXT] = {
-                'is_on_str_expr_context': True,
-            }
+            # NOTE: We need this flag only string nodes, because this flag is only for
+            # ProhibitUnnecessaryDoubleQuote.
+            if NodeType(node['type']) is NodeType.STRING:
+                node[STRING_EXPR_CONTEXT] = {
+                    'is_on_str_expr_context': True,
+                }
 
         for string_expr_content_node in string_expr_content_nodes:
             traverse(string_expr_content_node, on_enter=enter_handler)
