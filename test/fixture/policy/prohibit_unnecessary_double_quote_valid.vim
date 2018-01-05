@@ -17,3 +17,6 @@ echo "\<xxx>"
 
 " Double quote literal should not be prohibited too
 echo "'"
+
+" String literal should not be prohibited
+echo map([], '""')
