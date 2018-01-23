@@ -19,7 +19,7 @@ class TestVintDoNotDiedWhenLintingVital(unittest.TestCase):
 
     def test_survive_after_linting(self):
         vital_dir = str(Path('test', 'fixture', 'cli', 'vital.vim'))
-        cmd = ['vint', vital_dir]
+        cmd = ['bin/vint', vital_dir]
 
         self.assertVintStillAlive(cmd)
 
