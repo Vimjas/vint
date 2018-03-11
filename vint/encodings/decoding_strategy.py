@@ -86,6 +86,11 @@ class DecodingStrategyByScriptencoding(DecodingStrategy):
         # type: (bytes, Dict[str, Any]) -> Optional[bytes]
         try:
             start_index = bytes_seq.index(SCRIPTENCODING_PREFIX)
+
+            if start_index != 0:
+                debug_hint['scriptencoding_error'] = '`scriptencoding` is comment or string'
+                return None
+
             encoding_part_start_index = start_index + len(SCRIPTENCODING_PREFIX)
 
             try:
