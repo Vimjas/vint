@@ -32,22 +32,16 @@ class ProhibitUnusedVariable(AbstractPolicy):
         """
 
         scope_plugin = lint_context['plugins']['scope']
-        is_used = not scope_plugin.is_unused_declarative_identifier(identifier)
-
-        scope_visibility = scope_plugin.get_objective_scope_visibility(identifier)
-        is_global = scope_visibility is ScopeVisibility.GLOBAL_LIKE
-        is_builtin = scope_visibility is ScopeVisibility.BUILTIN
-        is_unanalyzable = scope_visibility is ScopeVisibility.UNANALYZABLE
+        if not scope_plugin.is_unused_declarative_identifier(identifier):
+            return True
 
         # Ignore global like variables.
-        is_valid = is_used or is_global or is_builtin or is_unanalyzable
+        scope_visibility = scope_plugin.get_objective_scope_visibility(identifier)
+        if (scope_visibility is ScopeVisibility.GLOBAL_LIKE or
+                scope_visibility is ScopeVisibility.BUILTIN or
+                scope_visibility is ScopeVisibility.UNANALYZABLE):
+            return True
 
-        if not is_valid:
-            self._make_description(identifier)
-
-        return is_valid
-
-
-    def _make_description(self, identifier):
         self.description = 'Unused variable: {var_name}'.format(
             var_name=identifier['value'])
+        return False
