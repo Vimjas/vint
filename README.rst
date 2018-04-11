@@ -48,6 +48,9 @@ Vint will read config files on the following priority order:
 
 You can see all options on `Wiki <https://github.com/Kuniwak/vint/wiki/Config>`__.
 
+The default configuration is defined in
+`default_config.yaml <vint/asset/default_config.yaml>`_.
+
 
 User config
 ~~~~~~~~~~~
