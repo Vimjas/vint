@@ -31,7 +31,7 @@ class TestPolicySet(TestCase):
             actual_enabled_policy_classes[actual_enabled_policy.__class__] = True
 
         pprint(actual_enabled_policy_classes)
-        assert all(actual_enabled_policy_classes.values())
+        self.assertTrue(all(actual_enabled_policy_classes.values()))
 
 
     def test_get_enabled_policies_with_a_disabled_option(self):

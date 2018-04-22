@@ -1,6 +1,16 @@
 from enum import Enum, unique
 
 
+def get_node_type(node):
+    """ Returns a node type of the specified node. """
+    return NodeType(node['type'])
+
+
+def is_node_type_of(node_type, node):
+    """ Whether the specified type is the node type of the node. """
+    return get_node_type(node) is node_type
+
+
 @unique
 class NodeType(Enum):
     TOPLEVEL = 1

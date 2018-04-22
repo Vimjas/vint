@@ -3,7 +3,9 @@ from vint.ast.node_type import NodeType
 from vint.linting.level import Level
 from vint.linting.policy.abstract_policy import AbstractPolicy
 from vint.linting.policy_registry import register_policy
-from vint.ast.dictionary.autocmd_events import AutoCmdEvents
+from vint.ast.dictionary.autocmd_events import AutocmdEvents
+from vint.ast.plugin.autocmd_parser import AUTOCMD_CONTENT
+from pprint import pprint
 
 
 @register_policy
@@ -27,19 +29,21 @@ class ProhibitAutocmdWithNoGroup(AbstractPolicy):
         autocmd family should be called with any groups.
         """
 
-        # noed.ea.cmd is empty when line jump command such as 1
+        # node.ea.cmd is empty when line jump command such as 1
         cmd_name = node['ea']['cmd'].get('name', None)
 
         is_autocmd = cmd_name == 'autocmd'
         if is_autocmd and not self.is_inside_of_augroup:
-            matched = re.match(r'au(?:tocmd)?!?\s+(\S+)', node['str'])
-
-            if not matched:
+            autocmd_attr = node[AUTOCMD_CONTENT]
+            if autocmd_attr['bang']:
                 # Looks like autocmd with a bang
                 return True
 
-            has_no_group = matched.group(1) in AutoCmdEvents
-            return not has_no_group
+            has_group = autocmd_attr.get('group') is not None
+            if has_group:
+                return True
+
+            return self.is_inside_of_augroup
 
         is_augroup = cmd_name == 'augroup'
         if is_augroup:
