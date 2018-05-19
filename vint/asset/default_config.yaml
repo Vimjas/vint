@@ -12,3 +12,5 @@ policies:
   # Experimental
   ProhibitUnusedVariable:
     enabled: no
+  ProhibitImplicitScopeVariable:
+    enabled: no
