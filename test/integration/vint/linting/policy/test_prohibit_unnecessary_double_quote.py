@@ -18,7 +18,7 @@ class TestProhibitUnnecessaryDoubleQuote(PolicyAssertion, unittest.TestCase):
         expected_violations = [
             {
                 'name': 'ProhibitUnnecessaryDoubleQuote',
-                'level': Level.WARNING,
+                'level': Level.STYLE_PROBLEM,
                 'position': {
                     'line': 2,
                     'column': 6,
@@ -27,7 +27,7 @@ class TestProhibitUnnecessaryDoubleQuote(PolicyAssertion, unittest.TestCase):
             },
             {
                 'name': 'ProhibitUnnecessaryDoubleQuote',
-                'level': Level.WARNING,
+                'level': Level.STYLE_PROBLEM,
                 'position': {
                     'line': 3,
                     'column': 6,

@@ -31,7 +31,7 @@ class ProhibitUnnecessaryDoubleQuote(AbstractPolicy):
         super(ProhibitUnnecessaryDoubleQuote, self).__init__()
         self.description = 'Prefer single quoted strings'
         self.reference = get_reference_source('STRINGS')
-        self.level = Level.WARNING
+        self.level = Level.STYLE_PROBLEM
 
 
     def listen_node_types(self):
