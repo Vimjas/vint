@@ -36,7 +36,7 @@ class TestCallNodeParser(unittest.TestCase):
         parser = CallNodeParser()
         got_ast = parser.process(ast)
 
-        string_expr_nodes = get_lambda_string_expr_content(got_ast['body'][0]['left'])
+        string_expr_nodes = get_lambda_string_expr_content(got_ast['body'][0]['left']['rlist'][1])
         self.assertEqual('v:val', string_expr_nodes[0]['left'].get('value'))
 
 
@@ -45,7 +45,7 @@ class TestCallNodeParser(unittest.TestCase):
         parser = CallNodeParser()
         got_ast = parser.process(ast)
 
-        string_expr_nodes = get_lambda_string_expr_content(got_ast['body'][1]['left'])
+        string_expr_nodes = get_lambda_string_expr_content(got_ast['body'][1]['left']['rlist'][1])
         self.assertEqual('v:key', string_expr_nodes[0]['left'].get('value'))
 
 
@@ -101,7 +101,7 @@ class TestCallNodeParser(unittest.TestCase):
         parser = CallNodeParser()
         got_ast = parser.process(ast)
 
-        call_node = got_ast['body'][0]['left']
+        call_node = got_ast['body'][0]['left']['rlist'][0]
         self.assertTrue(FUNCTION_REFERENCE_STRING_EXPR_CONTENT in call_node)
         self.assertEqual(len(call_node[FUNCTION_REFERENCE_STRING_EXPR_CONTENT]), 1)
 
@@ -111,7 +111,7 @@ class TestCallNodeParser(unittest.TestCase):
         parser = CallNodeParser()
         got_ast = parser.process(ast)
 
-        call_node = got_ast['body'][0]['left']
+        call_node = got_ast['body'][0]['left']['rlist'][0]
         self.assertTrue(FUNCTION_REFERENCE_STRING_EXPR_CONTENT in call_node)
         self.assertEqual(len(call_node[FUNCTION_REFERENCE_STRING_EXPR_CONTENT]), 1)
 
