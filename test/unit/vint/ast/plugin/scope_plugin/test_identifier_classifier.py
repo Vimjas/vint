@@ -47,8 +47,8 @@ Fixtures = {
         Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_arithmetic_assignment.vim'),
     'MAP_FUNC':
         Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_map_func.vim'),
-    'ISSUE_274':
-        Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_issue_274.vim'),
+    'ISSUE_274_CURLYNAME':
+        Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_issue_274_curlyname.vim'),
 }
 
 
@@ -335,8 +335,8 @@ class TestIdentifierClassifier(unittest.TestCase):
         self.assertAttributesInIdentifiers(attached_ast, expected_id_attr_map)
 
 
-    def test_issue_274(self):
-        ast = self.create_ast(Fixtures['ISSUE_274'])
+    def test_issue_274_curlyname(self):
+        ast = self.create_ast(Fixtures['ISSUE_274_CURLYNAME'])
         id_classifier = IdentifierClassifier()
 
         attached_ast = id_classifier.attach_identifier_attributes(ast)
