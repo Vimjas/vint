@@ -29,8 +29,8 @@ class PolicyAssertion(unittest.TestCase):
             for policy, options in policy_options.items():
                 options['enabled'] = False
 
-            for policy in policy_names_to_enable:
-                options = policy_options.setdefault(policy, {})
+            for policy_name in policy_names_to_enable:
+                options = policy_options.setdefault(policy_name, {})
                 options['enabled'] = True
 
             self._config_dict = {
@@ -56,7 +56,7 @@ class PolicyAssertion(unittest.TestCase):
         policy_name = Policy.__name__
 
         policy_set = PolicyAssertion.StubPolicySet(policy_to_test)
-        config = PolicyAssertion.StubConfigContainer(policy_name)
+        config = PolicyAssertion.StubConfigContainer([policy_name])
 
         if policy_options is not None:
             config.get_config_dict()['policies'][policy_name].update(policy_options)
@@ -74,13 +74,9 @@ class PolicyAssertion(unittest.TestCase):
     def assertViolation(self, actual_violation, expected_violation):
         self.assertIsNot(actual_violation, None)
         self.assertIsNot(expected_violation, None)
-
-        pprint(actual_violation)
-
-        assert actual_violation['name'] == expected_violation['name']
-        assert actual_violation['position'] == expected_violation['position']
-        assert actual_violation['level'] == expected_violation['level']
-
+        self.assertEqual(actual_violation['name'], expected_violation['name'])
+        self.assertEqual(actual_violation['position'], expected_violation['position'])
+        self.assertEqual(actual_violation['level'], expected_violation['level'])
         self.assertIsInstance(actual_violation['description'], str)
 
 
