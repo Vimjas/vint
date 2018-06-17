@@ -2,7 +2,8 @@ from vint.ast.node_type import NodeType
 from vint.ast.traversing import traverse, register_traverser_extension
 from vint.ast.parsing import Parser
 
-STRING_EXPR_CONTENT = 'VINT:string_expression'
+LAMBDA_STRING_EXPR_CONTENT = 'VINT:lambda_string_expression'
+FUNCTION_REFERENCE_STRING_EXPR_CONTENT = 'VINT:function_reference_expression'
 STRING_EXPR_CONTEXT = 'VINT:string_expression_context'
 STRING_EXPR_CONTEXT_FLAG = 'is_on_string_expr'
 
@@ -56,7 +57,7 @@ class CallNodeParser(object):
         # Set a flag that means whether the expression is in other string literals.
         CallNodeParser._set_string_expr_context_flag(string_expr_content_nodes)
 
-        map_or_func_call_node[STRING_EXPR_CONTENT] = string_expr_content_nodes
+        map_or_func_call_node[LAMBDA_STRING_EXPR_CONTENT] = string_expr_content_nodes
 
 
     @classmethod
@@ -89,11 +90,21 @@ class CallNodeParser(object):
 
         parser = Parser()
         string_expr_content_nodes = parser.parse_string_expr(string_expr_node)
-        call_call_node[STRING_EXPR_CONTENT] = string_expr_content_nodes
+
+        func_ref_nodes = list(filter(
+            lambda node: NodeType(node['type']) is NodeType.IDENTIFIER,
+            string_expr_content_nodes
+        ))
+
+        call_call_node[FUNCTION_REFERENCE_STRING_EXPR_CONTENT] = func_ref_nodes
 
 
-def get_string_expr_content(node):
-    return node.get(STRING_EXPR_CONTENT)
+def get_lambda_string_expr_content(node):
+    return node.get(LAMBDA_STRING_EXPR_CONTENT)
+
+
+def get_function_reference_string_expr_content(node):
+    return node.get(FUNCTION_REFERENCE_STRING_EXPR_CONTENT)
 
 
 def is_on_string_expr_context(node):
@@ -103,9 +114,14 @@ def is_on_string_expr_context(node):
 
 @register_traverser_extension
 def traverse_string_expr_content(node, on_enter=None, on_leave=None):
-    string_expr_content_nodes = get_string_expr_content(node)
-    if string_expr_content_nodes is None:
-        return
+    lambda_string_expr_content_nodes = get_lambda_string_expr_content(node)
+    if lambda_string_expr_content_nodes is not None:
+        for child_node in lambda_string_expr_content_nodes:
+            traverse(child_node, on_enter=on_enter, on_leave=on_leave)
 
-    for child_node in string_expr_content_nodes:
-        traverse(child_node, on_enter=on_enter, on_leave=on_leave)
+    func_ref_string_expr_content_nodes = get_function_reference_string_expr_content(node)
+    if func_ref_string_expr_content_nodes is not None:
+        for child_node in func_ref_string_expr_content_nodes:
+            traverse(child_node, on_enter=on_enter, on_leave=on_leave)
+
+

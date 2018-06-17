@@ -7,8 +7,8 @@ from vint.ast.node_type import NodeType
 from vint.ast.traversing import traverse
 from vint.ast.plugin.scope_plugin.call_node_parser import (
     CallNodeParser,
-    get_string_expr_content,
-    STRING_EXPR_CONTENT,
+    get_lambda_string_expr_content,
+    FUNCTION_REFERENCE_STRING_EXPR_CONTENT,
 )
 
 
@@ -36,7 +36,7 @@ class TestCallNodeParser(unittest.TestCase):
         parser = CallNodeParser()
         got_ast = parser.process(ast)
 
-        string_expr_nodes = get_string_expr_content(got_ast['body'][0]['left'])
+        string_expr_nodes = get_lambda_string_expr_content(got_ast['body'][0]['left'])
         self.assertEqual('v:val', string_expr_nodes[0]['left'].get('value'))
 
 
@@ -45,7 +45,7 @@ class TestCallNodeParser(unittest.TestCase):
         parser = CallNodeParser()
         got_ast = parser.process(ast)
 
-        string_expr_nodes = get_string_expr_content(got_ast['body'][1]['left'])
+        string_expr_nodes = get_lambda_string_expr_content(got_ast['body'][1]['left'])
         self.assertEqual('v:key', string_expr_nodes[0]['left'].get('value'))
 
 
@@ -83,8 +83,8 @@ class TestCallNodeParser(unittest.TestCase):
         parser = CallNodeParser()
         got_ast = parser.process(ast)
 
-        nested_map_ast = get_string_expr_content(got_ast['body'][0]['left'])[0]
-        self.assertIsNotNone(get_string_expr_content(nested_map_ast))
+        nested_map_ast = get_lambda_string_expr_content(got_ast['body'][0]['left'])[0]
+        self.assertIsNotNone(get_lambda_string_expr_content(nested_map_ast))
 
 
     def test_nested_filter(self):
@@ -92,8 +92,8 @@ class TestCallNodeParser(unittest.TestCase):
         parser = CallNodeParser()
         got_ast = parser.process(ast)
 
-        nested_filter_ast = get_string_expr_content(got_ast['body'][1]['left'])[0]
-        self.assertIsNotNone(get_string_expr_content(nested_filter_ast))
+        nested_filter_ast = get_lambda_string_expr_content(got_ast['body'][1]['left'])[0]
+        self.assertIsNotNone(get_lambda_string_expr_content(nested_filter_ast))
 
 
     def test_issue_274_call(self):
@@ -102,7 +102,8 @@ class TestCallNodeParser(unittest.TestCase):
         got_ast = parser.process(ast)
 
         call_node = got_ast['body'][0]['left']
-        self.assertTrue(STRING_EXPR_CONTENT in call_node)
+        self.assertTrue(FUNCTION_REFERENCE_STRING_EXPR_CONTENT in call_node)
+        self.assertEqual(len(call_node[FUNCTION_REFERENCE_STRING_EXPR_CONTENT]), 1)
 
 
     def test_issue_274_function(self):
@@ -111,7 +112,8 @@ class TestCallNodeParser(unittest.TestCase):
         got_ast = parser.process(ast)
 
         call_node = got_ast['body'][0]['left']
-        self.assertTrue(STRING_EXPR_CONTENT in call_node)
+        self.assertTrue(FUNCTION_REFERENCE_STRING_EXPR_CONTENT in call_node)
+        self.assertEqual(len(call_node[FUNCTION_REFERENCE_STRING_EXPR_CONTENT]), 1)
 
 
 if __name__ == '__main__':

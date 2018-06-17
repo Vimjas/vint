@@ -6,7 +6,8 @@ from vint.ast.plugin.scope_plugin.redir_assignment_parser import (
 )
 from vint.ast.plugin.scope_plugin.call_node_parser import (
     CallNodeParser,
-    get_string_expr_content,
+    get_lambda_string_expr_content,
+    get_function_reference_string_expr_content,
 )
 from vint.ast.node_type import NodeType
 
@@ -442,19 +443,30 @@ class IdentifierClassifier(object):
         left_node = call_node['left']
         self._enter_identifier_like_node(left_node, is_function=True)
 
-        # Care the 2nd argument of the map or filter function.
-        self._enter_str_expr_content_node(call_node)
+        # Classify the 2nd argument node of "map" and "filter" call when the node type is STRING.
+        lambda_string_expr_content_nodes = get_lambda_string_expr_content(call_node)
+        if lambda_string_expr_content_nodes is not None:
+            self._enter_lambda_str_expr_content_node(lambda_string_expr_content_nodes)
+
+        # Classify the 1st argument node of "call" and "function" call when the node type is STRING.
+        func_ref_expr_content_nodes = get_function_reference_string_expr_content(call_node)
+        if func_ref_expr_content_nodes is not None:
+            self._enter_func_ref_str_expr_content_node(func_ref_expr_content_nodes)
 
 
-    def _enter_str_expr_content_node(self, call_node):
-        string_expr_content_nodes = get_string_expr_content(call_node)
-        if not string_expr_content_nodes:
-            return
-
+    def _enter_lambda_str_expr_content_node(self, lambda_string_expr_content_nodes):
         def enter_handler(node):
             self._enter_identifier_like_node(node, is_on_str_expr_context=True)
 
-        for string_expr_content_node in string_expr_content_nodes:
+        for string_expr_content_node in lambda_string_expr_content_nodes:
+            traverse(string_expr_content_node, on_enter=enter_handler)
+
+
+    def _enter_func_ref_str_expr_content_node(self, func_ref_str_expr_content_nodes):
+        def enter_handler(node):
+            self._enter_identifier_node(node, is_function=True, is_on_str_expr_context=True)
+
+        for string_expr_content_node in func_ref_str_expr_content_nodes:
             traverse(string_expr_content_node, on_enter=enter_handler)
 
 
