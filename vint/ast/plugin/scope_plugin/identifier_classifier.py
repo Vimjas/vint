@@ -249,15 +249,6 @@ class IdentifierClassifier(object):
                                       is_on_str_expr_context=is_on_str_expr_context)
             return
 
-        if node_type in IdentifierTerminateNodeTypes:
-            id_like_node = node
-            self._enter_identifier_node(id_like_node,
-                                        is_declarative=is_declarative,
-                                        is_function=is_function,
-                                        is_declarative_parameter=is_declarative_parameter,
-                                        is_on_str_expr_context=is_on_str_expr_context)
-            return
-
         # Curlyname node can have a dynamic name. For example:
         #   let s:var = 'VAR'
         #   let my_{s:var} = 0
@@ -270,10 +261,19 @@ class IdentifierClassifier(object):
                                        is_on_str_expr_context=is_on_str_expr_context)
             return
 
+        if node_type in IdentifierTerminateNodeTypes:
+            id_like_node = node
+            self._enter_identifier_node(id_like_node,
+                                        is_declarative=is_declarative,
+                                        is_function=is_function,
+                                        is_declarative_parameter=is_declarative_parameter,
+                                        is_on_str_expr_context=is_on_str_expr_context)
+            return
+
 
     def _enter_function_node(self, func_node):
         # Function node has declarative identifiers as the function name and
-        # the paramerter names.
+        # the parameter names.
 
         # Function name is in the left.
         func_name_node = func_node['left']
