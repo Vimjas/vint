@@ -34,9 +34,10 @@ if __name__ == '__main__':
         ast = parser.parse_file(filepath)
         traverse(ast, on_enter=prettify_node_type)
 
-        print("////////// AST //////////\n")
-        pprint(ast)
+        print("////////// SCOPE TREE //////////\n")
+        pprint(scope_plugin._ref_tester._scope_linker.scope_tree)
         print("\n\n")
 
-        print("////////// SCOPE TREE //////////\n")
-        pprint(scope_plugin._ref_tester._scope_tree)
+        print("////////// LINK REGISTRY //////////\n")
+        pprint(scope_plugin._ref_tester._scope_linker.link_registry._vars_to_declarative_ids_map)
+        pprint(scope_plugin._ref_tester._scope_linker.link_registry._ids_to_scopes_map)

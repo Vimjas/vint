@@ -36,7 +36,7 @@ class ScopePlugin(object):
     def _get_link_registry(self):
         # NOTE: This is a hack for performance. We should build LinkRegistry
         # by this method if ReferenceReachabilityTester hide the link_registry.
-        return self._ref_tester._link_registry
+        return self._ref_tester._scope_linker.link_registry
 
 
     def is_unreachable_reference_identifier(self, node):

@@ -1,3 +1,4 @@
+from typing import Dict, Any, Union
 from vint.ast.traversing import traverse, SKIP_CHILDREN
 from vint.ast.node_type import NodeType
 from vint.ast.plugin.scope_plugin.scope_detector import (
@@ -274,8 +275,8 @@ class ScopeLinker(object):
         """
 
         def __init__(self):
-            self._vars_to_declarative_ids_map = {}
-            self._ids_to_scopes_map = {}
+            self._vars_to_declarative_ids_map = {}  # type: Dict[int, Dict[str, Any]]
+            self._ids_to_scopes_map = {}  # type: Dict[int, Dict[str, Any]]
 
 
         def link_variable_to_declarative_identifier(self, variable, declaring_id_node):
@@ -299,8 +300,10 @@ class ScopeLinker(object):
 
 
     def __init__(self):
-        self.scope_tree = None
-        self.link_registry = None
+        self.scope_tree = None  # type: Union[Dict[str, Any], None]
+        self.link_registry = None  # type: ScopeLinker.ScopeLinkRegistry
+
+        self._scope_tree_builder = ScopeLinker.ScopeTreeBuilder()
 
 
     def process(self, ast):
@@ -310,8 +313,6 @@ class ScopeLinker(object):
         """
         id_classifier = IdentifierClassifier()
         attached_ast = id_classifier.attach_identifier_attributes(ast)
-
-        self._scope_tree_builder = ScopeLinker.ScopeTreeBuilder()
 
         # We are already in script local scope.
         self._scope_tree_builder.enter_new_scope(ScopeVisibility.SCRIPT_LOCAL)

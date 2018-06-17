@@ -1,3 +1,4 @@
+import typing
 from vint.ast.plugin.scope_plugin.scope_detector import (
     detect_scope_visibility,
     normalize_variable_name,
@@ -38,20 +39,20 @@ class ReferenceReachabilityTester(object):
             return scope_tree
 
 
+    def __init__(self):
+        self._scope_linker = ScopeLinker()  # type: ScopeLinker
+
+
     def process(self, ast):
-        scope_linker = ScopeLinker()
-        scope_linker.process(ast)
+        self._scope_linker.process(ast)
 
         id_collector = IdentifierClassifier.IdentifierCollector()
         classified_id_group = id_collector.collect_identifiers(ast)
         dec_id_nodes = classified_id_group['static_declaring_identifiers']
         ref_id_nodes = classified_id_group['static_referencing_identifiers']
 
-        self._scope_tree = scope_linker.scope_tree
-        self._link_registry = scope_linker.link_registry
-
         # Attach a parent_scope accessor to the scope tree
-        ReferenceReachabilityTester.TwoWayScopeReferenceAttacher.attach(self._scope_tree)
+        ReferenceReachabilityTester.TwoWayScopeReferenceAttacher.attach(self._scope_linker.scope_tree)
 
         # Reset REFERECED_FLAG to False
         for dec_id_node in dec_id_nodes:
@@ -64,7 +65,8 @@ class ReferenceReachabilityTester(object):
 
     def get_objective_scope_visibility(self, node):
         """ Returns a objective scope visibility. """
-        context_scope = self._link_registry.get_scope_by_referencing_identifier(node)
+        # FIXME: It seems a broken reference, but I do not have the enough time to fix it.
+        context_scope = self._scope_linker.link_registry.get_scope_by_referencing_identifier(node)
         return detect_scope_visibility(node, context_scope)['scope_visibility']
 
 
@@ -82,7 +84,7 @@ class ReferenceReachabilityTester(object):
 
 
     def check_reachability(self, ref_id_node):
-        scope = self._link_registry.get_context_scope_by_identifier(ref_id_node)
+        scope = self._scope_linker.link_registry.get_context_scope_by_identifier(ref_id_node)
         var_name = normalize_variable_name(ref_id_node, scope)
         is_func_id = is_function_identifier(ref_id_node)
 
@@ -92,7 +94,7 @@ class ReferenceReachabilityTester(object):
                 if var_name in functions_list:
                     # The function is found in the symbol table for functions.
                     for variable in functions_list[var_name]:
-                        declaring_id_node = self._link_registry\
+                        declaring_id_node = self._scope_linker.link_registry\
                             .get_declarative_identifier_by_variable(variable)
                         declaring_id_node[REFERECED_FLAG] = True
 
@@ -109,7 +111,7 @@ class ReferenceReachabilityTester(object):
                 # The variable or function reference found in the symbol table
                 # for variables.
                 for variable in variables_list[var_name]:
-                    declaring_id_node = self._link_registry\
+                    declaring_id_node = self._scope_linker.link_registry\
                         .get_declarative_identifier_by_variable(variable)
                     declaring_id_node[REFERECED_FLAG] = True
 
