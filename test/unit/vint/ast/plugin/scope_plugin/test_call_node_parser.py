@@ -5,9 +5,10 @@ import enum
 from vint.ast.parsing import Parser
 from vint.ast.node_type import NodeType
 from vint.ast.traversing import traverse
-from vint.ast.plugin.scope_plugin.map_and_filter_parser import (
-    MapAndFilterParser,
+from vint.ast.plugin.scope_plugin.call_node_parser import (
+    CallNodeParser,
     get_string_expr_content,
+    STRING_EXPR_CONTENT,
 )
 
 
@@ -19,9 +20,11 @@ class Fixtures(enum.Enum):
     MAP_AND_FILTER_VARIABLE = Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_map_and_filter.vim')
     ISSUE_256 = Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_issue_256.vim')
     NESTED = Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_nested_map_and_filter.vim')
+    ISSUE_274_CALL = Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_issue_274_call.vim')
+    ISSUE_274_FUNCTION = Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_issue_274_function.vim')
 
 
-class TestMapAndFilterParser(unittest.TestCase):
+class TestCallNodeParser(unittest.TestCase):
     def create_ast(self, file_path):
         parser = Parser()
         ast = parser.parse_file(file_path.value)
@@ -30,7 +33,7 @@ class TestMapAndFilterParser(unittest.TestCase):
 
     def test_process_with_map_function(self):
         ast = self.create_ast(Fixtures.MAP_AND_FILTER_VARIABLE)
-        parser = MapAndFilterParser()
+        parser = CallNodeParser()
         got_ast = parser.process(ast)
 
         string_expr_nodes = get_string_expr_content(got_ast['body'][0]['left'])
@@ -39,7 +42,7 @@ class TestMapAndFilterParser(unittest.TestCase):
 
     def test_process_with_filter_function(self):
         ast = self.create_ast(Fixtures.MAP_AND_FILTER_VARIABLE)
-        parser = MapAndFilterParser()
+        parser = CallNodeParser()
         got_ast = parser.process(ast)
 
         string_expr_nodes = get_string_expr_content(got_ast['body'][1]['left'])
@@ -48,7 +51,7 @@ class TestMapAndFilterParser(unittest.TestCase):
 
     def test_traverse(self):
         ast = self.create_ast(Fixtures.MAP_AND_FILTER_VARIABLE)
-        parser = MapAndFilterParser()
+        parser = CallNodeParser()
         got_ast = parser.process(ast)
 
         is_map_and_filter_content_visited = {
@@ -69,7 +72,7 @@ class TestMapAndFilterParser(unittest.TestCase):
 
     def test_issue_256(self):
         ast = self.create_ast(Fixtures.ISSUE_256)
-        parser = MapAndFilterParser()
+        parser = CallNodeParser()
         got_ast = parser.process(ast)
 
         self.assertIsNotNone(got_ast)
@@ -77,7 +80,7 @@ class TestMapAndFilterParser(unittest.TestCase):
 
     def test_nested_map(self):
         ast = self.create_ast(Fixtures.NESTED)
-        parser = MapAndFilterParser()
+        parser = CallNodeParser()
         got_ast = parser.process(ast)
 
         nested_map_ast = get_string_expr_content(got_ast['body'][0]['left'])[0]
@@ -86,11 +89,29 @@ class TestMapAndFilterParser(unittest.TestCase):
 
     def test_nested_filter(self):
         ast = self.create_ast(Fixtures.NESTED)
-        parser = MapAndFilterParser()
+        parser = CallNodeParser()
         got_ast = parser.process(ast)
 
         nested_filter_ast = get_string_expr_content(got_ast['body'][1]['left'])[0]
         self.assertIsNotNone(get_string_expr_content(nested_filter_ast))
+
+
+    def test_issue_274_call(self):
+        ast = self.create_ast(Fixtures.ISSUE_274_CALL)
+        parser = CallNodeParser()
+        got_ast = parser.process(ast)
+
+        call_node = got_ast['body'][0]['left']
+        self.assertTrue(STRING_EXPR_CONTENT in call_node)
+
+
+    def test_issue_274_function(self):
+        ast = self.create_ast(Fixtures.ISSUE_274_FUNCTION)
+        parser = CallNodeParser()
+        got_ast = parser.process(ast)
+
+        call_node = got_ast['body'][0]['left']
+        self.assertTrue(STRING_EXPR_CONTENT in call_node)
 
 
 if __name__ == '__main__':

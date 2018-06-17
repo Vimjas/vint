@@ -4,8 +4,8 @@ from vint.ast.plugin.scope_plugin.redir_assignment_parser import (
     RedirAssignmentParser,
     get_redir_content,
 )
-from vint.ast.plugin.scope_plugin.map_and_filter_parser import (
-    MapAndFilterParser,
+from vint.ast.plugin.scope_plugin.call_node_parser import (
+    CallNodeParser,
     get_string_expr_content,
 )
 from vint.ast.node_type import NodeType
@@ -128,7 +128,7 @@ class IdentifierClassifier(object):
         redir_assignment_parser = RedirAssignmentParser()
         ast_with_parsed_redir = redir_assignment_parser.process(ast)
 
-        map_and_filter_parser = MapAndFilterParser()
+        map_and_filter_parser = CallNodeParser()
         ast_with_parse_map_and_filter_and_redir = \
             map_and_filter_parser.process(ast_with_parsed_redir)
 

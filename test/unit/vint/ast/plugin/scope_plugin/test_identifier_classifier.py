@@ -49,6 +49,8 @@ Fixtures = {
         Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_map_func.vim'),
     'ISSUE_274_CURLYNAME':
         Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_issue_274_curlyname.vim'),
+    'ISSUE_274_CALL':
+        Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_issue_274_call.vim'),
 }
 
 
