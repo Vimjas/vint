@@ -143,7 +143,7 @@ You can enable/disable linting policies by a comment as following:
     let &cpo = s:save_cpo
     unlet s:save_cpo
 
-And you can enable/disable linting policies only one line by the postfix comment:
+And you can use line config comments. It can enable/disable linting policies in only one line by the postfix comment:
 
 .. code:: vim
 
