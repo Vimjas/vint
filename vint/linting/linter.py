@@ -35,7 +35,7 @@ class Linter(object):
     def __init__(self, policy_set, config_dict_global):
         self._plugins = {
             'scope': ScopePlugin(),
-            'inline_position': PostfixCommentPlugin(),
+            'postfix_comment': PostfixCommentPlugin(),
         }
         self._policy_set = policy_set
 
@@ -54,7 +54,12 @@ class Linter(object):
         config_dict = self._config.get_config_dict()
         enable_neovim = get_config_value(config_dict, ['cmdargs', 'env', 'neovim'], False)
 
-        parser = Parser(self._plugins.values(), enable_neovim=enable_neovim)
+        parser = Parser([
+            # FIXME: scope_plugin must run before postfix_comment_plugin.
+            #        Because scope_plugin extends "traverse".
+            self._plugins['scope'],
+            self._plugins['postfix_comment'],
+        ], enable_neovim=enable_neovim)
         return parser
 
 
