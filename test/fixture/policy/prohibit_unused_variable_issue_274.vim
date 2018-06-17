@@ -1,5 +1,5 @@
 function! s:foo() abort
-    let x = ''
+    let x = 'x'
     let y = l:{x}
     echo y
 endfunction
