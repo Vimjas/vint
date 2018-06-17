@@ -15,6 +15,7 @@ from vint.ast.plugin.scope_plugin.identifier_classifier import (
     IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG,
     IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG,
     IDENTIFIER_ATTRIBUTE_STRING_EXPRESSION_CONTEXT,
+    IDENTIFIER_ATTRIBUTE_VARIADIC_SYMBOL_FLAG,
 )
 
 
@@ -62,7 +63,7 @@ class TestIdentifierClassifier(unittest.TestCase):
     def create_id_attr(self, is_declarative=False, is_dynamic=False,
                        is_member=False, is_function=False,
                        is_autoload=False, is_declarative_parameter=False,
-                       is_on_str_expr_context=False):
+                       is_on_str_expr_context=False, is_variadic=False):
         return {
             IDENTIFIER_ATTRIBUTE_DECLARATION_FLAG: is_declarative,
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: is_dynamic,
@@ -71,6 +72,7 @@ class TestIdentifierClassifier(unittest.TestCase):
             IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: is_autoload,
             IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG: is_declarative_parameter,
             IDENTIFIER_ATTRIBUTE_STRING_EXPRESSION_CONTEXT: is_on_str_expr_context,
+            IDENTIFIER_ATTRIBUTE_VARIADIC_SYMBOL_FLAG: is_variadic,
         }
 
 
@@ -271,7 +273,7 @@ class TestIdentifierClassifier(unittest.TestCase):
             'g:FunctionWithParamsAndVarParams': self.create_id_attr(is_declarative=True, is_function=True),
             'param_var1': self.create_id_attr(is_declarative=True, is_declarative_parameter=True),
             'g:FunctionWithRange': self.create_id_attr(is_declarative=True, is_function=True),
-            '...': self.create_id_attr(is_declarative=True, is_declarative_parameter=True),
+            '...': self.create_id_attr(is_declarative=True, is_declarative_parameter=True, is_variadic=True),
             'g:FunctionWithDict': self.create_id_attr(is_declarative=True, is_function=True),
         }
 

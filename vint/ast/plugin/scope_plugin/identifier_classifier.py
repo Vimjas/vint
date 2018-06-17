@@ -20,6 +20,7 @@ IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG = 'is_function'
 IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG = 'is_autoload'
 IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG = 'is_declarative_parameter'
 IDENTIFIER_ATTRIBUTE_STRING_EXPRESSION_CONTEXT = 'is_on_str_expr_context'
+IDENTIFIER_ATTRIBUTE_VARIADIC_SYMBOL_FLAG = 'is_variadic_symbol'
 REFERENCING_IDENTIFIERS = 'VINT:referencing_identifiers'
 DECLARING_IDENTIFIERS = 'VINT:declaring_identifiers'
 
@@ -101,7 +102,8 @@ class IdentifierClassifier(object):
             # FIXME: Dynamic identifiers should be returned and it should be filtered by the caller.
             id_attr = node[IDENTIFIER_ATTRIBUTE]
             if id_attr[IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG] or \
-                    id_attr[IDENTIFIER_ATTRIBUTE_MEMBER_FLAG]:
+                    id_attr[IDENTIFIER_ATTRIBUTE_MEMBER_FLAG] or \
+                    id_attr[IDENTIFIER_ATTRIBUTE_VARIADIC_SYMBOL_FLAG]:
                 return
 
             if id_attr[IDENTIFIER_ATTRIBUTE_DECLARATION_FLAG]:
@@ -141,7 +143,8 @@ class IdentifierClassifier(object):
     def _set_identifier_attribute(self, node, is_declarative=None, is_dynamic=None,
                                   is_member=None, is_function=None, is_autoload=None,
                                   is_declarative_parameter=None,
-                                  is_on_str_expr_context=None):
+                                  is_on_str_expr_context=None,
+                                  is_variadic=None):
         id_attr = node.setdefault(IDENTIFIER_ATTRIBUTE, {
             IDENTIFIER_ATTRIBUTE_DECLARATION_FLAG: False,
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: False,
@@ -150,6 +153,7 @@ class IdentifierClassifier(object):
             IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: False,
             IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG: False,
             IDENTIFIER_ATTRIBUTE_STRING_EXPRESSION_CONTEXT: False,
+            IDENTIFIER_ATTRIBUTE_VARIADIC_SYMBOL_FLAG: False,
         })
 
         if is_declarative is not None:
@@ -174,6 +178,9 @@ class IdentifierClassifier(object):
         if is_on_str_expr_context is not None:
             id_attr[IDENTIFIER_ATTRIBUTE_STRING_EXPRESSION_CONTEXT] = \
                 is_on_str_expr_context
+
+        if is_variadic is not None:
+            id_attr[IDENTIFIER_ATTRIBUTE_VARIADIC_SYMBOL_FLAG] = is_variadic
 
 
     def _enter_handler(self, node):
@@ -314,12 +321,14 @@ class IdentifierClassifier(object):
     def _enter_identifier_node(self, id_node, is_declarative=None, is_function=None,
                                is_declarative_parameter=None, is_on_str_expr_context=None):
         is_autoload = '#' in id_node['value']
+        is_variadic = id_node['value'] == '...'
         self._set_identifier_attribute(id_node,
                                        is_declarative=is_declarative,
                                        is_autoload=is_autoload,
                                        is_function=is_function,
                                        is_declarative_parameter=is_declarative_parameter,
-                                       is_on_str_expr_context=is_on_str_expr_context)
+                                       is_on_str_expr_context=is_on_str_expr_context,
+                                       is_variadic=is_variadic)
 
 
     def _enter_accessor_node(self, accessor_node, is_declarative=None,
@@ -532,3 +541,11 @@ def is_on_string_expression_context(node):
         return False
 
     return node[IDENTIFIER_ATTRIBUTE][IDENTIFIER_ATTRIBUTE_STRING_EXPRESSION_CONTEXT]
+
+
+def is_variadic_symbol(node):
+    if not is_identifier_like_node(node):
+        return False
+
+    return node[IDENTIFIER_ATTRIBUTE][IDENTIFIER_ATTRIBUTE_VARIADIC_SYMBOL_FLAG]
+
