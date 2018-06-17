@@ -11,7 +11,7 @@ from vint.ast.plugin.scope_plugin.identifier_classifier import (
 
 
 REACHABILITY_FLAG = 'VINT:is_reachable'
-REFERECED_FLAG = 'VINT:is_referenced'
+REFERENCED_FLAG = 'VINT:is_referenced'
 
 
 class ReferenceReachabilityTester(object):
@@ -55,7 +55,7 @@ class ReferenceReachabilityTester(object):
 
         # Reset REFERECED_FLAG to False
         for dec_id_node in dec_id_nodes:
-            dec_id_node[REFERECED_FLAG] = False
+            dec_id_node[REFERENCED_FLAG] = False
 
         for ref_id_node in ref_id_nodes:
             is_reachable = self.check_reachability(ref_id_node)
@@ -73,11 +73,11 @@ class ReferenceReachabilityTester(object):
         for child_scope in scope_tree['child_scopes']:
             for functions in child_scope['functions'].values():
                 for function in functions:
-                    function[REFERECED_FLAG] = False
+                    function[REFERENCED_FLAG] = False
 
             for variables in child_scope['variables'].values():
                 for variable in variables:
-                    variable[REFERECED_FLAG] = False
+                    variable[REFERENCED_FLAG] = False
 
             self._reset_referenced_flag(child_scope)
 
@@ -95,7 +95,7 @@ class ReferenceReachabilityTester(object):
                     for variable in functions_list[var_name]:
                         declaring_id_node = self._scope_linker.link_registry\
                             .get_declarative_identifier_by_variable(variable)
-                        declaring_id_node[REFERECED_FLAG] = True
+                        declaring_id_node[REFERENCED_FLAG] = True
 
                     return True
                 else:
@@ -112,7 +112,7 @@ class ReferenceReachabilityTester(object):
                 for variable in variables_list[var_name]:
                     declaring_id_node = self._scope_linker.link_registry\
                         .get_declarative_identifier_by_variable(variable)
-                    declaring_id_node[REFERECED_FLAG] = True
+                    declaring_id_node[REFERENCED_FLAG] = True
 
                 return True
 
@@ -131,8 +131,8 @@ def is_reachable_reference_identifier(node):
 
 
 def is_declarative_identifier(node):
-    return REFERECED_FLAG in node
+    return REFERENCED_FLAG in node
 
 
 def is_referenced_declarative_identifier(node):
-    return node.get(REFERECED_FLAG, False)
+    return node.get(REFERENCED_FLAG, False)
