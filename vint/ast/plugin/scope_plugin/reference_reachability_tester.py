@@ -65,7 +65,7 @@ class ReferenceReachabilityTester(object):
 
     def get_objective_scope_visibility(self, node):
         """ Returns a objective scope visibility. """
-        # FIXME: It seems a broken reference, but I do not have the enough time to fix it.
+        # FIXME: It seems a broken reference, but I do not have enough time to fix it.
         context_scope = self._scope_linker.link_registry.get_scope_by_referencing_identifier(node)
         return detect_scope_visibility(node, context_scope)['scope_visibility']
 

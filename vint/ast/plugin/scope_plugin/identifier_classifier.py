@@ -1,3 +1,4 @@
+from typing import List, Dict, Any, Optional
 from vint.ast.traversing import traverse
 from vint.ast.plugin.scope_plugin.redir_assignment_parser import (
     RedirAssignmentParser,
@@ -61,9 +62,9 @@ class IdentifierClassifier(object):
     - is autoload: True if the identifier is declared with autoload.
     - is function: True if the identifier is a function. Vim distinguish
         between function identifiers and variable identifiers.
-    - is declarative paramter: True if the identifier is a declarative
+    - is declarative parameter: True if the identifier is a declarative
         parameter. For example, the identifier "param" in Func(param) is a
-        declarative paramter.
+        declarative parameter.
     """
 
     class IdentifierCollector(object):
@@ -72,16 +73,21 @@ class IdentifierClassifier(object):
         be grouped by 2 types; declaring or referencing.
         """
 
+        def __init__(self):
+            self._static_referencing_identifiers = None  # type: Optional[List[Dict[str, Any]]]
+            self._static_declaring_identifiers = None  # type: Optional[List[Dict[str, Any]]]
+
+
         def collect_identifiers(self, ast):
-            self.static_referencing_identifiers = []
-            self.static_declaring_identifiers = []
+            self._static_referencing_identifiers = []
+            self._static_declaring_identifiers = []
 
             # TODO: Make more performance efficiency.
             traverse(ast, on_enter=self._enter_handler)
 
             return {
-                'static_declaring_identifiers': self.static_declaring_identifiers,
-                'static_referencing_identifiers': self.static_referencing_identifiers,
+                'static_declaring_identifiers': self._static_declaring_identifiers,
+                'static_referencing_identifiers': self._static_referencing_identifiers,
             }
 
 
@@ -91,15 +97,16 @@ class IdentifierClassifier(object):
             if not is_identifier_like_node:
                 return
 
+            # FIXME: Dynamic identifiers should be returned and it should be filtered by the caller.
             id_attr = node[IDENTIFIER_ATTRIBUTE]
             if id_attr[IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG] or \
                     id_attr[IDENTIFIER_ATTRIBUTE_MEMBER_FLAG]:
                 return
 
             if id_attr[IDENTIFIER_ATTRIBUTE_DECLARATION_FLAG]:
-                self.static_declaring_identifiers.append(node)
+                self._static_declaring_identifiers.append(node)
             else:
-                self.static_referencing_identifiers.append(node)
+                self._static_referencing_identifiers.append(node)
 
 
     def attach_identifier_attributes(self, ast):
@@ -111,9 +118,9 @@ class IdentifierClassifier(object):
         - is autoload: True if the identifier is declared with autoload.
         - is function: True if the identifier is a function. Vim distinguish
             between function identifiers and variable identifiers.
-        - is declarative paramter: True if the identifier is a declarative
+        - is declarative parameter: True if the identifier is a declarative
             parameter. For example, the identifier "param" in Func(param) is a
-            declarative paramter.
+            declarative parameter.
         - is on string expression context: True if the variable is on the
             string expression context. The string expression context is the
             string content on the 2nd argument of the map or filter function.
@@ -186,7 +193,6 @@ class IdentifierClassifier(object):
 
         if node_type is NodeType.DELFUNCTION:
             self._enter_delfunction_node(node)
-            return
 
 
     def _pre_mark_accessor_children(self, node):
@@ -288,7 +294,6 @@ class IdentifierClassifier(object):
                                              is_declarative_parameter=True,
                                              is_declarative=True)
 
-
     def _enter_delfunction_node(self, delfunc_node):
         func_name_node = delfunc_node['left']
         self._enter_identifier_like_node(func_name_node,
@@ -386,14 +391,14 @@ class IdentifierClassifier(object):
         if let_node['op'] != '=':
             return
 
-        self._enter_destructuring_assignment_node(let_node)
+        self._enter_assignment_node(let_node)
 
 
     def _enter_for_node(self, for_node):
-        self._enter_destructuring_assignment_node(for_node)
+        self._enter_assignment_node(for_node)
 
 
-    def _enter_destructuring_assignment_node(self, node):
+    def _enter_assignment_node(self, node):
         # In VimLParser spec, an empty array means null.
         #
         # | Normal assignment    | Destructuring assignment    |
