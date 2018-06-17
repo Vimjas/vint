@@ -6,6 +6,7 @@ from vint.linting.policy.prohibit_unused_variable import ProhibitUnusedVariable
 
 PATH_VALID_VIM_SCRIPT = get_fixture_path('prohibit_unused_variable_valid.vim')
 PATH_INVALID_VIM_SCRIPT = get_fixture_path('prohibit_unused_variable_invalid.vim')
+PATH_ISSUE_274 = get_fixture_path('prohibit_unused_variable_issue_274.vim')
 
 
 class TestProhibitUnusedVariable(PolicyAssertion, unittest.TestCase):
@@ -39,6 +40,10 @@ class TestProhibitUnusedVariable(PolicyAssertion, unittest.TestCase):
         self.assertFoundViolationsEqual(PATH_INVALID_VIM_SCRIPT,
                                         ProhibitUnusedVariable,
                                         expected_violations)
+
+    def test_issue_274(self):
+        self.assertFoundNoViolations(PATH_ISSUE_274, ProhibitUnusedVariable)
+
 
 if __name__ == '__main__':
     unittest.main()
