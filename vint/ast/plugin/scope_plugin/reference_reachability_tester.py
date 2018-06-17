@@ -1,4 +1,3 @@
-import typing
 from vint.ast.plugin.scope_plugin.scope_detector import (
     detect_scope_visibility,
     normalize_variable_name,

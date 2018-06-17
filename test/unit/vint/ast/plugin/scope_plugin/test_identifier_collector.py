@@ -23,7 +23,7 @@ class TestIdentifierCollector(unittest.TestCase):
         return attached_ast
 
 
-    def test_bucket(self):
+    def test_loop_var(self):
         ast = self.create_ast(Fixtures['LOOP_VAR'])
         collector = IdentifierClassifier.IdentifierCollector()
 
@@ -40,7 +40,6 @@ class TestIdentifierCollector(unittest.TestCase):
 
         self.assertEqual(expected_declaring_id_values, declaring_id_values)
         self.assertEqual(expected_referencing_id_values, referencing_id_values)
-
 
 
 if __name__ == '__main__':
