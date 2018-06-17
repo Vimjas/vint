@@ -70,6 +70,10 @@ ChildType = {
         'accessor': ChildNodeAccessor['LIST'],
         'property_name': 'value',
     },
+    'CURLYNAMEEXPR_VALUES': {
+        'accessor': ChildNodeAccessor['NODE'],
+        'property_name': 'value',
+    },
 
     'ELSEIF': {
         'accessor': ChildNodeAccessor['LIST'],
@@ -196,7 +200,7 @@ ChildNodeAccessorMap = {
     NodeType.ENV: [],
     NodeType.REG: [],
     NodeType.CURLYNAMEPART: [],
-    NodeType.CURLYNAMEEXPR: [],
+    NodeType.CURLYNAMEEXPR: [ChildType['CURLYNAMEEXPR_VALUES']],
     NodeType.LAMBDA: [],
 }
 
