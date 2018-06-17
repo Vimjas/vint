@@ -128,7 +128,7 @@ ChildNodeAccessorMap = {
     NodeType.ENDIF: [],
     NodeType.WHILE: [ChildType['COND'], ChildType['BODY'], ChildType['ENDWHILE']],
     NodeType.ENDWHILE: [],
-    NodeType.FOR: [ChildType['BODY'], ChildType['LEFT'], ChildType['LIST'], ChildType['REST'], ChildType['RIGHT'], ChildType['ENDFOR']],
+    NodeType.FOR: [ChildType['LEFT'], ChildType['LIST'], ChildType['RIGHT'], ChildType['REST'], ChildType['BODY'], ChildType['ENDFOR']],
     NodeType.ENDFOR: [],
     NodeType.CONTINUE: [],
     NodeType.BREAK: [],

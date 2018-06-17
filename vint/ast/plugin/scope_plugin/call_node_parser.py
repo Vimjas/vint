@@ -57,7 +57,7 @@ class CallNodeParser(object):
         # Set a flag that means whether the expression is in other string literals.
         CallNodeParser._set_string_expr_context_flag(string_expr_content_nodes)
 
-        map_or_func_call_node[LAMBDA_STRING_EXPR_CONTENT] = string_expr_content_nodes
+        string_expr_node[LAMBDA_STRING_EXPR_CONTENT] = string_expr_content_nodes
 
 
     @classmethod
@@ -96,7 +96,7 @@ class CallNodeParser(object):
             string_expr_content_nodes
         ))
 
-        call_call_node[FUNCTION_REFERENCE_STRING_EXPR_CONTENT] = func_ref_nodes
+        string_expr_node[FUNCTION_REFERENCE_STRING_EXPR_CONTENT] = func_ref_nodes
 
 
 def get_lambda_string_expr_content(node):
@@ -123,5 +123,3 @@ def traverse_string_expr_content(node, on_enter=None, on_leave=None):
     if func_ref_string_expr_content_nodes is not None:
         for child_node in func_ref_string_expr_content_nodes:
             traverse(child_node, on_enter=on_enter, on_leave=on_leave)
-
-

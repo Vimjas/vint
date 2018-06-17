@@ -202,6 +202,9 @@ class IdentifierClassifier(object):
         if node_type is NodeType.DELFUNCTION:
             self._enter_delfunction_node(node)
 
+        if node_type is NodeType.STRING:
+            self._enter_string_node(node)
+
 
     def _pre_mark_accessor_children(self, node):
         node_type = NodeType(node['type'])
@@ -452,13 +455,15 @@ class IdentifierClassifier(object):
         left_node = call_node['left']
         self._enter_identifier_like_node(left_node, is_function=True)
 
+
+    def _enter_string_node(self, string_node):
         # Classify the 2nd argument node of "map" and "filter" call when the node type is STRING.
-        lambda_string_expr_content_nodes = get_lambda_string_expr_content(call_node)
+        lambda_string_expr_content_nodes = get_lambda_string_expr_content(string_node)
         if lambda_string_expr_content_nodes is not None:
             self._enter_lambda_str_expr_content_node(lambda_string_expr_content_nodes)
 
         # Classify the 1st argument node of "call" and "function" call when the node type is STRING.
-        func_ref_expr_content_nodes = get_function_reference_string_expr_content(call_node)
+        func_ref_expr_content_nodes = get_function_reference_string_expr_content(string_node)
         if func_ref_expr_content_nodes is not None:
             self._enter_func_ref_str_expr_content_node(func_ref_expr_content_nodes)
 

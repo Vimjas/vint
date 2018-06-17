@@ -1,10 +1,10 @@
 import unittest
 from test.asserting.config_source import ConfigSourceAssertion
 from vint.ast.node_type import NodeType
-from vint.linting.config.config_comment_source import ConfigCommentSource
+from vint.linting.config.config_toggle_comment_source import ConfigToggleCommentSource
 
 
-class TestConfigCommentSource(ConfigSourceAssertion, unittest.TestCase):
+class TestToggleConfigCommentSource(ConfigSourceAssertion, unittest.TestCase):
     def test_get_config_dict(self):
         expected_config_dict = {
             'policies': {
@@ -22,7 +22,7 @@ class TestConfigCommentSource(ConfigSourceAssertion, unittest.TestCase):
             'str': ' vint: -Policy1 +Policy2',
         }
 
-        config_source = ConfigCommentSource()
+        config_source = ConfigToggleCommentSource()
         config_source.update_by_node(node)
         self.assertConfigDict(config_source, expected_config_dict)
 
@@ -37,7 +37,7 @@ class TestConfigCommentSource(ConfigSourceAssertion, unittest.TestCase):
             'policies': {}
         }
 
-        config_source = ConfigCommentSource()
+        config_source = ConfigToggleCommentSource()
         config_source.update_by_node(node)
 
         self.assertConfigDict(config_source, expected_config_dict)
@@ -57,7 +57,7 @@ class TestConfigCommentSource(ConfigSourceAssertion, unittest.TestCase):
             }
         }
 
-        config_source = ConfigCommentSource()
+        config_source = ConfigToggleCommentSource()
         config_source.update_by_node(node)
 
         self.assertConfigDict(config_source, expected_config_dict)
@@ -80,45 +80,10 @@ class TestConfigCommentSource(ConfigSourceAssertion, unittest.TestCase):
             }
         }
 
-        config_source = ConfigCommentSource()
+        config_source = ConfigToggleCommentSource()
         config_source.update_by_node(node)
 
         self.assertConfigDict(config_source, expected_config_dict)
-
-
-    def test_is_requesting_update_when_config_comment_arrived(self):
-        node = {
-            'type': NodeType.COMMENT,
-            'str': ' vint: -Policy1 +Policy2',
-        }
-
-        config_source = ConfigCommentSource()
-        is_requesting_update = config_source.is_requesting_update(node)
-
-        self.assertTrue(is_requesting_update, 'Expected true was returned')
-
-
-    def test_is_requesting_update_when_just_comment_arrived(self):
-        node = {
-            'type': NodeType.COMMENT,
-            'str': ' Lorem ipsum',
-        }
-
-        config_source = ConfigCommentSource()
-        is_requesting_update = config_source.is_requesting_update(node)
-
-        self.assertFalse(is_requesting_update, 'Expected false was returned')
-
-
-    def test_is_requesting_update_when_other_node_arrived(self):
-        node = {
-            'type': NodeType.EXCALL,
-        }
-
-        config_source = ConfigCommentSource()
-        is_requesting_update = config_source.is_requesting_update(node)
-
-        self.assertFalse(is_requesting_update, 'Expected false was returned')
 
 
 if __name__ == '__main__':

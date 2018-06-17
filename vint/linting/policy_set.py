@@ -4,17 +4,14 @@ import vint.linting.policy_registry as policy_registry
 
 
 class PolicySet(object):
-    def __init__(self):
-        self._all_policies_map = self._create_all_policies_map()
+    def __init__(self, policy_classes):
+        self._all_policies_map = PolicySet.create_all_policies_map(policy_classes)
         self.enabled_policies = []
 
 
-    def _create_all_policies_map(self):
-        policy_class_map = policy_registry.get_policy_class_map()
-
-        policy_map = {policy_name: PolicyClass()
-                      for policy_name, PolicyClass
-                      in policy_class_map.items()}
+    @classmethod
+    def create_all_policies_map(cls, policy_classes):
+        policy_map = {PolicyClass.__name__: PolicyClass() for PolicyClass in policy_classes}
 
         return policy_map
 

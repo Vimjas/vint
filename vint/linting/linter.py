@@ -1,5 +1,6 @@
 import re
 import logging
+from typing import Dict, List, Any
 from pathlib import Path
 from vint._bundles import vimlparser
 from vint.encodings.decoder import EncodingDetectionError
@@ -7,9 +8,11 @@ from vint.ast.parsing import Parser
 from vint.ast.node_type import NodeType
 from vint.ast.traversing import traverse
 from vint.ast.plugin.scope_plugin import ScopePlugin
+from vint.ast.plugin.annotation_comment_plugin import PostfixCommentPlugin
 from vint.linting.config.config_container import ConfigContainer
 from vint.linting.config.config_dict_source import ConfigDictSource
-from vint.linting.config.config_comment_source import ConfigCommentSource
+from vint.linting.config.config_toggle_comment_source import ConfigToggleCommentSource
+from vint.linting.config.config_line_comment_source import ConfigLineCommentSource
 from vint.linting.config.config_util import get_config_value
 from vint.linting.level import Level
 
@@ -32,12 +35,15 @@ class Linter(object):
     def __init__(self, policy_set, config_dict_global):
         self._plugins = {
             'scope': ScopePlugin(),
+            'inline_position': PostfixCommentPlugin(),
         }
         self._policy_set = policy_set
 
-        self._config_comment_source = ConfigCommentSource()
-        self._config = self._decorate_config(config_dict_global,
-                                             self._config_comment_source)
+        self._dynamic_configs = [
+            ConfigToggleCommentSource(),
+            ConfigLineCommentSource(),
+        ]
+        self._config = self._decorate_config(config_dict_global)
 
         self._parser = self.build_parser()
 
@@ -48,15 +54,14 @@ class Linter(object):
         config_dict = self._config.get_config_dict()
         enable_neovim = get_config_value(config_dict, ['cmdargs', 'env', 'neovim'], False)
 
-        parser = Parser(self._plugins, enable_neovim=enable_neovim)
+        parser = Parser(self._plugins.values(), enable_neovim=enable_neovim)
         return parser
 
 
-    def _decorate_config(self, config_dict_global, config_comment_source):
+    def _decorate_config(self, config_dict_global):
         config_dict_source = ConfigDictSource(config_dict_global)
 
-        config_container = ConfigContainer(config_dict_source,
-                                           config_comment_source)
+        config_container = ConfigContainer(config_dict_source, *self._dynamic_configs)
 
         return config_container
 
@@ -151,7 +156,7 @@ class Linter(object):
 
 
     def _prepare_for_traversal(self):
-        self._violations = []
+        self._violations = []  # type: List[Dict[str, Any]]
         self._update_listeners_map()
 
 
@@ -182,17 +187,8 @@ class Linter(object):
 
 
     def _refresh_policies_if_necessary(self, node):
-        config_comment_source = self._config_comment_source
-
-        if not config_comment_source.is_requesting_update(node):
-            return
-
-        self._refresh_policies(node)
-
-
-    def _refresh_policies(self, node):
-        config_comment_source = self._config_comment_source
-        config_comment_source.update_by_node(node)
+        for dynamic_config in self._dynamic_configs:
+            dynamic_config.update_by_node(node)
 
         self._update_listeners_map()
 

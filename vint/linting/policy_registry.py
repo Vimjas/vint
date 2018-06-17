@@ -8,5 +8,5 @@ def register_policy(PolicyClass):
     return PolicyClass
 
 
-def get_policy_class_map():
-    return _policy_class_map
+def get_policy_classes():
+    return _policy_class_map.values()

@@ -1,3 +1,4 @@
+from vint.ast.plugin.abstract_ast_plugin import AbstractASTPlugin
 from vint.ast.plugin.scope_plugin.reference_reachability_tester import (
     ReferenceReachabilityTester,
     is_reference_identifier as _is_reference_identifier,
@@ -23,8 +24,9 @@ ScopeVisibility = _ScopeVisibility
 ExplicityOfScopeVisibility = _ExplicityOfScopeVisibility
 
 
-class ScopePlugin(object):
+class ScopePlugin(AbstractASTPlugin):
     def __init__(self):
+        super(ScopePlugin, self).__init__()
         self._ref_tester = ReferenceReachabilityTester()
 
 

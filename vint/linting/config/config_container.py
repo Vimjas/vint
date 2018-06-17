@@ -15,7 +15,7 @@ class ConfigContainer(ConfigSource):
                     if key in dict_to_extend:
                         extends_deeply(dict_to_extend[key], value)
                     else:
-                        dict_to_extend[key] = value
+                        dict_to_extend[key] = value.copy()
                 else:
                     dict_to_extend[key] = value
 
