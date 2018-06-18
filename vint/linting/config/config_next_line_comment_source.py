@@ -1,3 +1,4 @@
+import logging
 from typing import Dict, Any
 from vint.linting.config.config_abstract_dynamic_source import ConfigAbstractDynamicSource
 from vint.linting.config.config_comment_parser import parse_config_comment_node_if_exists
@@ -21,9 +22,10 @@ class ConfigNextLineCommentSource(ConfigAbstractDynamicSource):
         echo 'Vint do not check the code after the comment'
         echo 'Vint check the code'
     """
-    def __init__(self):
+    def __init__(self, is_debug=False):
         super(ConfigNextLineCommentSource, self).__init__()
 
+        self._is_debug = is_debug
         self._current_lnum = 0
         self._empty_config_dict = {
             'policies': {},
@@ -42,10 +44,28 @@ class ConfigNextLineCommentSource(ConfigAbstractDynamicSource):
         is_line_changed = lnum_of_node > self._current_lnum
 
         if is_line_changed:
+            if lnum_of_node - self._current_lnum == 1:
+                if self._is_debug and self._config_dict != self._config_dict_for_next_line:
+                    logging.debug("{cls}: update config to {config_dict} at {lnum}".format(
+                        cls=self.__class__.__name__,
+                        config_dict=self._config_dict_for_next_line,
+                        lnum=lnum_of_node
+                    ))
+
+                self._config_dict = self._config_dict_for_next_line
+            else:
+                if self._is_debug and self._config_dict != self._empty_config_dict:
+                    logging.debug("{cls}: update config to {config_dict} at {lnum}".format(
+                        cls=self.__class__.__name__,
+                        config_dict=self._empty_config_dict,
+                        lnum=lnum_of_node
+                    ))
+
+                self._config_dict = self._empty_config_dict
+
             # Refresh config_dict for each line.
-            self._config_dict = self._config_dict_for_next_line
-            self._config_dict_for_next_line = self._empty_config_dict
             self._current_lnum = lnum_of_node
+            self._config_dict_for_next_line = self._empty_config_dict
 
         config_comment = parse_config_comment_node_if_exists(node)
 
