@@ -83,8 +83,8 @@ class TestCallNodeParser(unittest.TestCase):
         parser = CallNodeParser()
         got_ast = parser.process(ast)
 
-        nested_map_ast = get_lambda_string_expr_content(got_ast['body'][0]['left'])[0]
-        self.assertIsNotNone(get_lambda_string_expr_content(nested_map_ast))
+        nested_map_ast = get_lambda_string_expr_content(got_ast['body'][0]['left']['rlist'][1])[0]
+        self.assertIsNotNone(get_lambda_string_expr_content(nested_map_ast['rlist'][1]))
 
 
     def test_nested_filter(self):
@@ -92,8 +92,8 @@ class TestCallNodeParser(unittest.TestCase):
         parser = CallNodeParser()
         got_ast = parser.process(ast)
 
-        nested_filter_ast = get_lambda_string_expr_content(got_ast['body'][1]['left'])[0]
-        self.assertIsNotNone(get_lambda_string_expr_content(nested_filter_ast))
+        nested_filter_ast = get_lambda_string_expr_content(got_ast['body'][1]['left']['rlist'][1])[0]
+        self.assertIsNotNone(get_lambda_string_expr_content(nested_filter_ast['rlist'][1]))
 
 
     def test_issue_274_call(self):
