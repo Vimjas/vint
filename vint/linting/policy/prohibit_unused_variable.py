@@ -50,9 +50,10 @@ class ProhibitUnusedVariable(AbstractPolicy):
         ignored_patterns = self.get_policy_config(lint_context).get("ignored_patterns", [])
         for ignored_pattern in ignored_patterns:
             if re.search(ignored_pattern, identifier_value) is not None:
-                logging.debug("{policy_name}: {name} is ignored.".format(
+                logging.debug("{policy_name}: {name} is unused but ignored by the ignored_pattern {ignored_pattern}.".format(
                     policy_name=self.__class__.__name__,
-                    name=identifier_value
+                    name=identifier_value,
+                    ignored_pattern=ignored_pattern
                 ))
                 return True
 

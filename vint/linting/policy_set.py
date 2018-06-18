@@ -29,14 +29,7 @@ class PolicySet(object):
             name=policy_name))
 
 
-    def _log_severity(self, config_dict):
-        level_name = config_dict['cmdargs']['severity'].name
-        logging.debug('severity: {level}'.format(level=level_name))
-
-
     def _get_enabling_map(self, config_dict):
-        self._log_severity(config_dict)
-
         severity = config_dict['cmdargs']['severity']
         policy_enabling_map = {}
 
@@ -74,15 +67,7 @@ class PolicySet(object):
                 enabled_policy = self._get_policy(policy_name)
                 self.enabled_policies.append(enabled_policy)
 
-            self._log_policy_status(policy_name, is_policy_enabled)
-
 
     def get_enabled_policies(self):
         """ Returns enabled policies. """
         return self.enabled_policies
-
-
-    def _log_policy_status(self, policy_name, enabled):
-        status = 'enabled' if enabled else 'disabled'
-        logging.debug('{status}: {policy_name}'.format(status=status,
-                                                       policy_name=policy_name))
