@@ -147,13 +147,12 @@ And you can use line config comments. It can enable/disable linting policies in 
 
 .. code:: vim
 
-    let s:foobar = 'x'  " vint: -ProhibitUnusedVariable
+    " vint: next-line -ProhibitUnusedVariable
+    let s:foobar = 'x'
     echo s:{'foo' . 'bar'}
 
-This syntax is: ``" vint: [+-]<PolicyName> [+-]<PolicyName> ...``.
-
-You can see all policy names on `Vint linting policy
-summary <https://github.com/Kuniwak/vint/wiki/Vint-linting-policy-summary>`__.
+This syntax is: `" vint: [next-line] [+-]<PolicyName> [+-]<PolicyName> ...`.
+You can see all policy names on `Vint linting policy summary <https://github.com/Kuniwak/vint/wiki/Vint-linting-policy-summary>`__.
 
 Code health
 -----------

@@ -8,11 +8,10 @@ from vint.ast.parsing import Parser
 from vint.ast.node_type import NodeType
 from vint.ast.traversing import traverse
 from vint.ast.plugin.scope_plugin import ScopePlugin
-from vint.ast.plugin.annotation_comment_plugin import PostfixCommentPlugin
 from vint.linting.config.config_container import ConfigContainer
 from vint.linting.config.config_dict_source import ConfigDictSource
 from vint.linting.config.config_toggle_comment_source import ConfigToggleCommentSource
-from vint.linting.config.config_line_comment_source import ConfigLineCommentSource
+from vint.linting.config.config_next_line_comment_source import ConfigNextLineCommentSource
 from vint.linting.config.config_util import get_config_value
 from vint.linting.level import Level
 
@@ -35,13 +34,12 @@ class Linter(object):
     def __init__(self, policy_set, config_dict_global):
         self._plugins = {
             'scope': ScopePlugin(),
-            'postfix_comment': PostfixCommentPlugin(),
         }
         self._policy_set = policy_set
 
         self._dynamic_configs = [
             ConfigToggleCommentSource(),
-            ConfigLineCommentSource(),
+            ConfigNextLineCommentSource(),
         ]
         self._config = self._decorate_config(config_dict_global)
 
@@ -54,12 +52,7 @@ class Linter(object):
         config_dict = self._config.get_config_dict()
         enable_neovim = get_config_value(config_dict, ['cmdargs', 'env', 'neovim'], False)
 
-        parser = Parser([
-            # FIXME: scope_plugin must run before postfix_comment_plugin.
-            #        Because scope_plugin extends "traverse".
-            self._plugins['scope'],
-            self._plugins['postfix_comment'],
-        ], enable_neovim=enable_neovim)
+        parser = Parser([self._plugins['scope']], enable_neovim=enable_neovim)
         return parser
 
 

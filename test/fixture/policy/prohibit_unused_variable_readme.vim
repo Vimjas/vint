@@ -1,2 +1,3 @@
-let s:foobar = 'x'  " vint: -ProhibitUnusedVariable
+" vint: next-line -ProhibitUnusedVariable
+let s:foobar = 'x'
 echo s:{'foo' . 'bar'}

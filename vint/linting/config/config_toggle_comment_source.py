@@ -1,10 +1,6 @@
 from vint.ast.node_type import NodeType
-from vint.ast.plugin.annotation_comment_plugin import is_postfix_comment
 from vint.linting.config.config_abstract_dynamic_source import ConfigAbstractDynamicSource
-from vint.linting.config.config_comment_parser import (
-    parse_config_comment,
-    is_config_comment,
-)
+from vint.linting.config.config_comment_parser import parse_config_comment_node_if_exists
 
 
 class ConfigToggleCommentSource(ConfigAbstractDynamicSource):
@@ -28,9 +24,7 @@ class ConfigToggleCommentSource(ConfigAbstractDynamicSource):
     """
     def __init__(self):
         super(ConfigToggleCommentSource, self).__init__()
-        self._config_dict = {
-            'policies': {},
-        }
+        self._config_dict = {'policies': {}}
 
 
     def get_config_dict(self):
@@ -38,22 +32,13 @@ class ConfigToggleCommentSource(ConfigAbstractDynamicSource):
 
 
     def update_by_node(self, node):
-        if not ConfigToggleCommentSource._is_toggle_config_comment(node):
+        comment_config = parse_config_comment_node_if_exists(node)
+
+        if comment_config is None:
             return
 
-        comment_content = node['str']
+        if comment_config.is_only_next_line:
+            # Config comment only affects to next line should be handled by an other class.
+            return
 
-        config_dict = self._config_dict
-        config_dict['policies'] = parse_config_comment(comment_content)
-
-
-    @classmethod
-    def _is_toggle_config_comment(cls, node):
-        if NodeType(node['type']) is not NodeType.COMMENT:
-            return False
-
-        if is_postfix_comment(node):
-            # This is a line config comment, not a toggle config comment.
-            return False
-
-        return is_config_comment(node['str'])
+        self._config_dict = comment_config.config_dict

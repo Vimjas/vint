@@ -15,10 +15,10 @@ class Fixtures(enum.Enum):
 
 
 
-class TestLineConfigCommentSource(ConfigSourceAssertion, unittest.TestCase):
+class TestConfigNextLineCommentSource(ConfigSourceAssertion, unittest.TestCase):
     def test_simple_example(self):
         global_config_dict = {'cmdargs': {'severity': Level.ERROR}}
-        policy_set = PolicySet([TestLineConfigCommentSource.ProhibitStringPolicy])
+        policy_set = PolicySet([TestConfigNextLineCommentSource.ProhibitStringPolicy])
         linter = Linter(policy_set, global_config_dict)
 
         reported_string_node_values = [violation['description']
@@ -32,7 +32,7 @@ class TestLineConfigCommentSource(ConfigSourceAssertion, unittest.TestCase):
 
     def test_lambda_string_expr(self):
         global_config_dict = {'cmdargs': {'severity': Level.ERROR}}
-        policy_set = PolicySet([TestLineConfigCommentSource.ProhibitStringPolicy])
+        policy_set = PolicySet([TestConfigNextLineCommentSource.ProhibitStringPolicy])
         linter = Linter(policy_set, global_config_dict)
 
         reported_string_node_values = [violation['description']
@@ -41,12 +41,15 @@ class TestLineConfigCommentSource(ConfigSourceAssertion, unittest.TestCase):
         self.assertEqual(reported_string_node_values, [
             "'report me because I have no line config comments'",
             "'report me because I have no line config comments, but the previous line have it'",
+            # NOTE: In the current implementation, string in string will reported twice.
+            "'\"report me because I have no line config comments, but the parent node have it\"'",
+            '"report me because I have no line config comments, but the parent node have it"',
         ])
 
 
     class ProhibitStringPolicy(AbstractPolicy):
         def __init__(self):
-            super(TestLineConfigCommentSource.ProhibitStringPolicy, self).__init__()
+            super(TestConfigNextLineCommentSource.ProhibitStringPolicy, self).__init__()
             self.description = ''
             self.reference = 'nothing'
             self.level = Level.ERROR

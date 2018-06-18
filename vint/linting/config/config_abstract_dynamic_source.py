@@ -1,3 +1,4 @@
+from typing import Dict, Any
 from vint.linting.config.config_source import ConfigSource
 
 
@@ -8,8 +9,10 @@ class ConfigAbstractDynamicSource(ConfigSource):
 
 
     def get_config_dict(self):
+        # type: () -> Dict[str, Any]
         raise NotImplementedError()
 
 
     def update_by_node(self, node):
+        # type: (Dict[str, Any]) -> None
         raise NotImplementedError()
