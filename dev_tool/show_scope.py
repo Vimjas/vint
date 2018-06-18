@@ -28,7 +28,7 @@ if __name__ == '__main__':
     enable_neovim = namespace['enable_neovim']
 
     scope_plugin = ScopePlugin()
-    parser = Parser(plugins={'scope': scope_plugin}, enable_neovim=enable_neovim)
+    parser = Parser(plugins=[scope_plugin], enable_neovim=enable_neovim)
 
     for filepath in filepaths:
         ast = parser.parse_file(filepath)
