@@ -32,5 +32,6 @@ class ConfigContainer(ConfigSource):
                                              for config_source in self.config_sources]
 
         result = reduce(merge_dict_deeply, config_dicts_ordered_by_prior_asc, {})
+        result['source_name'] = self.__class__.__name__
 
         return result

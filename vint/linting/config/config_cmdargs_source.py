@@ -21,7 +21,10 @@ class ConfigCmdargsSource(ConfigSource):
 
 
     def _build_config_dict(self, env):
-        config_dict = {'cmdargs': {}}
+        config_dict = {
+            'cmdargs': {},
+            'source_name': self.__class__.__name__,
+        }
 
         config_dict = self._normalize_color(env, config_dict)
         config_dict = self._normalize_json(env, config_dict)

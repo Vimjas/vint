@@ -1,4 +1,5 @@
-from vint.ast.node_type import NodeType
+from typing import Dict, Any
+import logging
 from vint.linting.config.config_abstract_dynamic_source import ConfigAbstractDynamicSource
 from vint.linting.config.config_comment_parser import parse_config_comment_node_if_exists
 
@@ -24,7 +25,11 @@ class ConfigToggleCommentSource(ConfigAbstractDynamicSource):
     """
     def __init__(self):
         super(ConfigToggleCommentSource, self).__init__()
-        self._config_dict = {'policies': {}}
+
+        self._config_dict = {
+            'policies': {},
+            'source_name': self.__class__.__name__,
+        }  # type: Dict[str, Any]
 
 
     def get_config_dict(self):
@@ -32,13 +37,20 @@ class ConfigToggleCommentSource(ConfigAbstractDynamicSource):
 
 
     def update_by_node(self, node):
-        comment_config = parse_config_comment_node_if_exists(node)
+        config_comment = parse_config_comment_node_if_exists(node)
 
-        if comment_config is None:
+        if config_comment is None:
             return
 
-        if comment_config.is_only_next_line:
+        if config_comment.is_only_next_line:
             # Config comment only affects to next line should be handled by an other class.
             return
 
-        self._config_dict = comment_config.config_dict
+        logging.debug("{cls}: update config to {config_dict} at {lnum}".format(
+            cls=self.__class__.__name__,
+            config_dict=config_comment.config_dict,
+            lnum=node['pos']['lnum']
+        ))
+
+        self._config_dict = config_comment.config_dict
+        self._config_dict['source_name'] = self.__class__.__name__

@@ -25,7 +25,10 @@ class ConfigNextLineCommentSource(ConfigAbstractDynamicSource):
         super(ConfigNextLineCommentSource, self).__init__()
 
         self._current_lnum = 0
-        self._empty_config_dict = {'policies': {}}  # type: Dict[str, Any]
+        self._empty_config_dict = {
+            'policies': {},
+            'source_name': self.__class__.__name__,
+        }  # type: Dict[str, Any]
         self._config_dict = self._empty_config_dict
         self._config_dict_for_next_line = self._empty_config_dict
 
@@ -54,3 +57,4 @@ class ConfigNextLineCommentSource(ConfigAbstractDynamicSource):
             return
 
         self._config_dict_for_next_line = config_comment.config_dict
+        self._config_dict_for_next_line['source_name'] = self.__class__.__name__
