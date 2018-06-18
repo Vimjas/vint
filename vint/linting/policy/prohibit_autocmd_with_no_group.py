@@ -38,12 +38,12 @@ class ProhibitAutocmdWithNoGroup(AbstractPolicy):
                 # Looks like autocmd with a bang
                 return True
 
-            has_no_group = matched.group(1) in AutoCmdEvents
-            return not has_no_group
+            has_group = any(x and x.upper() not in AutoCmdEvents for x in matched.group(1).split(','))
+            return has_group
 
         is_augroup = cmd_name == 'augroup'
         if is_augroup:
-            matched = re.match(r'aug(?:roup)?\s+END', node['str'])
+            matched = re.match(r'aug(?:roup)?\s+[eE][nN][dD]$', node['str'])
             is_augroup_end = bool(matched)
             self.is_inside_of_augroup = not is_augroup_end
 

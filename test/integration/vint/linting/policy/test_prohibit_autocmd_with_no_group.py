@@ -43,6 +43,7 @@ class TestProhibitAutocmdWithNoGroup(PolicyAssertion, unittest.TestCase):
         expected_violations = [
             self.create_violation(1, INVALID_VIM_SCRIPT),
             self.create_violation(6, INVALID_VIM_SCRIPT),
+            self.create_violation(7, INVALID_VIM_SCRIPT),
         ]
         self.assertFoundViolationsEqual(INVALID_VIM_SCRIPT,
                                         ProhibitAutocmdWithNoGroup,
