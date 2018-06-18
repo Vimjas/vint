@@ -83,7 +83,7 @@ class Parser(object):
 
 
     def parse_string_expr(self, string_expr_node):
-        """ Parse a command :redir content. """
+        """ Parse a string node content. """
         string_expr_node_value = string_expr_node['value']
         string_expr_str = string_expr_node_value[1:-1]
 

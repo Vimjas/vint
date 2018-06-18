@@ -3,13 +3,12 @@ from vint.ast.traversing import traverse, register_traverser_extension
 from vint.ast.parsing import Parser
 
 STRING_EXPR_CONTENT = 'VINT:string_expression'
+STRING_EXPR_CONTEXT = 'VINT:string_expression_context'
 
 
 
 class MapAndFilterParser(object):
-    """ A class to make string expression in map and filter function parseable.
-    """
-
+    """ A class to make string expression in map and filter function parseable. """
     def process(self, ast):
         def enter_handler(node):
             node_type = NodeType(node['type'])
@@ -42,8 +41,7 @@ class MapAndFilterParser(object):
             if NodeType(string_expr_node['type']) is not NodeType.STRING:
                 return
 
-            parser = Parser()
-            string_expr_content_nodes = parser.parse_string_expr(string_expr_node)
+            string_expr_content_nodes = MapAndFilterParser._parse_string_expr_content_nodes(string_expr_node)
             node[STRING_EXPR_CONTENT] = string_expr_content_nodes
 
         traverse(ast, on_enter=enter_handler)
@@ -51,8 +49,33 @@ class MapAndFilterParser(object):
         return ast
 
 
+    @classmethod
+    def _parse_string_expr_content_nodes(cls, string_expr_node):
+        parser = Parser()
+        string_expr_content_nodes = parser.parse_string_expr(string_expr_node)
+
+        def enter_handler(node):
+            # NOTE: We need this flag only string nodes, because this flag is only for
+            # ProhibitUnnecessaryDoubleQuote.
+            if NodeType(node['type']) is NodeType.STRING:
+                node[STRING_EXPR_CONTEXT] = {
+                    'is_on_str_expr_context': True,
+                }
+
+        for string_expr_content_node in string_expr_content_nodes:
+            traverse(string_expr_content_node, on_enter=enter_handler)
+
+        return string_expr_content_nodes
+
+
 def get_string_expr_content(node):
     return node.get(STRING_EXPR_CONTENT)
+
+
+def get_string_context(node):
+    return node.get(STRING_EXPR_CONTEXT, {
+        'is_on_str_expr_context': False,
+    })
 
 
 @register_traverser_extension

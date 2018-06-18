@@ -18,6 +18,7 @@ FIXTURE_BASE_PATH = Path('test', 'fixture', 'ast', 'scope_plugin')
 class Fixtures(enum.Enum):
     MAP_AND_FILTER_VARIABLE = Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_map_and_filter.vim')
     ISSUE_256 = Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_issue_256.vim')
+    NESTED = Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_nested_map_and_filter.vim')
 
 
 class TestMapAndFilterParser(unittest.TestCase):
@@ -72,6 +73,24 @@ class TestMapAndFilterParser(unittest.TestCase):
         got_ast = parser.process(ast)
 
         self.assertIsNotNone(got_ast)
+
+
+    def test_nested_map(self):
+        ast = self.create_ast(Fixtures.NESTED)
+        parser = MapAndFilterParser()
+        got_ast = parser.process(ast)
+
+        nested_map_ast = get_string_expr_content(got_ast['body'][0]['left'])[0]
+        self.assertIsNotNone(get_string_expr_content(nested_map_ast))
+
+
+    def test_nested_filter(self):
+        ast = self.create_ast(Fixtures.NESTED)
+        parser = MapAndFilterParser()
+        got_ast = parser.process(ast)
+
+        nested_filter_ast = get_string_expr_content(got_ast['body'][1]['left'])[0]
+        self.assertIsNotNone(get_string_expr_content(nested_filter_ast))
 
 
 if __name__ == '__main__':
