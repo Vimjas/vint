@@ -112,11 +112,31 @@ class Linter(object):
             decoding_error = self._create_decoding_error(path, str(exception))
             return [decoding_error]
 
+        self._traverse(root_ast, path)
 
-        self._violations = []
-        self._update_listeners_map()
+        return self._violations
 
-        # Given root AST to makepolicy flexibility
+
+    def lint_text(self, text):
+        self._log_file_path_to_lint('stdin')
+
+        try:
+            root_ast = self._parser.parse(text)
+        except vimlparser.VimLParserException as exception:
+            parse_error = self._create_parse_error('stdin', str(exception))
+            return [parse_error]
+        except EncodingDetectionError as exception:
+            decoding_error = self._create_decoding_error('stdin', str(exception))
+            return [decoding_error]
+
+        self._traverse(root_ast, 'stdin')
+
+        return self._violations
+
+
+    def _traverse(self, root_ast, path):
+        self._prepare_for_traversal()
+
         lint_context = {
             'path': path,
             'root_node': root_ast,
@@ -129,7 +149,10 @@ class Linter(object):
                  on_enter=lambda node: self._handle_enter(node, lint_context),
                  on_leave=lambda node: self._handle_leave(node, lint_context))
 
-        return self._violations
+
+    def _prepare_for_traversal(self):
+        self._violations = []
+        self._update_listeners_map()
 
 
     def _handle_enter(self, node, lint_context):

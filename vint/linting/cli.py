@@ -1,5 +1,6 @@
 import sys
 from argparse import ArgumentParser
+from pathlib import PosixPath
 import pkg_resources
 import logging
 
@@ -14,7 +15,6 @@ from vint.linting.policy_set import PolicySet
 from vint.linting.formatter.formatter import Formatter
 from vint.linting.formatter.json_formatter import JSONFormatter
 from vint.linting.formatter.statistic_formatter import StatisticFormatter
-
 
 class CLI(object):
     def start(self):
@@ -44,11 +44,12 @@ class CLI(object):
             parser.print_help()
             parser.exit(status=1)
 
-        for path_to_lint in paths_to_lint:
-            if not path_to_lint.exists() or not path_to_lint.is_file():
-                logging.error('no such file or directory: `{path}`'.format(
-                    path=str(path_to_lint)))
-                parser.exit(status=1)
+        if not self._should_read_from_stdin(env):
+            for path_to_lint in paths_to_lint:
+                if not path_to_lint.exists() or not path_to_lint.is_file():
+                    logging.error('no such file or directory: `{path}`'.format(
+                        path=str(path_to_lint)))
+                    parser.exit(status=1)
 
 
     def _build_config_dict(self, env):
@@ -116,10 +117,16 @@ class CLI(object):
         violations = []
         linter = self._build_linter(config_dict)
 
-        for file_path in paths_to_lint:
-            violations += linter.lint_file(file_path)
+        if self._should_read_from_stdin(env):
+            violations += linter.lint_text(sys.stdin.read())
+        else:
+            for file_path in paths_to_lint:
+                violations += linter.lint_file(file_path)
 
         return violations
+
+    def _should_read_from_stdin(self, env):
+        return len(env['file_paths']) == 1 and PosixPath('-') in env['file_paths']
 
 
     def _get_formatter(self, config_dict):
