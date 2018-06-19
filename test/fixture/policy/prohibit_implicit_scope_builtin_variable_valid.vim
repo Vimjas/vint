@@ -45,7 +45,7 @@ call b:BufferLocalFunc()
 call w:WindowLocalFunc()
 call t:TabLocalFunc()
 
-function! g:FuncContext(param)
+function! FuncContext(param)
     echo a:0
     echo a:000
     echo a:param
@@ -68,3 +68,9 @@ echo b:
 echo w:
 echo t:
 echo v:
+
+
+" Allow function parameter that have same name as builtins
+function! FuncContext(count)
+    echo a:count
+endfunction

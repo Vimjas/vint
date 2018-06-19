@@ -193,6 +193,13 @@ def _detect_possible_identifier_scope_visibility(id_node, context_scope):
             ExplicityOfScopeVisibility.EXPLICIT
         )
 
+    if is_function_argument(id_node):
+        # Function arguments can not have any explicit scope prefix.
+        return ScopeVisibilityHint(
+            ScopeVisibility.FUNCTION_LOCAL,
+            ExplicityOfScopeVisibility.IMPLICIT_BUT_CONSTRAINED
+        )
+
     if is_builtin_function(id_node):
         # Builtin functions can not have any scope prefix.
         return ScopeVisibilityHint(
@@ -217,13 +224,6 @@ def _detect_possible_identifier_scope_visibility(id_node, context_scope):
         # SEE: https://github.com/Kuniwak/vint/pull/136
         return ScopeVisibilityHint(
             ScopeVisibility.GLOBAL_LIKE,
-            ExplicityOfScopeVisibility.IMPLICIT_BUT_CONSTRAINED
-        )
-
-    if is_function_argument(id_node):
-        # Function arguments can not have any explicit scope prefix.
-        return ScopeVisibilityHint(
-            ScopeVisibility.FUNCTION_LOCAL,
             ExplicityOfScopeVisibility.IMPLICIT_BUT_CONSTRAINED
         )
 
