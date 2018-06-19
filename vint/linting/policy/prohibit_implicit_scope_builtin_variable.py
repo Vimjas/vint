@@ -1,4 +1,5 @@
 from vint.ast.node_type import NodeType
+from vint.ast.plugin.scope_plugin import ScopePlugin
 from vint.linting.level import Level
 from vint.linting.policy.abstract_policy import AbstractPolicy
 from vint.linting.policy_registry import register_policy
@@ -23,18 +24,22 @@ class ProhibitImplicitScopeBuiltinVariable(AbstractPolicy):
     def is_valid(self, identifier, lint_context):
         """ Implicit scope builtin variables are prohibited.
         Because it will make unexpected variable name conflict between builtin
-        and imlicit global/function local. For example:
+        and implicit global/function local. For example:
 
             " This variable is not global variable but builtin variable.
             let count = 100
         """
 
-        scope_plugin = lint_context['plugins']['scope']
-        explicity = scope_plugin.get_explicity_of_scope_visibility(identifier)
-        objective_scope_visibility = scope_plugin.get_objective_scope_visibility(identifier)
+        scope_plugin = lint_context['plugins']['scope']  # type: ScopePlugin
 
-        is_valid = not (explicity is ExplicityOfScopeVisibility.IMPLICIT
-                        and objective_scope_visibility is ScopeVisibility.BUILTIN)
+        # NOTE: This policy interest only builtin variables.
+        scope_visibility = scope_plugin.get_objective_scope_visibility(identifier)
+        if scope_visibility is not ScopeVisibility.BUILTIN:
+            return True
+
+        explicity = scope_plugin.get_explicity_of_scope_visibility(identifier)
+
+        is_valid = explicity is not ExplicityOfScopeVisibility.IMPLICIT
 
         if not is_valid:
             self._make_description(identifier, scope_plugin)

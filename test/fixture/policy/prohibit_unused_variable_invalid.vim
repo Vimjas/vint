@@ -11,3 +11,5 @@ function! g:FuncContext(param_var, param_func)
     let l:explicit_func_local_var = 106
     let implicit_func_local_var = 107
 endfunction
+
+call { i -> 0 }()

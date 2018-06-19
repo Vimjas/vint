@@ -28,7 +28,8 @@ class TestConfigFileSource(ConfigSourceAssertion, unittest.TestCase):
                 'ProhibitSomethingDengerous': {
                     'enabled': True,
                 },
-            }
+            },
+            'source_name': 'ConcreteConfigFileSource',
         }
 
         config_source = self.initialize_config_source_with_env(

@@ -30,10 +30,10 @@ class TestIdentifierCollector(unittest.TestCase):
         bucket = collector.collect_identifiers(ast)
 
         declaring_id_values = [id_node['value'] for id_node in
-                               bucket['static_declaring_identifiers']]
+                               bucket.statically_declared_identifiers]
 
         referencing_id_values = [id_node['value'] for id_node in
-                                 bucket['static_referencing_identifiers']]
+                                 bucket.statically_referencing_identifiers]
 
         expected_declaring_id_values = ['implicit_global_loop_var']
         expected_referencing_id_values = ['g:array']

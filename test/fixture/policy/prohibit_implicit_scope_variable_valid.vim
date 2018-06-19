@@ -69,3 +69,6 @@ call ImplicitGlobalFunc()
 function! autoload#ImplicitGlobalAutoloadFunc()
 endfunction
 call autoload#ImplicitGlobalAutoloadFunc()
+
+" Lambda arguments can not have any scope prefix
+call { i, ... -> i }(0)

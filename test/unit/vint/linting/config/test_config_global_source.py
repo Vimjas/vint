@@ -1,7 +1,7 @@
 import unittest
-from enum import Enum
 from test.asserting.config_source import ConfigSourceAssertion, get_fixture_path
 from vint.linting.config.config_global_source import ConfigGlobalSource
+from vint.linting.level import Level
 
 
 class TestConfigGlobalSource(ConfigSourceAssertion, unittest.TestCase):
@@ -14,8 +14,9 @@ class TestConfigGlobalSource(ConfigSourceAssertion, unittest.TestCase):
             'cmdargs': {
                 'verbose': bool,
                 'error-limit': int,
-                'severity': Enum,
-            }
+                'severity': Level,
+            },
+            'source_name': str,
         }
         config_source = self.initialize_config_source_with_env(ConfigGlobalSource, env)
         self.assertConfigValueType(config_source, expected_config_dict)
@@ -26,7 +27,7 @@ class TestConfigGlobalSource(ConfigSourceAssertion, unittest.TestCase):
             'home_path': get_fixture_path('unexistent_home'),
             'xdg_config_home': get_fixture_path('unexistent_xdg_config_home'),
         }
-        expected_config_dict = {}
+        expected_config_dict = {'source_name': 'ConfigGlobalSource'}
         config_source = self.initialize_config_source_with_env(ConfigGlobalSource, env)
         self.assertConfigDict(config_source, expected_config_dict)
 
@@ -40,8 +41,9 @@ class TestConfigGlobalSource(ConfigSourceAssertion, unittest.TestCase):
             'cmdargs': {
                 'verbose': bool,
                 'error-limit': int,
-                'severity': Enum,
-            }
+                'severity': Level,
+            },
+            'source_name': str,
         }
         config_source = self.initialize_config_source_with_env(ConfigGlobalSource, env)
         self.assertConfigValueType(config_source, expected_config_dict)

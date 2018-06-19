@@ -5,7 +5,7 @@ from vint.linting.config.config_cmdargs_source import ConfigCmdargsSource
 from vint.linting.level import Level
 
 
-class TestConfigFileSource(ConfigSourceAssertion, unittest.TestCase):
+class TestConfigCmdargsSource(ConfigSourceAssertion, unittest.TestCase):
     def test_get_config_dict(self):
         env = {
             'cmdargs': {
@@ -22,6 +22,7 @@ class TestConfigFileSource(ConfigSourceAssertion, unittest.TestCase):
                 'severity': Level.WARNING,
                 'max-violations': 10,
             },
+            'source_name': 'ConfigCmdargsSource',
         }
 
         config_source = self.initialize_config_source_with_env(ConfigCmdargsSource, env)
@@ -31,7 +32,11 @@ class TestConfigFileSource(ConfigSourceAssertion, unittest.TestCase):
     def test_get_config_dict_with_no_severity(self):
         env = {'cmdargs': {}}
 
-        expected_config_dict = {'cmdargs': {}}
+        expected_config_dict = {
+            'cmdargs': {},
+            'source_name': 'ConfigCmdargsSource',
+        }
+
 
         config_source = self.initialize_config_source_with_env(ConfigCmdargsSource, env)
         self.assertConfigDict(config_source, expected_config_dict)
@@ -48,6 +53,7 @@ class TestConfigFileSource(ConfigSourceAssertion, unittest.TestCase):
             'cmdargs': {
                 'severity': Level.STYLE_PROBLEM,
             },
+            'source_name': 'ConfigCmdargsSource',
         }
 
         config_source = self.initialize_config_source_with_env(ConfigCmdargsSource, env)
@@ -65,6 +71,7 @@ class TestConfigFileSource(ConfigSourceAssertion, unittest.TestCase):
             'cmdargs': {
                 'severity': Level.WARNING,
             },
+            'source_name': 'ConfigCmdargsSource',
         }
 
         config_source = self.initialize_config_source_with_env(ConfigCmdargsSource, env)
@@ -82,6 +89,7 @@ class TestConfigFileSource(ConfigSourceAssertion, unittest.TestCase):
             'cmdargs': {
                 'severity': Level.ERROR,
             },
+            'source_name': 'ConfigCmdargsSource',
         }
 
         config_source = self.initialize_config_source_with_env(ConfigCmdargsSource, env)

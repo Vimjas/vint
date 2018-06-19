@@ -14,12 +14,16 @@ class TestToggleConfigCommentSource(ConfigSourceAssertion, unittest.TestCase):
                 'Policy2': {
                     'enabled': True,
                 },
-            }
+            },
+            'source_name': 'ConfigToggleCommentSource',
         }
 
         node = {
             'type': NodeType.COMMENT,
             'str': ' vint: -Policy1 +Policy2',
+            'pos': {
+                'lnum': 10,
+            },
         }
 
         config_source = ConfigToggleCommentSource()
@@ -31,10 +35,14 @@ class TestToggleConfigCommentSource(ConfigSourceAssertion, unittest.TestCase):
         node = {
             'type': NodeType.COMMENT,
             'str': ' vint:',
+            'pos': {
+                'lnum': 10,
+            },
         }
 
         expected_config_dict = {
-            'policies': {}
+            'policies': {},
+            'source_name': 'ConfigToggleCommentSource',
         }
 
         config_source = ConfigToggleCommentSource()
@@ -47,6 +55,9 @@ class TestToggleConfigCommentSource(ConfigSourceAssertion, unittest.TestCase):
         node = {
             'type': NodeType.COMMENT,
             'str': ' vint: -Policy1',
+            'pos': {
+                'lnum': 10,
+            },
         }
 
         expected_config_dict = {
@@ -54,7 +65,8 @@ class TestToggleConfigCommentSource(ConfigSourceAssertion, unittest.TestCase):
                 'Policy1': {
                     'enabled': False,
                 },
-            }
+            },
+            'source_name': 'ConfigToggleCommentSource',
         }
 
         config_source = ConfigToggleCommentSource()
@@ -67,6 +79,9 @@ class TestToggleConfigCommentSource(ConfigSourceAssertion, unittest.TestCase):
         node = {
             'type': NodeType.COMMENT,
             'str': ' vint: -Policy1 +Policy2',
+            'pos': {
+                'lnum': 10,
+            },
         }
 
         expected_config_dict = {
@@ -77,7 +92,8 @@ class TestToggleConfigCommentSource(ConfigSourceAssertion, unittest.TestCase):
                 'Policy2': {
                     'enabled': True,
                 },
-            }
+            },
+            'source_name': 'ConfigToggleCommentSource',
         }
 
         config_source = ConfigToggleCommentSource()

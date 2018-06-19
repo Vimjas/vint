@@ -28,12 +28,13 @@ class TestConfigContainer(ConfigSourceAssertion, unittest.TestCase):
                     'ProhibitSomethingEvil': {
                         'enabled': False,
                     },
-                    'ProhibitSomethingDengerous': {
+                    'ProhibitSomethingDangerous': {
                         'enabled': True,
                     },
-                }
+                },
+                'source_name': 'FirstSource',
             },
-            {  # Somthing to overwrite
+            {  # Something to overwrite
                 'cmdargs': {
                     'error-limit': 20,
                 },
@@ -41,9 +42,12 @@ class TestConfigContainer(ConfigSourceAssertion, unittest.TestCase):
                     'ProhibitSomethingEvil': {
                         'enabled': True,
                     },
-                }
+                },
+                'source_name': 'SecondSource',
             },
-            {},  # Somthing to overwrite but no affect
+            {
+                'source_name': 'ThirdSource',
+            },  # Something to overwrite but no affect
         )
 
         config_sources = [TestConfigContainer.StubConfigSource(config_dict)
@@ -61,10 +65,11 @@ class TestConfigContainer(ConfigSourceAssertion, unittest.TestCase):
                 'ProhibitSomethingEvil': {
                     'enabled': True,
                 },
-                'ProhibitSomethingDengerous': {
+                'ProhibitSomethingDangerous': {
                     'enabled': True,
                 },
-            }
+            },
+            'source_name': 'ConfigContainer',
         }
 
         self.assertConfigDict(config_container, expected_config_dict)

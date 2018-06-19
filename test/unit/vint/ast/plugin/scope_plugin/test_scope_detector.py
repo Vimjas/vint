@@ -1,22 +1,19 @@
 import pytest
 from vint.ast.node_type import NodeType
-from vint.ast.plugin.scope_plugin.identifier_classifier import (
+from vint.ast.plugin.scope_plugin.identifier_attribute import (
     IDENTIFIER_ATTRIBUTE,
     IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG,
     IDENTIFIER_ATTRIBUTE_DECLARATION_FLAG,
     IDENTIFIER_ATTRIBUTE_MEMBER_FLAG,
     IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG,
     IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG,
-    IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG,
-    IDENTIFIER_ATTRIBUTE_STRING_EXPRESSION_CONTEXT,
+    IDENTIFIER_ATTRIBUTE_FUNCTION_ARGUMENT_FLAG,
+    IDENTIFIER_ATTRIBUTE_LAMBDA_STRING_CONTEXT,
 )
 from vint.ast.plugin.scope_plugin.scope_detector import (
     ScopeVisibility as Vis,
-    detect_scope_visibility,
-    normalize_variable_name,
+    detect_possible_scope_visibility,
     is_builtin_variable,
-    ExplicityOfScopeVisibility,
-    get_explicity_of_scope_visibility,
 )
 
 
@@ -44,8 +41,8 @@ def create_id(id_value, is_declarative=True, is_function=False, is_autoload=Fals
             IDENTIFIER_ATTRIBUTE_MEMBER_FLAG: False,
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: is_function,
             IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: is_autoload,
-            IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG: is_declarative_parameter,
-            IDENTIFIER_ATTRIBUTE_STRING_EXPRESSION_CONTEXT: is_on_str_expr_context,
+            IDENTIFIER_ATTRIBUTE_FUNCTION_ARGUMENT_FLAG: is_declarative_parameter,
+            IDENTIFIER_ATTRIBUTE_LAMBDA_STRING_CONTEXT: is_on_str_expr_context,
         },
     }
 
@@ -60,8 +57,8 @@ def create_env(env_value):
             IDENTIFIER_ATTRIBUTE_MEMBER_FLAG: False,
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
             IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: False,
-            IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG: False,
-            IDENTIFIER_ATTRIBUTE_STRING_EXPRESSION_CONTEXT: False,
+            IDENTIFIER_ATTRIBUTE_FUNCTION_ARGUMENT_FLAG: False,
+            IDENTIFIER_ATTRIBUTE_LAMBDA_STRING_CONTEXT: False,
         },
     }
 
@@ -76,8 +73,8 @@ def create_option(opt_value):
             IDENTIFIER_ATTRIBUTE_MEMBER_FLAG: False,
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
             IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: False,
-            IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG: False,
-            IDENTIFIER_ATTRIBUTE_STRING_EXPRESSION_CONTEXT: False,
+            IDENTIFIER_ATTRIBUTE_FUNCTION_ARGUMENT_FLAG: False,
+            IDENTIFIER_ATTRIBUTE_LAMBDA_STRING_CONTEXT: False,
         },
     }
 
@@ -92,8 +89,8 @@ def create_reg(reg_value):
             IDENTIFIER_ATTRIBUTE_MEMBER_FLAG: False,
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
             IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: False,
-            IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG: False,
-            IDENTIFIER_ATTRIBUTE_STRING_EXPRESSION_CONTEXT: False,
+            IDENTIFIER_ATTRIBUTE_FUNCTION_ARGUMENT_FLAG: False,
+            IDENTIFIER_ATTRIBUTE_LAMBDA_STRING_CONTEXT: False,
         },
     }
 
@@ -122,8 +119,8 @@ def create_curlyname(is_declarative=True):
             IDENTIFIER_ATTRIBUTE_MEMBER_FLAG: False,
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
             IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: False,
-            IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG: False,
-            IDENTIFIER_ATTRIBUTE_STRING_EXPRESSION_CONTEXT: False,
+            IDENTIFIER_ATTRIBUTE_FUNCTION_ARGUMENT_FLAG: False,
+            IDENTIFIER_ATTRIBUTE_LAMBDA_STRING_CONTEXT: False,
         },
     }
 
@@ -138,8 +135,8 @@ def create_subscript_member(is_declarative=True):
             IDENTIFIER_ATTRIBUTE_MEMBER_FLAG: True,
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: False,
             IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: False,
-            IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG: False,
-            IDENTIFIER_ATTRIBUTE_STRING_EXPRESSION_CONTEXT: False,
+            IDENTIFIER_ATTRIBUTE_FUNCTION_ARGUMENT_FLAG: False,
+            IDENTIFIER_ATTRIBUTE_LAMBDA_STRING_CONTEXT: False,
         },
     }
 
@@ -244,7 +241,7 @@ def create_subscript_member(is_declarative=True):
 )
 def test_detect_scope_visibility(context_scope_visibility, id_node, expected_scope_visibility, expected_implicity):
     scope = create_scope(context_scope_visibility)
-    scope_visibility_hint = detect_scope_visibility(id_node, scope)
+    scope_visibility_hint = detect_possible_scope_visibility(id_node, scope)
 
     expected_scope_visibility_hint = create_scope_visibility_hint(expected_scope_visibility,
                                                                   is_implicit=expected_implicity)
@@ -311,22 +308,4 @@ def test_is_builtin_variable(id_value, is_function, expected_result):
     id_node = create_id(id_value, is_function=is_function)
     result = is_builtin_variable(id_node)
 
-    assert expected_result == result
-
-
-
-@pytest.mark.parametrize(
-    'node, expected_result', [
-        (create_id('my_var'), ExplicityOfScopeVisibility.IMPLICIT),
-        (create_id('g:my_var'), ExplicityOfScopeVisibility.EXPLICIT),
-
-        (create_id('param', is_declarative=True, is_declarative_parameter=True), ExplicityOfScopeVisibility.EXPLICIT),
-
-        (create_id('localtime', is_declarative=False, is_function=True), ExplicityOfScopeVisibility.EXPLICIT),
-
-        (create_curlyname(), ExplicityOfScopeVisibility.UNANALYZABLE),
-    ]
-)
-def test_get_explicity_of_scope_visibility(node, expected_result):
-    result = get_explicity_of_scope_visibility(node)
     assert expected_result == result

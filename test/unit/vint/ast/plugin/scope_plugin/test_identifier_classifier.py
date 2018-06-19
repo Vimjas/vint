@@ -7,15 +7,19 @@ from vint.ast.plugin.scope_plugin.redir_assignment_parser import traverse
 from vint.ast.node_type import NodeType
 from vint.ast.plugin.scope_plugin.identifier_classifier import (
     IdentifierClassifier,
+)
+from vint.ast.plugin.scope_plugin.identifier_attribute import (
     IDENTIFIER_ATTRIBUTE,
     IDENTIFIER_ATTRIBUTE_DECLARATION_FLAG,
     IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG,
     IDENTIFIER_ATTRIBUTE_MEMBER_FLAG,
     IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG,
     IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG,
-    IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG,
-    IDENTIFIER_ATTRIBUTE_STRING_EXPRESSION_CONTEXT,
+    IDENTIFIER_ATTRIBUTE_FUNCTION_ARGUMENT_FLAG,
+    IDENTIFIER_ATTRIBUTE_LAMBDA_STRING_CONTEXT,
     IDENTIFIER_ATTRIBUTE_VARIADIC_SYMBOL_FLAG,
+    IDENTIFIER_ATTRIBUTE_LAMBDA_ARGUMENT_FLAG,
+    IDENTIFIER_ATTRIBUTE_LAMBDA_BODY_CONTEXT,
 )
 
 
@@ -50,6 +54,10 @@ Fixtures = {
         Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_map_func.vim'),
     'ISSUE_274_CURLYNAME':
         Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_issue_274_curlyname.vim'),
+    'ISSUE_274_CURLYNAME_COMPLEX':
+        Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_issue_274_curlyname_complex.vim'),
+    'LAMBDA':
+        Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_lambda_param.vim')
 }
 
 
@@ -63,16 +71,19 @@ class TestIdentifierClassifier(unittest.TestCase):
     def create_id_attr(self, is_declarative=False, is_dynamic=False,
                        is_member=False, is_function=False,
                        is_autoload=False, is_declarative_parameter=False,
-                       is_on_str_expr_context=False, is_variadic=False):
+                       is_on_lambda_string=False, is_variadic=False,
+                       is_lambda_argument=False, is_on_lambda_body=False):
         return {
             IDENTIFIER_ATTRIBUTE_DECLARATION_FLAG: is_declarative,
             IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG: is_dynamic,
             IDENTIFIER_ATTRIBUTE_MEMBER_FLAG: is_member,
             IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG: is_function,
             IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG: is_autoload,
-            IDENTIFIER_ATTRIBUTE_PARAMETER_DECLARATION_FLAG: is_declarative_parameter,
-            IDENTIFIER_ATTRIBUTE_STRING_EXPRESSION_CONTEXT: is_on_str_expr_context,
+            IDENTIFIER_ATTRIBUTE_FUNCTION_ARGUMENT_FLAG: is_declarative_parameter,
+            IDENTIFIER_ATTRIBUTE_LAMBDA_STRING_CONTEXT: is_on_lambda_string,
             IDENTIFIER_ATTRIBUTE_VARIADIC_SYMBOL_FLAG: is_variadic,
+            IDENTIFIER_ATTRIBUTE_LAMBDA_ARGUMENT_FLAG: is_lambda_argument,
+            IDENTIFIER_ATTRIBUTE_LAMBDA_BODY_CONTEXT: is_on_lambda_body,
         }
 
 
@@ -86,9 +97,11 @@ class TestIdentifierClassifier(unittest.TestCase):
             id_name = node['value']
             footstamps[id_name] = True
 
-            # Print id_name for debugging
-            pprint((NodeType(node['type']), id_name))
-            self.assertEqual(expected_id_attr_map[id_name], node[IDENTIFIER_ATTRIBUTE])
+            self.assertEqual(
+                expected_id_attr_map[id_name],
+                node[IDENTIFIER_ATTRIBUTE],
+                "Identifier Attribute of {1}({0}) have unexpected differences".format(NodeType(node['type']), id_name)
+            )
 
         traverse(ast, on_enter=on_enter_handler)
 
@@ -327,8 +340,8 @@ class TestIdentifierClassifier(unittest.TestCase):
         id_classifier = IdentifierClassifier()
 
         expected_id_attr_map = {
-            'v:val': self.create_id_attr(is_on_str_expr_context=True),
-            'g:pattern': self.create_id_attr(is_on_str_expr_context=True),
+            'v:val': self.create_id_attr(is_on_lambda_string=True),
+            'g:pattern': self.create_id_attr(is_on_lambda_string=True),
             'map': self.create_id_attr(is_function=True),
         }
 
@@ -349,6 +362,36 @@ class TestIdentifierClassifier(unittest.TestCase):
         pprint(curlyname_node)
 
         self.assertTrue(curlyname_node[IDENTIFIER_ATTRIBUTE][IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG])
+
+
+    def test_issue_274_curlyname_complex(self):
+        ast = self.create_ast(Fixtures['ISSUE_274_CURLYNAME_COMPLEX'])
+        id_classifier = IdentifierClassifier()
+
+        attached_ast = id_classifier.attach_identifier_attributes(ast)
+
+        curlyname_node = attached_ast['body'][0]['body'][1]['right']
+
+        # For debugging.
+        pprint(curlyname_node)
+
+        self.assertTrue(curlyname_node[IDENTIFIER_ATTRIBUTE][IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG])
+
+
+    def test_lambda(self):
+        ast = self.create_ast(Fixtures['LAMBDA'])
+        id_classifier = IdentifierClassifier()
+
+        attached_ast = id_classifier.attach_identifier_attributes(ast)
+
+        expected_id_attr_map = {
+            'i': self.create_id_attr(is_declarative=True, is_lambda_argument=True),
+            'y': self.create_id_attr(is_on_lambda_body=True),
+            'map': self.create_id_attr(is_function=True),
+            '...': self.create_id_attr(is_declarative=True, is_lambda_argument=True, is_variadic=True),
+        }
+
+        self.assertAttributesInIdentifiers(attached_ast, expected_id_attr_map)
 
 
 if __name__ == '__main__':
