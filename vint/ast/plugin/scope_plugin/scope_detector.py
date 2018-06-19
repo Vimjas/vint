@@ -180,8 +180,7 @@ def _detect_possible_identifier_scope_visibility(id_node, context_scope):
     if explicit_scope_visibility is not None:
         # Vim allow `g:` as a function name prefix but it is not recommended.
         # SEE: https://github.com/Kuniwak/vint/pull/136
-        is_unrecommended_explicit = is_function_identifier(id_node) and \
-                                    explicit_scope_visibility is ScopeVisibility.GLOBAL_LIKE
+        is_unrecommended_explicit = is_function_identifier(id_node) and _is_just_global(id_node)
         if is_unrecommended_explicit:
             return ScopeVisibilityHint(
                 explicit_scope_visibility,
@@ -273,3 +272,8 @@ def _get_explicit_scope_visibility(id_node): # type: (Dict[str, Any]) -> Optiona
         return FunctionDeclarationIdentifierScopePrefixToScopeVisibility.get(scope_prefix)
     else:
         return VariableIdentifierScopePrefixToScopeVisibility.get(scope_prefix)
+
+
+def _is_just_global(id_node): # type: (Dict[str, Any]) -> bool
+    # See :help internal-variables
+    return id_node['value'][0:2] == 'g:'

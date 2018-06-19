@@ -51,7 +51,8 @@ def _normalize_identifier_value(id_node, reachability_tester):
     explicity = visibility_hint.explicity
 
     # Of course, we can return soon if the variable already have a explicit scope prefix.
-    if explicity is ExplicityOfScopeVisibility.EXPLICIT:
+    if explicity is ExplicityOfScopeVisibility.EXPLICIT \
+            or explicity is ExplicityOfScopeVisibility.UNRECOMMENDED_EXPLICIT:
         return id_node['value']
 
     # Builtin functions and function arguments can not have any explicit scope prefix.
