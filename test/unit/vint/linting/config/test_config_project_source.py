@@ -83,7 +83,7 @@ class TestConfigProjectSource(ConfigSourceAssertion, unittest.TestCase):
             'cwd': get_fixture_path('unexistent_project')
         }
 
-        expected_config_dict = {'source_name': str}
+        expected_config_dict = {'source_name': 'ConfigProjectSource'}
 
         config_source = self.initialize_config_source_with_env(ConfigProjectSource, env)
         self.assertConfigDict(config_source, expected_config_dict)
