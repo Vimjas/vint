@@ -7,7 +7,7 @@ def merge_dict_deeply(posterior, prior):
     # type: (Dict[str, Any], Dict[str, Any]) -> Dict[str, Any]
     tmp = {}
 
-    for key in posterior.keys() | prior.keys():
+    for key in set(posterior.keys()) | set(prior.keys()):
         if key in prior:
             if isinstance(prior[key], dict):
                 tmp[key] = merge_dict_deeply(posterior.get(key, {}), prior[key])
