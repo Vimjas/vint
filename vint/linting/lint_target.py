@@ -4,7 +4,7 @@ from io import BufferedIOBase
 
 
 
-class AbstractLintTarget:
+class AbstractLintTarget(object):
     def __init__(self, path): # type: (Path) -> None
         self.path = path
 
