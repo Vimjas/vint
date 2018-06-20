@@ -1,9 +1,9 @@
 import chardet
-import sys
 
 from vint.ast.node_type import NodeType
 from vint.ast.traversing import traverse, SKIP_CHILDREN
 from vint.linting.level import Level
+from vint.linting.lint_target import AbstractLintTarget
 from vint.linting.policy.abstract_policy import AbstractPolicy
 from vint.linting.policy_registry import register_policy
 
@@ -33,7 +33,7 @@ class ProhibitMissingScriptEncoding(AbstractPolicy):
         if self.has_scriptencoding:
             return True
 
-        return not self._check_script_has_multibyte_char(lint_context)
+        return not _has_multibyte_char(lint_context)
 
 
     def _check_scriptencoding(self, node):
@@ -49,28 +49,7 @@ class ProhibitMissingScriptEncoding(AbstractPolicy):
         self.has_scriptencoding = node['str'].startswith('scripte')
 
 
-    def _check_script_has_multibyte_char(self, lint_context):
-        if self._is_from_stdin(lint_context):
-            return self._check_stdin_has_multibyte_char()
-        else:
-            return self._check_file_has_multibyte_char(lint_context)
-
-
-    def _is_from_stdin(self, lint_context):
-        return lint_context['path'] == 'stdin'
-
-
-    def _check_stdin_has_multibyte_char(self):
-        sys.stdin.seek(0)
-
-        try:
-            sys.stdin.read().encode('ascii')
-            return False
-        except UnicodeError:
-            return True
-
-    def _check_file_has_multibyte_char(self, lint_context):
-        # TODO: Use cache to make performance efficiency
-        with lint_context['path'].open(mode='br') as f:
-            byte_seq = f.read()
-        return len(byte_seq) and chardet.detect(byte_seq)['encoding'] != 'ascii'
+def _has_multibyte_char(lint_context):
+    lint_target = lint_context['lint_target'] # type: AbstractLintTarget
+    byte_seq = lint_target.read()
+    return len(byte_seq) > 0 and chardet.detect(byte_seq)['encoding'] != 'ascii'

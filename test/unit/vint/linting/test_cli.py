@@ -1,7 +1,7 @@
 import unittest
 from vint.compat.unittest import mock
 
-from vint.linting.cli import CLI
+from vint.linting.cli import start_cli
 from vint.bootstrap import import_all_policies
 
 
@@ -9,15 +9,14 @@ class TestCLI(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # For test_start_with_invalid_file_path.
-        # The test case want to load saveral policies.
+        # The test case want to load several policies.
         import_all_policies()
 
 
     def assertExitWithSuccess(self, argv):
         with mock.patch('sys.argv', argv):
             with self.assertRaises(SystemExit) as e:
-                cli = CLI()
-                cli.start()
+                start_cli()
 
             self.assertEqual(e.exception.code, 0)
 
@@ -25,8 +24,7 @@ class TestCLI(unittest.TestCase):
     def assertExitWithFailure(self, argv):
         with mock.patch('sys.argv', argv):
             with self.assertRaises(SystemExit) as e:
-                cli = CLI()
-                cli.start()
+                start_cli()
 
             self.assertNotEqual(e.exception.code, 0)
 
@@ -60,6 +58,13 @@ class TestCLI(unittest.TestCase):
     def test_passing_code_to_stdin_lints_the_code_from_stdin(self):
         argv = ['bin/vint', '-']
         self.assertExitWithSuccess(argv)
+
+
+    @mock.patch('sys.stdin', open('test/fixture/cli/valid1.vim'))
+    def test_multiple_stdin_symbol(self):
+        argv = ['bin/vint', '-', '-']
+        self.assertExitWithFailure(argv)
+
 
 if __name__ == '__main__':
     unittest.main()

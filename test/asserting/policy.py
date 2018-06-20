@@ -4,6 +4,8 @@ from pprint import pprint
 from vint.compat.itertools import zip_longest
 from vint.linting.policy_set import PolicySet
 from vint.linting.linter import Linter
+from vint.linting.config.config_default_source import ConfigDefaultSource
+from vint.linting.lint_target import LintTargetFile
 from vint.linting.level import Level
 
 
@@ -31,7 +33,7 @@ class PolicyAssertion(unittest.TestCase):
             config_dict['policies'][policy_name] = policy_options
 
         linter = Linter(policy_set, config_dict)
-        violations = linter.lint_file(path)
+        violations = linter.lint(LintTargetFile(path))
 
         pprint(violations)
         self.assertEqual(len(violations), len(expected_violations))
@@ -43,9 +45,13 @@ class PolicyAssertion(unittest.TestCase):
     def assertViolation(self, actual_violation, expected_violation):
         self.assertIsNot(actual_violation, None)
         self.assertIsNot(expected_violation, None)
+
+        pprint(actual_violation)
+
         self.assertEqual(actual_violation['name'], expected_violation['name'])
         self.assertEqual(actual_violation['position'], expected_violation['position'])
         self.assertEqual(actual_violation['level'], expected_violation['level'])
+
         self.assertIsInstance(actual_violation['description'], str)
 
 

@@ -19,5 +19,5 @@ if __name__ == '__main__':
 
     file_path = Path(namespace['file'][0])
     decoder = Decoder(default_decoding_strategy)
-    decoder.read(file_path)
+    decoder.decode(file_path)
     pprint(decoder.debug_hint)

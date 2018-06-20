@@ -21,6 +21,7 @@ from vint.ast.plugin.scope_plugin.identifier_attribute import (
     IDENTIFIER_ATTRIBUTE_LAMBDA_ARGUMENT_FLAG,
     IDENTIFIER_ATTRIBUTE_LAMBDA_BODY_CONTEXT,
 )
+from vint.linting.lint_target import LintTargetFile
 
 
 FIXTURE_BASE_PATH = Path('test', 'fixture', 'ast', 'scope_plugin')
@@ -64,7 +65,7 @@ Fixtures = {
 class TestIdentifierClassifier(unittest.TestCase):
     def create_ast(self, file_path):
         parser = Parser()
-        ast = parser.parse_file(file_path)
+        ast = parser.parse(LintTargetFile(file_path))
         return ast
 
 

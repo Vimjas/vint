@@ -9,8 +9,7 @@ from vint.linting.level import Level
 
 class TestJSONFormatter(FormatterAssertion, unittest.TestCase):
     def test_format_violations(self):
-        cmdargs = {}
-        formatter = JSONFormatter(cmdargs)
+        formatter = JSONFormatter()
 
         violations = [
             {
@@ -21,7 +20,7 @@ class TestJSONFormatter(FormatterAssertion, unittest.TestCase):
                 'position': {
                     'line': 1,
                     'column': 2,
-                    'path': Path('path', 'to', 'file1')
+                    'path': str(Path('path', 'to', 'file1'))
                 },
             },
             {
@@ -32,7 +31,7 @@ class TestJSONFormatter(FormatterAssertion, unittest.TestCase):
                 'position': {
                     'line': 11,
                     'column': 21,
-                    'path': Path('path', 'to', 'file2')
+                    'path': str(Path('path', 'to', 'file2'))
                 },
             },
         ]

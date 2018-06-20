@@ -1,4 +1,7 @@
 import unittest
+from io import BytesIO
+from pathlib import Path
+from vint.linting.lint_target import LintTargetBufferedStream
 from vint.linting.policy.abstract_policy import AbstractPolicy
 
 
@@ -23,7 +26,12 @@ class TestAbstractPolicy(unittest.TestCase):
         }
 
         node = {'pos': pos}
-        env = {'path': 'path/to/file.vim'}
+        lint_context = {
+            'lint_target': LintTargetBufferedStream(
+                alternate_path=Path('path/to/file.vim'),
+                buffered_io=BytesIO(),
+            )
+        }
 
         expected_violation = {
             'name': 'ConcretePolicy',
@@ -33,13 +41,13 @@ class TestAbstractPolicy(unittest.TestCase):
             'position': {
                 'column': 3,
                 'line': 3,
-                'path': 'path/to/file.vim',
+                'path': Path('path/to/file.vim'),
             },
         }
 
         policy = ConcretePolicy()
         self.assertEqual(
-            policy.create_violation_report(node, env),
+            policy.create_violation_report(node, lint_context),
             expected_violation)
 
     def test_get_policy_options(self):

@@ -10,6 +10,7 @@ from vint.ast.plugin.scope_plugin.reference_reachability_tester import (
     is_declarative_identifier,
 )
 from vint.ast.plugin.scope_plugin import ScopePlugin
+from vint.linting.lint_target import LintTargetFile
 
 
 FIXTURE_BASE_PATH = Path('test', 'fixture', 'ast', 'scope_plugin')
@@ -41,7 +42,7 @@ class Fixtures(enum.Enum):
 class TestScopePlugin(unittest.TestCase):
     def create_ast(self, file_path):
         parser = Parser()
-        ast = parser.parse_file(file_path.value)
+        ast = parser.parse(LintTargetFile(file_path.value))
         return ast
 
 

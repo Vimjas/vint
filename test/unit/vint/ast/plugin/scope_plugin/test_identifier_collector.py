@@ -3,6 +3,7 @@ from pathlib import Path
 
 from vint.ast.parsing import Parser
 from vint.ast.plugin.scope_plugin.identifier_classifier import IdentifierClassifier
+from vint.linting.lint_target import LintTargetFile
 
 FIXTURE_BASE_PATH = Path('test', 'fixture', 'ast', 'scope_plugin')
 
@@ -15,7 +16,7 @@ Fixtures = {
 class TestIdentifierCollector(unittest.TestCase):
     def create_ast(self, file_path):
         parser = Parser()
-        ast = parser.parse_file(file_path)
+        ast = parser.parse(LintTargetFile(file_path))
 
         id_classifier = IdentifierClassifier()
         attached_ast = id_classifier.attach_identifier_attributes(ast)

@@ -34,6 +34,7 @@ class ConfigCmdargsSource(ConfigSource):
         config_dict = self._normalize_max_violations(env, config_dict)
         config_dict = self._normalize_format(env, config_dict)
         config_dict = self._normalize_env(env, config_dict)
+        config_dict = self._normalize_stdin_filename(env, config_dict)
 
         return config_dict
 
@@ -114,3 +115,8 @@ class ConfigCmdargsSource(ConfigSource):
             config_dict_cmdargs['env'] = {'neovim': True}
 
         return config_dict
+
+
+    def _normalize_stdin_filename(self, env, config_dict):
+        return self._pass_config_by_key('stdin_alt_path', env, config_dict)
+
