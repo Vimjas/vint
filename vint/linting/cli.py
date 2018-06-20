@@ -184,10 +184,21 @@ def _adjust_log_level(env):
 def _build_lint_target(path, config_dict): # type: (Path, Dict[str, Any]) -> AbstractLintTarget
     if path == _stdin_symbol:
         stdin_alt_path = get_config_value(config_dict, ['cmdargs', 'stdin_alt_path'])
-        lint_target = LintTargetBufferedStream(
-            alternate_path=Path(stdin_alt_path),
-            buffered_io=sys.stdin.buffer
-        )
+
+        # NOTE: In Python 3, sys.stdin is a string not bytes. Then we can get bytes by sys.stdin.buffer.
+        #       But in Python 2, sys.stdin.buffer is not defined. But we can get bytes by sys.stdin directly.
+        is_python_3 = hasattr(sys.stdin, 'buffer')
+        if is_python_3:
+            lint_target = LintTargetBufferedStream(
+                alternate_path=Path(stdin_alt_path),
+                buffered_io=sys.stdin.buffer
+            )
+        else:
+            lint_target = LintTargetBufferedStream(
+                alternate_path=Path(stdin_alt_path),
+                buffered_io=sys.stdin
+            )
+
         return CachedLintTarget(lint_target)
     else:
         lint_target = LintTargetFile(path)
