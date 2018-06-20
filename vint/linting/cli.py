@@ -194,12 +194,21 @@ def _build_lint_target(path, config_dict): # type: (Path, Dict[str, Any]) -> Abs
                 buffered_io=sys.stdin.buffer
             )
         else:
+            # NOTE: Python 2 on Windows opens sys.stdin in text mode, and
+            # binary data that read from it becomes corrupted on \r\n
+            # SEE: https://stackoverflow.com/questions/2850893/reading-binary-data-from-stdin/38939320#38939320
+            if sys.platform == 'win32':
+                # set sys.stdin to binary mode
+                import os, msvcrt
+                msvcrt.setmode(sys.stdin.fileno(), os.O_BINARY)
+
             lint_target = LintTargetBufferedStream(
                 alternate_path=Path(stdin_alt_path),
                 buffered_io=sys.stdin
             )
 
         return CachedLintTarget(lint_target)
+
     else:
         lint_target = LintTargetFile(path)
         return CachedLintTarget(lint_target)
