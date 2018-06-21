@@ -144,5 +144,17 @@ class TestCLI(unittest.TestCase):
         self.assertRegex(got_output, expected_output_pattern)
 
 
+    def test_exec_vint_with_pipe(self):
+        cmd = 'echo "foo" =~ "bar" | bin/vint --stdin-display-name STDIN_TEST -'
+
+        with self.assertRaises(subprocess.CalledProcessError) as context_manager:
+            subprocess.check_output(cmd, shell=True, universal_newlines=True)
+
+        got_output = context_manager.exception.output
+
+        expected_output_pattern = '^STDIN_TEST:'
+        self.assertRegex(got_output, expected_output_pattern)
+
+
 if __name__ == '__main__':
     unittest.main()
