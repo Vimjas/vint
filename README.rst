@@ -122,7 +122,7 @@ You can configure linting severity, max errors, ... as following:
 
     $ vint --color --style ~/.vimrc
 
-And you can see all available options by `--help` as following:
+And you can see all available options by using `--help`:
 
 ::
     $ vint --help
