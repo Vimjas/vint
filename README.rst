@@ -152,7 +152,7 @@ And you can see all available options by using `--help`:
       --enable-neovim       enable Neovim syntax
       -f FORMAT, --format FORMAT
                             set output format
-      --stdin-alt-path STDIN_ALT_PATH
+      --stdin-display-name STDIN_DISPLAY_NAME
                             specify a file path that is used for reporting when
                             linting standard inputs
 

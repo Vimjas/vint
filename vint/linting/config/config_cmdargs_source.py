@@ -118,5 +118,5 @@ class ConfigCmdargsSource(ConfigSource):
 
 
     def _normalize_stdin_filename(self, env, config_dict):
-        return self._pass_config_by_key('stdin_alt_path', env, config_dict)
+        return self._pass_config_by_key('stdin_display_name', env, config_dict)
 

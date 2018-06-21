@@ -105,7 +105,7 @@ def _build_arg_parser():
     parser.add_argument('-t', '--stat', action='store_const', const=True, help='output statistic info')
     parser.add_argument('--enable-neovim', action='store_const', const=True, help='enable Neovim syntax')
     parser.add_argument('-f', '--format', help='set output format')
-    parser.add_argument('--stdin-alt-path', type=str, help='specify a file path that is used for reporting when linting standard inputs')
+    parser.add_argument('--stdin-display-name', type=str, help='specify a file path that is used for reporting when linting standard inputs')
     parser.add_argument('files', nargs='*', help='file or directory path to lint')
 
     return parser
@@ -183,7 +183,7 @@ def _adjust_log_level(env):
 
 def _build_lint_target(path, config_dict): # type: (Path, Dict[str, Any]) -> AbstractLintTarget
     if path == _stdin_symbol:
-        stdin_alt_path = get_config_value(config_dict, ['cmdargs', 'stdin_alt_path'])
+        stdin_alt_path = get_config_value(config_dict, ['cmdargs', 'stdin_display_name'])
 
         # NOTE: In Python 3, sys.stdin is a string not bytes. Then we can get bytes by sys.stdin.buffer.
         #       But in Python 2, sys.stdin.buffer is not defined. But we can get bytes by sys.stdin directly.
