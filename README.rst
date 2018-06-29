@@ -125,6 +125,7 @@ You can configure linting severity, max errors, ... as following:
 And you can see all available options by using `--help`:
 
 ::
+
     $ vint --help
     usage: vint [-h] [-v] [-V] [-e] [-w] [-s] [-m MAX_VIOLATIONS] [-c]
                 [--no-color] [-j] [-t] [--enable-neovim] [-f FORMAT]
