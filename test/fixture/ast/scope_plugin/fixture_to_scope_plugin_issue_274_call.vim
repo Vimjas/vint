@@ -1,0 +1,1 @@
+call call('s:Foo', [])

@@ -1,5 +1,4 @@
 from unittest import main, TestCase
-from vint.compat.unittest import mock
 
 from pprint import pprint
 from vint.linting.policy_set import PolicySet
@@ -9,13 +8,9 @@ from test.fixture.policy_set.policy_fixture_1 import PolicyFixture1
 from test.fixture.policy_set.policy_fixture_2 import PolicyFixture2
 
 
-@mock.patch('vint.linting.policy_registry.get_policy_class_map', lambda: {
-    'PolicyFixture1': PolicyFixture1,
-    'PolicyFixture2': PolicyFixture2,
-})
 class TestPolicySet(TestCase):
     def test_get_enabled_policies_when_no_updated(self):
-        policy_set = PolicySet()
+        policy_set = PolicySet([PolicyFixture1, PolicyFixture2])
 
         expected_no_policies = policy_set.get_enabled_policies()
         self.assertEqual(expected_no_policies, [],
@@ -49,7 +44,7 @@ class TestPolicySet(TestCase):
             }
         }
 
-        policy_set = PolicySet()
+        policy_set = PolicySet([PolicyFixture1, PolicyFixture2])
         policy_set.update_by_config(config_dict)
 
         actual_enabled_policies = policy_set.get_enabled_policies()
@@ -69,7 +64,7 @@ class TestPolicySet(TestCase):
             'policies': {}
         }
 
-        policy_set = PolicySet()
+        policy_set = PolicySet([PolicyFixture1, PolicyFixture2])
         policy_set.update_by_config(config_dict)
 
         actual_enabled_policies = policy_set.get_enabled_policies()
@@ -89,7 +84,7 @@ class TestPolicySet(TestCase):
             'policies': {}
         }
 
-        policy_set = PolicySet()
+        policy_set = PolicySet([PolicyFixture1, PolicyFixture2])
         policy_set.update_by_config(config_dict)
 
         actual_enabled_policies = policy_set.get_enabled_policies()

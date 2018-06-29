@@ -10,7 +10,7 @@ class Parser(object):
         """ Initialize Parser with the specified plugins.
         The plugins can add attributes to the AST.
         """
-        self.plugins = plugins.values() if plugins else []
+        self.plugins = plugins if plugins else []
         self._enable_neovim = enable_neovim
 
 

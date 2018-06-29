@@ -1,3 +1,6 @@
+from typing import Dict, Any
+
+
 class ConfigSource(object):
     class ConfigError(Exception):
         def __init__(self, msg):
@@ -8,4 +11,5 @@ class ConfigSource(object):
 
 
     def get_config_dict(self):
+        # type: () -> Dict[str, Any]
         raise NotImplementedError()

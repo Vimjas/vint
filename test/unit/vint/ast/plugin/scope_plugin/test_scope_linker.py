@@ -1,9 +1,16 @@
+from typing import List
 import unittest
 import enum
 from pathlib import Path
 
 from vint.ast.parsing import Parser
-from vint.ast.plugin.scope_plugin.scope_linker import ScopeLinker, ScopeVisibility
+from vint.ast.plugin.scope_plugin.scope_linker import ScopeLinker
+from vint.ast.plugin.scope_plugin.scope import (
+    Scope,
+    ScopeVisibility,
+    VariableDeclaration,
+    ExplicityOfScopeVisibility,
+)
 
 
 FIXTURE_BASE_PATH = Path('test', 'fixture', 'ast', 'scope_plugin')
@@ -21,6 +28,7 @@ class Fixtures(enum.Enum):
     DESTRUCTURING_ASSIGNMENT = Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_destructuring_assignment.vim')
     DECLARING_AND_REFERENCING = Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_declaring_and_referencing.vim')
     REDIR = Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_redir.vim')
+    LAMBDA = Path(FIXTURE_BASE_PATH, 'fixture_to_scope_plugin_lambda_param.vim')
 
 
 class TestScopeLinker(unittest.TestCase):
@@ -30,27 +38,56 @@ class TestScopeLinker(unittest.TestCase):
         return ast
 
 
-    def create_variable(self, is_implicit=False, is_builtin=False):
-        return {
-            'is_implicit': is_implicit,
-            'is_builtin': is_builtin,
-        }
+    def create_variable(self, explicity=ExplicityOfScopeVisibility.EXPLICIT, is_builtin=False,
+                        is_explicit_lambda_argument=False):
+        return VariableDeclaration(
+            explicity=explicity,
+            is_builtin=is_builtin,
+            is_explicit_lambda_argument=is_explicit_lambda_argument
+        )
 
 
     def create_scope(self, scope_visibility, variables=None, functions=None,
                      child_scopes=None):
-        return {
-            'scope_visibility': scope_visibility,
-            'functions': functions or {},
-            'variables': variables or {},
-            'child_scopes': child_scopes or [],
-        }
+        scope = Scope(scope_visibility=scope_visibility)
+        scope.functions=functions or {}
+        scope.variables=variables or {}
+        scope.child_scopes=child_scopes or []
+        return scope
 
 
-    def assertScopeTreeEqual(self, expected_scope_tree, actual_scope_tree):
+    def assertVariableDeclaration(self, expected_var_decl, actual_var_decl):
+        # type: (VariableDeclaration, VariableDeclaration) -> None
+
+        self.assertEqual(expected_var_decl.is_builtin, actual_var_decl.is_builtin, "is_builtin")
+        self.assertEqual(expected_var_decl.is_explicit_lambda_argument, actual_var_decl.is_explicit_lambda_argument, "is_explicit_lambda_argument")
+        self.assertEqual(expected_var_decl.explicity, actual_var_decl.explicity, "explicity")
+
+
+    def assertVariableDeclarations(self, expected_var_decls, actual_var_decls):
+        # type: (List[VariableDeclaration], List[VariableDeclaration]) -> None
+        for expected_var_decl, actual_var_decl in zip(expected_var_decls, actual_var_decls):
+            self.assertVariableDeclaration(expected_var_decl, actual_var_decl)
+
+
+    def assertScopeTreeEqual(self, expected_scope, actual_scope):
+        # type: (Scope, Scope) -> None
         self.maxDiff = 20000
 
-        self.assertEqual(expected_scope_tree, actual_scope_tree)
+        self.assertEqual(expected_scope.scope_visibility, actual_scope.scope_visibility)
+
+        self.assertEqual(set(expected_scope.functions.keys()), set(actual_scope.functions.keys()))
+        for expected_func_name, actual_func_name in zip(sorted(expected_scope.functions.keys()), sorted(actual_scope.functions.keys())):
+            self.assertVariableDeclarations(expected_scope.functions[expected_func_name], actual_scope.functions[actual_func_name])
+
+        self.assertEqual(set(expected_scope.variables.keys()), set(actual_scope.variables.keys()))
+        for expected_var_name, actual_var_name in zip(sorted(expected_scope.variables.keys()), sorted(actual_scope.variables.keys())):
+            self.assertVariableDeclarations(expected_scope.variables[expected_var_name], actual_scope.variables[actual_var_name])
+
+        for expected_child_scope, actual_child_scope in zip(expected_scope.child_scopes, actual_scope.child_scopes):
+            self.assertScopeTreeEqual(expected_child_scope, actual_child_scope)
+
+        # NOTE: Do not check scope.parent to avoid infinite recursion.
 
 
     def test_built_scope_tree_by_process_with_declaring_func(self):
@@ -69,8 +106,8 @@ class TestScopeLinker(unittest.TestCase):
                 'v:': [self.create_variable()],
             },
             functions={
-                'g:ExplicitGlobalFunc': [self.create_variable()],
-                'g:ImplicitGlobalFunc': [self.create_variable(is_implicit=True)],
+                'ExplicitGlobalFunc': [self.create_variable(explicity=ExplicityOfScopeVisibility.UNRECOMMENDED_EXPLICIT)],
+                'ImplicitGlobalFunc': [self.create_variable(explicity=ExplicityOfScopeVisibility.IMPLICIT_BUT_CONSTRAINED)],
             },
             child_scopes=[
                 self.create_scope(
@@ -133,8 +170,8 @@ class TestScopeLinker(unittest.TestCase):
                 'v:': [self.create_variable()],
             },
             functions={
-                'g:FuncContext': [self.create_variable(is_implicit=True)],
-                'g:ImplicitGlobalFunc': [self.create_variable(is_implicit=True)],
+                'FuncContext': [self.create_variable(explicity=ExplicityOfScopeVisibility.IMPLICIT_BUT_CONSTRAINED)],
+                'ImplicitGlobalFunc': [self.create_variable(explicity=ExplicityOfScopeVisibility.IMPLICIT_BUT_CONSTRAINED)],
             },
             child_scopes=[
                 self.create_scope(
@@ -185,15 +222,15 @@ class TestScopeLinker(unittest.TestCase):
                 'w:': [self.create_variable()],
                 't:': [self.create_variable()],
                 'v:': [self.create_variable()],
-                'g:explicit_global_var': [self.create_variable()],
+                'explicit_global_var': [self.create_variable()],
                 'b:buffer_local_var': [self.create_variable()],
                 'w:window_local_var': [self.create_variable()],
                 't:tab_local_var': [self.create_variable()],
-                'g:implicit_global_var': [self.create_variable(is_implicit=True)],
-                '$ENV_VAR': [self.create_variable()],
-                '@"': [self.create_variable()],
-                '&opt_var': [self.create_variable()],
-                'v:count': [self.create_variable(is_builtin=True)],
+                'implicit_global_var': [self.create_variable(explicity=ExplicityOfScopeVisibility.IMPLICIT)],
+                '$ENV_VAR': [self.create_variable(explicity=ExplicityOfScopeVisibility.IMPLICIT_BUT_CONSTRAINED)],
+                '@"': [self.create_variable(explicity=ExplicityOfScopeVisibility.IMPLICIT_BUT_CONSTRAINED)],
+                '&opt_var': [self.create_variable(explicity=ExplicityOfScopeVisibility.IMPLICIT_BUT_CONSTRAINED)],
+                'count': [self.create_variable(is_builtin=True)],
             },
             child_scopes=[
                 self.create_scope(
@@ -225,7 +262,7 @@ class TestScopeLinker(unittest.TestCase):
                 'v:': [self.create_variable()],
             },
             functions={
-                'g:FuncContext': [self.create_variable(is_implicit=True)],
+                'FuncContext': [self.create_variable(explicity=ExplicityOfScopeVisibility.IMPLICIT_BUT_CONSTRAINED)],
             },
             child_scopes=[
                 self.create_scope(
@@ -241,8 +278,8 @@ class TestScopeLinker(unittest.TestCase):
                                 'a:': [self.create_variable()],
                                 'a:0': [self.create_variable()],
                                 'a:000': [self.create_variable()],
-                                'l:explicit_func_local_var': [self.create_variable()],
-                                'l:implicit_func_local_var': [self.create_variable(is_implicit=True)],
+                                'explicit_func_local_var': [self.create_variable()],
+                                'implicit_func_local_var': [self.create_variable(explicity=ExplicityOfScopeVisibility.IMPLICIT)],
                             }
                         )
                     ]
@@ -281,7 +318,7 @@ class TestScopeLinker(unittest.TestCase):
                             ScopeVisibility.FUNCTION_LOCAL,
                             variables={
                                 'l:': [self.create_variable()],
-                                'l:self': [self.create_variable()],
+                                'self': [self.create_variable()],
                                 'a:': [self.create_variable()],
                                 'a:0': [self.create_variable()],
                                 'a:000': [self.create_variable()],
@@ -291,7 +328,7 @@ class TestScopeLinker(unittest.TestCase):
                             ScopeVisibility.FUNCTION_LOCAL,
                             variables={
                                 'l:': [self.create_variable()],
-                                'l:self': [self.create_variable()],
+                                'self': [self.create_variable()],
                                 'a:': [self.create_variable()],
                                 'a:0': [self.create_variable()],
                                 'a:000': [self.create_variable()],
@@ -319,12 +356,12 @@ class TestScopeLinker(unittest.TestCase):
                 'w:': [self.create_variable()],
                 't:': [self.create_variable()],
                 'v:': [self.create_variable()],
-                'g:for_var1': [self.create_variable()],
-                'g:for_var2': [self.create_variable()],
-                'g:let_var1': [self.create_variable()],
-                'g:let_var2': [self.create_variable()],
-                'g:let_var3': [self.create_variable()],
-                'g:rest': [self.create_variable()],
+                'for_var1': [self.create_variable()],
+                'for_var2': [self.create_variable()],
+                'let_var1': [self.create_variable()],
+                'let_var2': [self.create_variable()],
+                'let_var3': [self.create_variable()],
+                'rest': [self.create_variable()],
                 # g:list members are not analyzable
             },
             child_scopes=[
@@ -356,13 +393,13 @@ class TestScopeLinker(unittest.TestCase):
                 'v:': [self.create_variable()],
             },
             functions={
-                'g:FunctionWithNoParams': [self.create_variable()],
-                'g:FunctionWithOneParam': [self.create_variable()],
-                'g:FunctionWithTwoParams': [self.create_variable()],
-                'g:FunctionWithVarParams': [self.create_variable()],
-                'g:FunctionWithParamsAndVarParams': [self.create_variable()],
-                'g:FunctionWithRange': [self.create_variable()],
-                'g:FunctionWithDict': [self.create_variable()],
+                'FunctionWithNoParams': [self.create_variable(explicity=ExplicityOfScopeVisibility.UNRECOMMENDED_EXPLICIT)],
+                'FunctionWithOneParam': [self.create_variable(explicity=ExplicityOfScopeVisibility.UNRECOMMENDED_EXPLICIT)],
+                'FunctionWithTwoParams': [self.create_variable(explicity=ExplicityOfScopeVisibility.UNRECOMMENDED_EXPLICIT)],
+                'FunctionWithVarParams': [self.create_variable(explicity=ExplicityOfScopeVisibility.UNRECOMMENDED_EXPLICIT)],
+                'FunctionWithParamsAndVarParams': [self.create_variable(explicity=ExplicityOfScopeVisibility.UNRECOMMENDED_EXPLICIT)],
+                'FunctionWithRange': [self.create_variable(explicity=ExplicityOfScopeVisibility.UNRECOMMENDED_EXPLICIT)],
+                'FunctionWithDict': [self.create_variable(explicity=ExplicityOfScopeVisibility.UNRECOMMENDED_EXPLICIT)],
             },
             child_scopes=[
                 self.create_scope(
@@ -475,7 +512,7 @@ class TestScopeLinker(unittest.TestCase):
                             ScopeVisibility.FUNCTION_LOCAL,
                             variables={
                                 'l:': [self.create_variable()],
-                                'l:self': [self.create_variable()],
+                                'self': [self.create_variable()],
                                 'a:': [self.create_variable()],
                                 'a:0': [self.create_variable()],
                                 'a:000': [self.create_variable()],
@@ -532,7 +569,7 @@ class TestScopeLinker(unittest.TestCase):
                 'w:': [self.create_variable()],
                 't:': [self.create_variable()],
                 'v:': [self.create_variable()],
-                'g:implicit_global_loop_var': [self.create_variable(is_implicit=True)]
+                'implicit_global_loop_var': [self.create_variable(explicity=ExplicityOfScopeVisibility.IMPLICIT)]
             },
             child_scopes=[
                 self.create_scope(
@@ -561,7 +598,7 @@ class TestScopeLinker(unittest.TestCase):
                 'w:': [self.create_variable()],
                 't:': [self.create_variable()],
                 'v:': [self.create_variable()],
-                'g:var': [self.create_variable()]
+                'var': [self.create_variable()]
             },
             child_scopes=[
                 self.create_scope(
@@ -587,7 +624,7 @@ class TestScopeLinker(unittest.TestCase):
 
         scope_tree = linker.scope_tree
         # Expect a script local scope
-        expected_scope = scope_tree['child_scopes'][0]
+        expected_scope = scope_tree.child_scopes[0]
 
         link_registry = linker.link_registry
         actual_scope = link_registry.get_context_scope_by_identifier(ref_id_node)
@@ -606,7 +643,7 @@ class TestScopeLinker(unittest.TestCase):
 
         scope_tree = linker.scope_tree
         # Expect a script local scope
-        expected_scope = scope_tree['child_scopes'][0]
+        expected_scope = scope_tree.child_scopes[0]
 
         link_registry = linker.link_registry
         actual_scope = link_registry.get_context_scope_by_identifier(dec_id_node)
@@ -625,13 +662,73 @@ class TestScopeLinker(unittest.TestCase):
 
         scope_tree = linker.scope_tree
         # Function local scope
-        scope = scope_tree['child_scopes'][0]
-        variable_func = scope['functions']['s:Function'][0]
+        scope = scope_tree.child_scopes[0]
+        variable_func = scope.functions['s:Function'][0]
 
         link_registry = linker.link_registry
         actual_dec_id = link_registry.get_declarative_identifier_by_variable(variable_func)
 
-        self.assertScopeTreeEqual(expected_dec_id, actual_dec_id)
+        self.assertEqual(expected_dec_id, actual_dec_id)
+
+
+    def test_built_scope_tree_by_process_with_lambda(self):
+        ast = self.create_ast(Fixtures.LAMBDA)
+        linker = ScopeLinker()
+
+        linker.process(ast)
+
+        expected_scope_tree = self.create_scope(
+            ScopeVisibility.GLOBAL_LIKE,
+            variables={
+                'g:': [self.create_variable()],
+                'b:': [self.create_variable()],
+                'w:': [self.create_variable()],
+                't:': [self.create_variable()],
+                'v:': [self.create_variable()],
+            },
+            child_scopes=[
+                self.create_scope(
+                    ScopeVisibility.SCRIPT_LOCAL,
+                    variables={
+                        's:': [self.create_variable()],
+                    },
+                    child_scopes=[
+                        self.create_scope(
+                            ScopeVisibility.LAMBDA,
+                            variables={
+                                'i': [self.create_variable(
+                                    explicity=ExplicityOfScopeVisibility.IMPLICIT_BUT_CONSTRAINED,
+                                    is_explicit_lambda_argument=True,
+                                )],
+                                'a:000': [self.create_variable()],
+                                'a:0': [self.create_variable()],
+                                'a:1': [self.create_variable()],
+                                'a:2': [self.create_variable()],
+                                'a:3': [self.create_variable()],
+                                'a:4': [self.create_variable()],
+                                'a:5': [self.create_variable()],
+                                'a:6': [self.create_variable()],
+                                'a:7': [self.create_variable()],
+                                'a:8': [self.create_variable()],
+                                'a:9': [self.create_variable()],
+                                'a:10': [self.create_variable()],
+                                'a:11': [self.create_variable()],
+                                'a:12': [self.create_variable()],
+                                'a:13': [self.create_variable()],
+                                'a:14': [self.create_variable()],
+                                'a:15': [self.create_variable()],
+                                'a:16': [self.create_variable()],
+                                'a:17': [self.create_variable()],
+                                'a:18': [self.create_variable()],
+                                'a:19': [self.create_variable()],
+                            },
+                        ),
+                    ]
+                )
+            ]
+        )
+
+        self.assertScopeTreeEqual(expected_scope_tree, linker.scope_tree)
 
 
 if __name__ == '__main__':

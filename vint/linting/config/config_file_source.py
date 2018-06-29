@@ -1,3 +1,5 @@
+from typing import Dict, Any
+from pathlib import Path
 import yaml
 import logging
 from vint.linting.config.config_source import ConfigSource
@@ -7,6 +9,7 @@ from vint.linting.level import Level
 
 class ConfigFileSource(ConfigSource):
     def __init__(self, env):
+        # type: (Dict[str, Any]) -> None
         config_file_path = self.get_file_path(env)
 
         with config_file_path.open() as file_obj:
@@ -14,13 +17,14 @@ class ConfigFileSource(ConfigSource):
 
 
     def convert_config_dict(self, yaml_dict):
+        # type: (Dict[str, Any]) -> Dict[str, Any]
+
         if not yaml_dict:
-            return {}
+            return {'source_name': self.__class__.__name__}
 
         if 'cmdargs' in yaml_dict:
             # Care empty hash, because it becomes None.
-            if yaml_dict['cmdargs'] is None:
-                yaml_dict['cmdargs'] = {}
+            yaml_dict.setdefault('cmdargs', {})
 
             cmdargs_dict = yaml_dict['cmdargs']
 
@@ -29,15 +33,18 @@ class ConfigFileSource(ConfigSource):
                 severity = getattr(Level, severity_name, None)
 
                 if not severity:
-                    self._warn_invalid_severity(severity_name)
+                    ConfigFileSource._warn_invalid_severity(severity_name)
                     return yaml_dict
 
                 cmdargs_dict['severity'] = severity
 
+        yaml_dict['source_name'] = self.__class__.__name__
         return yaml_dict
 
 
-    def _warn_invalid_severity(self, severity_name):
+    @classmethod
+    def _warn_invalid_severity(cls, severity_name):
+        # type: (str) -> None
         possible_severities = ', '.join([possible_severity.name.lower()
                                          for possible_severity
                                          in list(Level)])
@@ -49,8 +56,10 @@ class ConfigFileSource(ConfigSource):
 
 
     def get_file_path(self, env):
+        # type: (Dict[str, Any]) -> Path
         raise NotImplementedError()
 
 
     def get_config_dict(self):
+        # type: () -> Dict[str, Any]
         return self._config_dict

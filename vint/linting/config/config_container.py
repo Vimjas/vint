@@ -1,6 +1,25 @@
+from typing import Dict, Any
 from functools import reduce
 from vint.linting.config.config_source import ConfigSource
 
+
+def merge_dict_deeply(posterior, prior):
+    # type: (Dict[str, Any], Dict[str, Any]) -> Dict[str, Any]
+    tmp = {}
+
+    for key in set(posterior.keys()) | set(prior.keys()):
+        if key in prior:
+            if isinstance(prior[key], dict):
+                tmp[key] = merge_dict_deeply(posterior.get(key, {}), prior[key])
+            else:
+                tmp[key] = prior[key]
+        else:
+            if isinstance(posterior[key], dict):
+                tmp[key] = posterior[key].copy()
+            else:
+                tmp[key] = posterior[key]
+
+    return tmp
 
 
 class ConfigContainer(ConfigSource):
@@ -9,20 +28,10 @@ class ConfigContainer(ConfigSource):
 
 
     def get_config_dict(self):
-        def extends_deeply(dict_to_extend, prior_dict):
-            for key, value in prior_dict.items():
-                if isinstance(value, dict):
-                    if key in dict_to_extend:
-                        extends_deeply(dict_to_extend[key], value)
-                    else:
-                        dict_to_extend[key] = value
-                else:
-                    dict_to_extend[key] = value
-
-            return dict_to_extend
-
-
         config_dicts_ordered_by_prior_asc = [config_source.get_config_dict()
                                              for config_source in self.config_sources]
 
-        return reduce(extends_deeply, config_dicts_ordered_by_prior_asc, {})
+        result = reduce(merge_dict_deeply, config_dicts_ordered_by_prior_asc, {})
+        result['source_name'] = self.__class__.__name__
+
+        return result

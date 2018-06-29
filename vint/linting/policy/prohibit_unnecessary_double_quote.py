@@ -1,6 +1,6 @@
 import re
 from vint.ast.node_type import NodeType
-from vint.ast.plugin.scope_plugin.map_and_filter_parser import get_string_context
+from vint.ast.plugin.scope_plugin.call_node_parser import is_on_string_expr_context
 from vint.linting.level import Level
 from vint.linting.policy.abstract_policy import AbstractPolicy
 from vint.linting.policy.reference.googlevimscriptstyleguide import get_reference_source
@@ -43,9 +43,10 @@ class ProhibitUnnecessaryDoubleQuote(AbstractPolicy):
     def is_valid(self, node, lint_context):
         """ Whether the specified node is valid.
 
-        In this policy, valid node is only 2 cases;
+        In this policy, valid node is only 3 cases;
         - single quoted
         - double quoted, but including a special char
+        - double quoted inside single quoted
 
         See `:help expr-string`. """
 
@@ -60,5 +61,4 @@ class ProhibitUnnecessaryDoubleQuote(AbstractPolicy):
         if has_escaped_char:
             return True
 
-        string_expr_context = get_string_context(node)
-        return string_expr_context['is_on_str_expr_context']
+        return is_on_string_expr_context(node)

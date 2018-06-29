@@ -70,6 +70,10 @@ ChildType = {
         'accessor': ChildNodeAccessor['LIST'],
         'property_name': 'value',
     },
+    'CURLYNAMEEXPR_VALUES': {
+        'accessor': ChildNodeAccessor['NODE'],
+        'property_name': 'value',
+    },
 
     'ELSEIF': {
         'accessor': ChildNodeAccessor['LIST'],
@@ -124,7 +128,7 @@ ChildNodeAccessorMap = {
     NodeType.ENDIF: [],
     NodeType.WHILE: [ChildType['COND'], ChildType['BODY'], ChildType['ENDWHILE']],
     NodeType.ENDWHILE: [],
-    NodeType.FOR: [ChildType['BODY'], ChildType['LEFT'], ChildType['LIST'], ChildType['REST'], ChildType['RIGHT'], ChildType['ENDFOR']],
+    NodeType.FOR: [ChildType['LEFT'], ChildType['LIST'], ChildType['RIGHT'], ChildType['REST'], ChildType['BODY'], ChildType['ENDFOR']],
     NodeType.ENDFOR: [],
     NodeType.CONTINUE: [],
     NodeType.BREAK: [],
@@ -196,8 +200,8 @@ ChildNodeAccessorMap = {
     NodeType.ENV: [],
     NodeType.REG: [],
     NodeType.CURLYNAMEPART: [],
-    NodeType.CURLYNAMEEXPR: [],
-    NodeType.LAMBDA: [],
+    NodeType.CURLYNAMEEXPR: [ChildType['CURLYNAMEEXPR_VALUES']],
+    NodeType.LAMBDA: [ChildType['RLIST'], ChildType['LEFT']],
 }
 
 

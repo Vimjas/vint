@@ -23,24 +23,23 @@ class TestIdentifierCollector(unittest.TestCase):
         return attached_ast
 
 
-    def test_bucket(self):
+    def test_loop_var(self):
         ast = self.create_ast(Fixtures['LOOP_VAR'])
         collector = IdentifierClassifier.IdentifierCollector()
 
         bucket = collector.collect_identifiers(ast)
 
         declaring_id_values = [id_node['value'] for id_node in
-                               bucket['static_declaring_identifiers']]
+                               bucket.statically_declared_identifiers]
 
         referencing_id_values = [id_node['value'] for id_node in
-                                 bucket['static_referencing_identifiers']]
+                                 bucket.statically_referencing_identifiers]
 
         expected_declaring_id_values = ['implicit_global_loop_var']
         expected_referencing_id_values = ['g:array']
 
         self.assertEqual(expected_declaring_id_values, declaring_id_values)
         self.assertEqual(expected_referencing_id_values, referencing_id_values)
-
 
 
 if __name__ == '__main__':

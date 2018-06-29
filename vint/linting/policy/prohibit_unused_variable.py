@@ -1,3 +1,5 @@
+import re
+import logging
 from vint.ast.node_type import NodeType
 from vint.linting.level import Level
 from vint.linting.policy.abstract_policy import AbstractPolicy
@@ -42,6 +44,18 @@ class ProhibitUnusedVariable(AbstractPolicy):
                 scope_visibility is ScopeVisibility.UNANALYZABLE):
             return True
 
-        self.description = 'Unused variable: {var_name}'.format(
-            var_name=identifier['value'])
+        identifier_value = identifier['value']
+
+        # Ignore the violation when the name is specified by "policies.ProhibitUnusedVariable.ignored_patterns".
+        ignored_patterns = self.get_policy_config(lint_context).get("ignored_patterns", [])
+        for ignored_pattern in ignored_patterns:
+            if re.search(ignored_pattern, identifier_value) is not None:
+                logging.debug("{policy_name}: {name} is unused but ignored by the ignored_pattern {ignored_pattern}.".format(
+                    policy_name=self.__class__.__name__,
+                    name=identifier_value,
+                    ignored_pattern=ignored_pattern
+                ))
+                return True
+
+        self.description = 'Unused variable: {var_name}'.format(var_name=identifier_value)
         return False

@@ -143,10 +143,16 @@ You can enable/disable linting policies by a comment as following:
     let &cpo = s:save_cpo
     unlet s:save_cpo
 
-This syntax is: ``" vint: [+-]<PolicyName> [+-]<PolicyName> ...``.
+And you can use line config comments. It can enable/disable linting policies in only one line by the postfix comment:
 
-You can see all policy names on `Vint linting policy
-summary <https://github.com/Kuniwak/vint/wiki/Vint-linting-policy-summary>`__.
+.. code:: vim
+
+    " vint: next-line -ProhibitUnusedVariable
+    let s:foobar = 'x'
+    echo s:{'foo' . 'bar'}
+
+This syntax is: `" vint: [next-line] [+-]<PolicyName> [+-]<PolicyName> ...`.
+You can see all policy names on `Vint linting policy summary <https://github.com/Kuniwak/vint/wiki/Vint-linting-policy-summary>`__.
 
 Code health
 -----------

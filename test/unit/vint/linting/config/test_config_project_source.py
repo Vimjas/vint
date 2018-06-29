@@ -1,8 +1,8 @@
 import unittest
 from pathlib import Path
-from enum import Enum
 from test.asserting.config_source import ConfigSourceAssertion, get_fixture_path
 from vint.linting.config.config_project_source import ConfigProjectSource
+from vint.linting.level import Level
 
 
 class TestConfigProjectSource(ConfigSourceAssertion, unittest.TestCase):
@@ -15,8 +15,9 @@ class TestConfigProjectSource(ConfigSourceAssertion, unittest.TestCase):
             'cmdargs': {
                 'verbose': bool,
                 'error-limit': int,
-                'severity': Enum,
-            }
+                'severity': Level,
+            },
+            'source_name': str,
         }
 
         config_source = self.initialize_config_source_with_env(ConfigProjectSource, env)
@@ -32,8 +33,9 @@ class TestConfigProjectSource(ConfigSourceAssertion, unittest.TestCase):
             'cmdargs': {
                 'verbose': bool,
                 'error-limit': int,
-                'severity': Enum,
-            }
+                'severity': Level,
+            },
+            'source_name': str,
         }
 
         config_source = self.initialize_config_source_with_env(ConfigProjectSource, env)
@@ -49,8 +51,9 @@ class TestConfigProjectSource(ConfigSourceAssertion, unittest.TestCase):
             'cmdargs': {
                 'verbose': bool,
                 'error-limit': int,
-                'severity': Enum,
-            }
+                'severity': Level,
+            },
+            'source_name': str,
         }
 
         config_source = self.initialize_config_source_with_env(ConfigProjectSource, env)
@@ -66,8 +69,9 @@ class TestConfigProjectSource(ConfigSourceAssertion, unittest.TestCase):
             'cmdargs': {
                 'verbose': bool,
                 'error-limit': int,
-                'severity': Enum,
-            }
+                'severity': Level,
+            },
+            'source_name': str,
         }
 
         config_source = self.initialize_config_source_with_env(ConfigProjectSource, env)
@@ -79,7 +83,7 @@ class TestConfigProjectSource(ConfigSourceAssertion, unittest.TestCase):
             'cwd': get_fixture_path('unexistent_project')
         }
 
-        expected_config_dict = {}
+        expected_config_dict = {'source_name': 'ConfigProjectSource'}
 
         config_source = self.initialize_config_source_with_env(ConfigProjectSource, env)
         self.assertConfigDict(config_source, expected_config_dict)

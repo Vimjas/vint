@@ -12,6 +12,7 @@ from vint.linting.config.config_default_source import ConfigDefaultSource
 from vint.linting.config.config_global_source import ConfigGlobalSource
 from vint.linting.config.config_project_source import ConfigProjectSource
 from vint.linting.policy_set import PolicySet
+from vint.linting.policy_registry import get_policy_classes
 from vint.linting.formatter.formatter import Formatter
 from vint.linting.formatter.json_formatter import JSONFormatter
 from vint.linting.formatter.statistic_formatter import StatisticFormatter
@@ -107,7 +108,7 @@ class CLI(object):
 
 
     def _build_linter(self, config_dict):
-        policy_set = PolicySet()
+        policy_set = PolicySet(get_policy_classes())
         linter = Linter(policy_set, config_dict)
         return linter
 

@@ -1,5 +1,6 @@
 import re
 import logging
+from typing import Dict, List, Any
 from pathlib import Path
 from vint._bundles import vimlparser
 from vint.encodings.decoder import EncodingDetectionError
@@ -9,9 +10,12 @@ from vint.ast.traversing import traverse
 from vint.ast.plugin.scope_plugin import ScopePlugin
 from vint.linting.config.config_container import ConfigContainer
 from vint.linting.config.config_dict_source import ConfigDictSource
-from vint.linting.config.config_comment_source import ConfigCommentSource
+from vint.linting.config.config_abstract_dynamic_source import ConfigAbstractDynamicSource
+from vint.linting.config.config_toggle_comment_source import ConfigToggleCommentSource
+from vint.linting.config.config_next_line_comment_source import ConfigNextLineCommentSource
 from vint.linting.config.config_util import get_config_value
 from vint.linting.level import Level
+from vint.linting.policy_set import PolicySet
 
 
 class Linter(object):
@@ -30,35 +34,25 @@ class Linter(object):
     returned by policies.
     """
     def __init__(self, policy_set, config_dict_global):
+        # type: (PolicySet, Dict[str, Any]) -> None
+        self._is_debug = get_config_value(config_dict_global, ['cmdargs', 'verbose'], False)
+
         self._plugins = {
             'scope': ScopePlugin(),
         }
+
         self._policy_set = policy_set
-
-        self._config_comment_source = ConfigCommentSource()
-        self._config = self._decorate_config(config_dict_global,
-                                             self._config_comment_source)
-
+        self._config_dict_global = config_dict_global
         self._parser = self.build_parser()
 
         self._listeners_map = {}
 
 
     def build_parser(self):
-        config_dict = self._config.get_config_dict()
-        enable_neovim = get_config_value(config_dict, ['cmdargs', 'env', 'neovim'], False)
+        enable_neovim = get_config_value(self._config_dict_global, ['cmdargs', 'env', 'neovim'], False)
 
-        parser = Parser(self._plugins, enable_neovim=enable_neovim)
+        parser = Parser([self._plugins['scope']], enable_neovim=enable_neovim)
         return parser
-
-
-    def _decorate_config(self, config_dict_global, config_comment_source):
-        config_dict_source = ConfigDictSource(config_dict_global)
-
-        config_container = ConfigContainer(config_dict_source,
-                                           config_comment_source)
-
-        return config_container
 
 
     def _parse_vimlparser_error(self, err_message):
@@ -95,14 +89,7 @@ class Linter(object):
         }
 
 
-    def _log_file_path_to_lint(self, file_path):
-        msg = 'checking: `{file_path}`'.format(file_path=file_path)
-        logging.debug(msg)
-
-
     def lint_file(self, path):
-        self._log_file_path_to_lint(path)
-
         try:
             root_ast = self._parser.parse_file(path)
         except vimlparser.VimLParserException as exception:
@@ -118,8 +105,6 @@ class Linter(object):
 
 
     def lint_text(self, text):
-        self._log_file_path_to_lint('stdin')
-
         try:
             root_ast = self._parser.parse(text)
         except vimlparser.VimLParserException as exception:
@@ -135,6 +120,16 @@ class Linter(object):
 
 
     def _traverse(self, root_ast, path):
+        if self._is_debug:
+            logging.debug('{cls}: checking `{file_path}`'.format(
+                cls=self.__class__.__name__,
+                file_path=path)
+            )
+            logging.debug('{cls}: using config as {config_dict}'.format(
+                cls=self.__class__.__name__,
+                config_dict=self._config_dict_global
+            ))
+
         self._prepare_for_traversal()
 
         lint_context = {
@@ -151,12 +146,27 @@ class Linter(object):
 
 
     def _prepare_for_traversal(self):
-        self._violations = []
+        self._dynamic_configs = [
+            ConfigToggleCommentSource(),
+            ConfigNextLineCommentSource(is_debug=self._is_debug),
+        ]  # type: List[ConfigAbstractDynamicSource]
+
+        config_dict_source = ConfigDictSource(self._config_dict_global.copy())
+        self._config = ConfigContainer(config_dict_source, *self._dynamic_configs)
+
+        self._violations = []  # type: List[Dict[str, Any]]
         self._update_listeners_map()
 
 
     def _handle_enter(self, node, lint_context):
         self._refresh_policies_if_necessary(node)
+
+        if self._is_debug:
+            logging.debug("{cls}: checking {pos}".format(
+                cls=self.__class__.__name__,
+                pos=node['pos']
+            ))
+
         self._fire_listeners(node, lint_context)
 
         lint_context['stack_trace'].append(node)
@@ -182,17 +192,8 @@ class Linter(object):
 
 
     def _refresh_policies_if_necessary(self, node):
-        config_comment_source = self._config_comment_source
-
-        if not config_comment_source.is_requesting_update(node):
-            return
-
-        self._refresh_policies(node)
-
-
-    def _refresh_policies(self, node):
-        config_comment_source = self._config_comment_source
-        config_comment_source.update_by_node(node)
+        for dynamic_config in self._dynamic_configs:
+            dynamic_config.update_by_node(node)
 
         self._update_listeners_map()
 

@@ -17,9 +17,9 @@ function! s:ScriptLocalFunc()
 endfunction
 call s:ScriptLocalFunc()
 
-redir => l:redit_variable
+redir => l:redir_variable
 redir END
-echo l:redit_variable
+echo l:redir_variable
 
 function! g:FuncContext(param_var, param_func, param_member)
     " Parameter should be used
@@ -38,4 +38,6 @@ function! g:FuncContext(param_var, param_func, param_member)
 endfunction
 
 " redir variable should be used
-redir => l:redit_variable
+redir => l:redir_variable
+
+call { i, ... -> i }(0)

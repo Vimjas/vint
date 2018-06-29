@@ -33,6 +33,18 @@ class AbstractPolicy(object):
         }
 
 
+    def get_policy_config(self, lint_context):
+        """
+        Returns a config of the concrete policy. For example, a config of ProhibitSomethingEvil is located on
+        config.policies.ProhibitSomethingEvil.
+        """
+        policy_config = lint_context['config']\
+            .get('policies', {})\
+            .get(self.__class__.__name__, {})
+
+        return policy_config
+
+
     def get_violation_if_found(self, node, lint_context):
         """ Returns a violation if the node is invalid. """
         if self.is_valid(node, lint_context):

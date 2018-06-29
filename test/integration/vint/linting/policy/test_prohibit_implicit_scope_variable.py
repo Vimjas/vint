@@ -30,9 +30,9 @@ class TestProhibitImplicitScopeVariable(PolicyAssertion, unittest.TestCase):
         expected_violations = [
             self.create_violation(2, 5),
             self.create_violation(4, 10),
-            self.create_violation(8, 5),
-            self.create_violation(12, 10),
-            self.create_violation(16, 5),
+            self.create_violation(9, 10),
+            self.create_violation(13, 5),
+            self.create_violation(16, 11),
         ]
 
         self.assertFoundViolationsEqual(PATH_INVALID_VIM_SCRIPT,

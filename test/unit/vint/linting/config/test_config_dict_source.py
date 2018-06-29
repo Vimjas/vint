@@ -21,7 +21,8 @@ class TestConfigDictSource(ConfigSourceAssertion, unittest.TestCase):
                 'ProhibitSomethingDengerous': {
                     'enabled': True,
                 },
-            }
+            },
+            'source_name': 'ConfigDictSource',
         }
 
         config_source = ConfigDictSource(config_dict)
