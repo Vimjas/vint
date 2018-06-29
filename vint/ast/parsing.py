@@ -1,8 +1,10 @@
+from typing import Dict, Any
 import re
 from vint._bundles import vimlparser
 from vint.ast.traversing import traverse
 from vint.encodings.decoder import Decoder
 from vint.encodings.decoding_strategy import default_decoding_strategy
+from vint.linting.lint_target import AbstractLintTarget
 
 
 class Parser(object):
@@ -14,7 +16,16 @@ class Parser(object):
         self._enable_neovim = enable_neovim
 
 
-    def parse(self, string):
+    def parse(self, lint_target): # type: (AbstractLintTarget) -> Dict[str, Any]
+        """ Parse vim script file and return the AST. """
+        decoder = Decoder(default_decoding_strategy)
+        decoded = decoder.decode(lint_target.read())
+        decoded_and_lf_normalized = decoded.replace('\r\n', '\n')
+
+        return self.parse_string(decoded_and_lf_normalized)
+
+
+    def parse_string(self, string): # type: (str) -> Dict[str, Any]
         """ Parse vim script string and return the AST. """
         lines = string.split('\n')
 
@@ -29,15 +40,6 @@ class Parser(object):
             plugin.process(ast)
 
         return ast
-
-
-    def parse_file(self, file_path):
-        """ Parse vim script file and return the AST. """
-        decoder = Decoder(default_decoding_strategy)
-        decoded = decoder.read(file_path)
-        decoded_and_lf_normalized = decoded.replace('\r\n', '\n')
-
-        return self.parse(decoded_and_lf_normalized)
 
 
     def parse_redir(self, redir_cmd):
@@ -59,7 +61,7 @@ class Parser(object):
             }
 
             # NOTE: This is a hack to parse variable node.
-            raw_ast = self.parse('echo ' + redir_cmd_body)
+            raw_ast = self.parse_string('echo ' + redir_cmd_body)
 
             # We need the left node of ECHO node
             redir_cmd_ast = raw_ast['body'][0]['list'][0]
@@ -94,7 +96,7 @@ class Parser(object):
             string_expr_str = string_expr_str.replace('\\"', '"')
 
         # NOTE: This is a hack to parse expr1. See :help expr1
-        raw_ast = self.parse('echo ' + string_expr_str)
+        raw_ast = self.parse_string('echo ' + string_expr_str)
 
         # We need the left node of ECHO node
         parsed_string_expr_nodes = raw_ast['body'][0]['list']

@@ -1,3 +1,4 @@
+from typing import Dict, Any, List
 import re
 import logging
 from typing import Dict, List, Any
@@ -8,6 +9,7 @@ from vint.ast.parsing import Parser
 from vint.ast.node_type import NodeType
 from vint.ast.traversing import traverse
 from vint.ast.plugin.scope_plugin import ScopePlugin
+from vint.linting.lint_target import AbstractLintTarget
 from vint.linting.config.config_container import ConfigContainer
 from vint.linting.config.config_dict_source import ConfigDictSource
 from vint.linting.config.config_abstract_dynamic_source import ConfigAbstractDynamicSource
@@ -89,41 +91,28 @@ class Linter(object):
         }
 
 
-    def lint_file(self, path):
+    def lint(self, lint_target): # type: (AbstractLintTarget) -> List[Dict[str, Any]]
+        logging.debug('checking: `{file_path}`'.format(file_path=lint_target.path))
+
         try:
-            root_ast = self._parser.parse_file(path)
+            root_ast = self._parser.parse(lint_target)
         except vimlparser.VimLParserException as exception:
-            parse_error = self._create_parse_error(path, str(exception))
+            parse_error = self._create_parse_error(lint_target.path, str(exception))
             return [parse_error]
         except EncodingDetectionError as exception:
-            decoding_error = self._create_decoding_error(path, str(exception))
+            decoding_error = self._create_decoding_error(lint_target, str(exception))
             return [decoding_error]
 
-        self._traverse(root_ast, path)
+        self._traverse(root_ast, lint_target)
 
         return self._violations
 
 
-    def lint_text(self, text):
-        try:
-            root_ast = self._parser.parse(text)
-        except vimlparser.VimLParserException as exception:
-            parse_error = self._create_parse_error('stdin', str(exception))
-            return [parse_error]
-        except EncodingDetectionError as exception:
-            decoding_error = self._create_decoding_error('stdin', str(exception))
-            return [decoding_error]
-
-        self._traverse(root_ast, 'stdin')
-
-        return self._violations
-
-
-    def _traverse(self, root_ast, path):
+    def _traverse(self, root_ast, lint_target):
         if self._is_debug:
             logging.debug('{cls}: checking `{file_path}`'.format(
                 cls=self.__class__.__name__,
-                file_path=path)
+                file_path=lint_target.path)
             )
             logging.debug('{cls}: using config as {config_dict}'.format(
                 cls=self.__class__.__name__,
@@ -133,7 +122,7 @@ class Linter(object):
         self._prepare_for_traversal()
 
         lint_context = {
-            'path': path,
+            'lint_target': lint_target,
             'root_node': root_ast,
             'stack_trace': [],
             'plugins': self._plugins,

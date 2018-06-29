@@ -4,6 +4,7 @@ from test.asserting.ast import get_fixture_path
 from vint.ast.parsing import Parser
 from vint.ast.node_type import NodeType
 from vint.ast.traversing import traverse, SKIP_CHILDREN
+from vint.linting.lint_target import LintTargetFile
 
 FIXTURE_FILE = get_fixture_path('fixture_to_traverse.vim')
 
@@ -11,7 +12,7 @@ FIXTURE_FILE = get_fixture_path('fixture_to_traverse.vim')
 class TestTraverse(unittest.TestCase):
     def setUp(self):
         parser = Parser()
-        self.ast = parser.parse_file(FIXTURE_FILE)
+        self.ast = parser.parse(LintTargetFile(FIXTURE_FILE))
 
     def test_traverse(self):
         expected_order_of_events = [

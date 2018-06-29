@@ -1,7 +1,6 @@
 import sys
 from typing import Dict, Any
 from pprint import pformat
-from pathlib import Path
 from vint.encodings.decoding_strategy import DecodingStrategy
 
 
@@ -16,25 +15,22 @@ class Decoder(object):
         self.debug_hint = dict(version=sys.version)
 
 
-    def read(self, file_path):
-        # type: (Path) -> str
+    def decode(self, bytes_seq):
+        # type: (bytes) -> str
+        strings = []
 
-        with file_path.open(mode='rb') as f:
-            bytes_seq = f.read()
-            strings = []
+        for (loc, hunk) in _split_by_scriptencoding(bytes_seq):
+            debug_hint_for_the_loc = dict()
+            self.debug_hint[loc] = debug_hint_for_the_loc
 
-            for (loc, hunk) in _split_by_scriptencoding(bytes_seq):
-                debug_hint_for_the_loc = dict()
-                self.debug_hint[loc] = debug_hint_for_the_loc
+            string = self.strategy.decode(hunk, debug_hint=debug_hint_for_the_loc)
 
-                string = self.strategy.decode(hunk, debug_hint=debug_hint_for_the_loc)
+            if string is None:
+                raise EncodingDetectionError(self.debug_hint)
 
-                if string is None:
-                    raise EncodingDetectionError(self.debug_hint)
+            strings.append(string)
 
-                strings.append(string)
-
-            return ''.join(strings)
+        return ''.join(strings)
 
 
 def _split_by_scriptencoding(bytes_seq):

@@ -27,12 +27,12 @@ class TestEnv(unittest.TestCase):
                 'warning': True,
                 'max_violations': 10,
             },
-            'file_paths': set([
+            'file_paths': [
                 Path(FIXTURE_PATH, '1.vim'),
                 Path(FIXTURE_PATH, '2.vim'),
                 Path(FIXTURE_PATH, 'sub', '3.vim'),
                 Path(FIXTURE_PATH, 'sub', '4.vim'),
-            ]),
+            ],
             'home_path': home,
             'xdg_config_home': xdg_config_home,
             'cwd': cwd,

@@ -7,6 +7,7 @@ cmdargs:
   json: no
   env:
     neovim: no
+  stdin_display_name: stdin
 
 policies:
   # Experimental

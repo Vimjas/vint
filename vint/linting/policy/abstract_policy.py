@@ -28,7 +28,7 @@ class AbstractPolicy(object):
             'position': {
                 'line': node['pos']['lnum'],
                 'column': node['pos']['col'],
-                'path': lint_context['path'],
+                'path': lint_context['lint_target'].path,
             },
         }
 

@@ -1,5 +1,7 @@
+from typing import List, Dict, Any
 from pathlib import Path
 from ansicolor import Colors, colorize
+from vint.linting.formatter.abstract_formatter import AbstractFormatter
 
 
 DEFAULT_FORMAT = '{file_path}:{line_number}:{column_number}: {description} (see {reference})'
@@ -16,8 +18,8 @@ FORMAT_COLOR_MAP = {
 }
 
 
-class Formatter(object):
-    def __init__(self, config_dict):
+class Formatter(AbstractFormatter):
+    def __init__(self, config_dict): # type: (Dict[str, Any]) -> None
         if 'cmdargs' in config_dict:
             cmdargs = config_dict['cmdargs']
         else:
@@ -34,52 +36,55 @@ class Formatter(object):
             self._should_be_colorized = False
 
 
-    def _sort_violations(self, violations):
-        return sorted(violations, key=lambda violation: (violation['position']['path'],
-                                                         violation['position']['line']))
-
-
-    def format_violations(self, violations):
-        sorted_violations = self._sort_violations(violations)
+    def format_violations(self, violations): # type: (List[Dict[str, Any]]) -> str
+        sorted_violations = _sort_violations(violations)
         formatted_lines = map(self.format_violation, sorted_violations)
 
         return '\n'.join(formatted_lines)
 
 
-    def format_violation(self, violation):
+    def format_violation(self, violation): # type: (Dict[str, Any]) -> str
         if self._should_be_colorized:
-            formatter_map = self._get_colorize_formatter_map(violation)
+            formatter_map = _get_colorize_formatter_map(violation)
         else:
-            formatter_map = self._get_formatter_map(violation)
+            formatter_map = _get_formatter_map(violation)
 
         formatted_line = self._format.format(**formatter_map)
         return formatted_line
 
 
-    def _get_colorize_formatter_map(self, violation):
-        formatter_map = self._get_formatter_map(violation)
-        colorized_formatter_map = {}
 
-        for key, value in formatter_map.items():
-            if key in FORMAT_COLOR_MAP:
-                Color = FORMAT_COLOR_MAP[key]
-                colorized_formatter_map[key] = colorize(str(value), Color())
-            else:
-                colorized_formatter_map[key] = value
+def _get_colorize_formatter_map(violation):
+    formatter_map = _get_formatter_map(violation)
+    colorized_formatter_map = {}
 
-        return colorized_formatter_map
+    for key, value in formatter_map.items():
+        if key in FORMAT_COLOR_MAP:
+            Color = FORMAT_COLOR_MAP[key]
+            colorized_formatter_map[key] = colorize(str(value), Color())
+        else:
+            colorized_formatter_map[key] = value
+
+    return colorized_formatter_map
 
 
-    def _get_formatter_map(self, violation):
-        file_path = Path(violation['position']['path'])
 
-        return {
-            'file_path': file_path,
-            'file_name': file_path.name,
-            'line_number': violation['position']['line'],
-            'column_number': violation['position']['column'],
-            'severity': violation['level'].name.lower(),
-            'description': violation['description'],
-            'policy_name': violation['name'],
-            'reference': violation['reference'],
-        }
+def _get_formatter_map(violation):
+    file_path = Path(violation['position']['path'])
+
+    return {
+        'file_path': file_path,
+        'file_name': file_path.name,
+        'line_number': violation['position']['line'],
+        'column_number': violation['position']['column'],
+        'severity': violation['level'].name.lower(),
+        'description': violation['description'],
+        'policy_name': violation['name'],
+        'reference': violation['reference'],
+    }
+
+
+
+def _sort_violations(violations):
+    return sorted(violations, key=lambda violation: (violation['position']['path'],
+                                                     violation['position']['line']))

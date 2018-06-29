@@ -1,3 +1,4 @@
+import sys
 import os
 import os.path
 from pathlib import Path
@@ -10,7 +11,7 @@ def build_environment(cmdargs):
         'home_path': _get_home_path(),
         'xdg_config_home': _get_xdg_config_home(),
         'cwd': _get_cwd(),
-        'file_paths': _get_file_paths(cmdargs)
+        'file_paths': _get_file_paths(cmdargs),
     }
 
 
@@ -28,7 +29,7 @@ def _get_file_paths(cmdargs):
 
     found_file_paths = find_vim_script(map(Path, cmdargs['files']))
 
-    return set(found_file_paths)
+    return found_file_paths
 
 
 def _get_xdg_config_home():

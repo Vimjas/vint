@@ -1,6 +1,7 @@
 import unittest
 import enum
 from vint.linting.linter import Linter
+from vint.linting.lint_target import LintTargetFile
 from vint.linting.policy_set import PolicySet
 from vint.ast.node_type import NodeType
 from vint.linting.level import Level
@@ -20,9 +21,10 @@ class TestConfigNextLineCommentSource(ConfigSourceAssertion, unittest.TestCase):
         global_config_dict = {'cmdargs': {'severity': Level.ERROR}}
         policy_set = PolicySet([TestConfigNextLineCommentSource.ProhibitStringPolicy])
         linter = Linter(policy_set, global_config_dict)
+        lint_target = LintTargetFile(Fixtures.SIMPLE.value)
 
         reported_string_node_values = [violation['description']
-                                       for violation in linter.lint_file(Fixtures.SIMPLE.value)]
+                                       for violation in linter.lint(lint_target)]
 
         self.assertEqual(reported_string_node_values, [
             "'report me because I have no line config comments'",
@@ -34,9 +36,10 @@ class TestConfigNextLineCommentSource(ConfigSourceAssertion, unittest.TestCase):
         global_config_dict = {'cmdargs': {'severity': Level.ERROR}}
         policy_set = PolicySet([TestConfigNextLineCommentSource.ProhibitStringPolicy])
         linter = Linter(policy_set, global_config_dict)
+        lint_target = LintTargetFile(Fixtures.LAMBDA_STRING_EXPR.value)
 
         reported_string_node_values = [violation['description']
-                                       for violation in linter.lint_file(Fixtures.LAMBDA_STRING_EXPR.value)]
+                                       for violation in linter.lint(lint_target)]
 
         self.assertEqual(reported_string_node_values, [
             "'report me because I have no line config comments'",

@@ -24,7 +24,7 @@ class ProhibitNoAbortFunction(AbstractPolicy):
         This policy prohibits functions in autoload that have no 'abort' or bang
         """
 
-        if 'autoload' not in lint_context['path'].parts:
+        if 'autoload' not in lint_context['lint_target'].path.parts:
             return True
 
         has_bang = node['ea']['forceit'] != 0

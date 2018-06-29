@@ -4,6 +4,7 @@ from vint.ast.node_type import NodeType
 from vint.linting.level import Level
 from vint.linting.policy.abstract_policy import AbstractPolicy
 from vint.linting.linter import Linter
+from vint.linting.lint_target import LintTargetFile
 
 INVALID_VIM_SCRIPT = Path('test', 'fixture', 'linter', 'invalid.vim')
 BROKEN_VIM_SCRIPT = Path('test', 'fixture', 'linter', 'broken.vim')
@@ -86,7 +87,7 @@ class TestLinterIntegral(unittest.TestCase):
         }
 
         linter = Linter(policy_set, config_dict_global)
-        got_violations = linter.lint_file(INVALID_VIM_SCRIPT)
+        got_violations = linter.lint(LintTargetFile(INVALID_VIM_SCRIPT))
 
         expected_violations = [
             {
@@ -147,7 +148,7 @@ class TestLinterIntegral(unittest.TestCase):
         }
 
         linter = Linter(policy_set, config_dict_global)
-        got_violations = linter.lint_file(BROKEN_VIM_SCRIPT)
+        got_violations = linter.lint(LintTargetFile(BROKEN_VIM_SCRIPT))
 
         expected_violations = [
             {

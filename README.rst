@@ -122,6 +122,40 @@ You can configure linting severity, max errors, ... as following:
 
     $ vint --color --style ~/.vimrc
 
+And you can see all available options by using `--help`:
+
+::
+    $ vint --help
+    usage: vint [-h] [-v] [-V] [-e] [-w] [-s] [-m MAX_VIOLATIONS] [-c]
+                [--no-color] [-j] [-t] [--enable-neovim] [-f FORMAT]
+                [--stdin-alt-path STDIN_ALT_PATH]
+                [files [files ...]]
+    
+    Lint Vim script
+    
+    positional arguments:
+      files                 file or directory path to lint
+    
+    optional arguments:
+      -h, --help            show this help message and exit
+      -v, --version         show program's version number and exit
+      -V, --verbose         output verbose message
+      -e, --error           report only errors
+      -w, --warning         report errors and warnings
+      -s, --style-problem   report errors, warnings and style problems
+      -m MAX_VIOLATIONS, --max-violations MAX_VIOLATIONS
+                            limit max violations count
+      -c, --color           colorize output when possible
+      --no-color            do not colorize output
+      -j, --json            output json style
+      -t, --stat            output statistic info
+      --enable-neovim       enable Neovim syntax
+      -f FORMAT, --format FORMAT
+                            set output format
+      --stdin-display-name STDIN_DISPLAY_NAME
+                            specify a file path that is used for reporting when
+                            linting standard inputs
+
 Comment config
 ~~~~~~~~~~~~~~
 

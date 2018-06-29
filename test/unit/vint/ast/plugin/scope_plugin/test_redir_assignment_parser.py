@@ -9,6 +9,7 @@ from vint.ast.plugin.scope_plugin.redir_assignment_parser import (
     RedirAssignmentParser,
     get_redir_content,
 )
+from vint.linting.lint_target import LintTargetFile
 
 
 FIXTURE_BASE_PATH = Path('test', 'fixture', 'ast', 'scope_plugin')
@@ -22,7 +23,7 @@ class Fixtures(enum.Enum):
 class TestRedirAssignmentParser(unittest.TestCase):
     def create_ast(self, file_path):
         parser = Parser()
-        ast = parser.parse_file(file_path.value)
+        ast = parser.parse(LintTargetFile(file_path.value))
         return ast
 
 

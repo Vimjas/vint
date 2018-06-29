@@ -2,7 +2,7 @@ import importlib
 import pkgutil
 from pathlib import Path
 
-from vint.linting.cli import CLI
+from vint.linting.cli import start_cli
 import logging
 
 
@@ -18,8 +18,7 @@ def init_linter():
 
 
 def init_cli():
-    cli = CLI()
-    cli.start()
+    start_cli()
 
 
 def import_all_policies():

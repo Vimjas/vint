@@ -10,6 +10,7 @@ from vint.ast.plugin.scope_plugin.call_node_parser import (
     get_lambda_string_expr_content,
     FUNCTION_REFERENCE_STRING_EXPR_CONTENT,
 )
+from vint.linting.lint_target import LintTargetFile
 
 
 FIXTURE_BASE_PATH = Path('test', 'fixture', 'ast', 'scope_plugin')
@@ -27,7 +28,7 @@ class Fixtures(enum.Enum):
 class TestCallNodeParser(unittest.TestCase):
     def create_ast(self, file_path):
         parser = Parser()
-        ast = parser.parse_file(file_path.value)
+        ast = parser.parse(LintTargetFile(file_path.value))
         return ast
 
 

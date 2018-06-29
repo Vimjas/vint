@@ -4,6 +4,8 @@ import enum
 from pathlib import Path
 
 from vint.ast.parsing import Parser
+from vint.ast.plugin.scope_plugin.scope_linker import ScopeLinker, ScopeVisibility
+from vint.linting.lint_target import LintTargetFile
 from vint.ast.plugin.scope_plugin.scope_linker import ScopeLinker
 from vint.ast.plugin.scope_plugin.scope import (
     Scope,
@@ -34,7 +36,8 @@ class Fixtures(enum.Enum):
 class TestScopeLinker(unittest.TestCase):
     def create_ast(self, file_path):
         parser = Parser()
-        ast = parser.parse_file(file_path.value)
+        lint_target = LintTargetFile(file_path.value)
+        ast = parser.parse(lint_target)
         return ast
 
 
