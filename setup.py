@@ -37,6 +37,11 @@ def get_version():
     return version_file.read().strip()
 
 
+def read_readme():
+    with open('README.md', 'r') as f:
+        return f.read()
+
+
 VERSION = get_version()
 
 
@@ -44,6 +49,8 @@ setup(
     name='vim-vint',
     version=VERSION,
     description='Lint tool for Vim script Language',
+    long_description=read_readme(),
+    long_description_content_type="text/markdown",
     author='Kuniwak',
     author_email='orga.chem.job+vint@gmail.com',
     url='https://github.com/Kuniwak/vint',
