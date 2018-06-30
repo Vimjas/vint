@@ -21,13 +21,14 @@ test_requires = [
 ]
 
 
-def get_version():
-    vint_root = os.path.dirname(__file__)
-    version_file = open(os.path.join(vint_root, 'VERSION.txt'))
-    return version_file.read().strip()
+# Load the package's __version__.py module as a dictionary.
+about = {}
+with open(os.path.join(os.path.dirname(__file__),
+                       'vint', '__version__.py')) as f:
+    exec(f.read(), about)
 
 
-VERSION = get_version()
+VERSION = about['__version__']
 
 
 setup(
