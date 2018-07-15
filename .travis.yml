@@ -3,7 +3,7 @@ language: python
 
 env:
   global:
-    PYTEST_ADDOPTS="--cov vint"
+    PYTEST_ADDOPTS="--cov vint --cov-report=xml --cov-report=term-missing:skip-covered"
 
 python:
   - "2.7"
@@ -21,8 +21,6 @@ after_success:
   - pip install codecov coveralls
   # coveralls only support one env.
   - if [ "$TOXENV" = py36 ]; then coveralls; fi
-  - coverage combine
-  - coverage xml
   - codecov -X search gcov pycov -f coverage.xml
 
 notifications:
