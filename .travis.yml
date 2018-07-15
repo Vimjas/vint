@@ -1,24 +1,29 @@
+sudo: false
 language: python
 
-python:
-  - "3.4"
-
 env:
-  - TOXENV="py27"
-  - TOXENV="py34"
-  - TOXENV="coverage"
+  global:
+    PYTEST_ADDOPTS="--cov vint"
+
+python:
+  - "2.7"
+  - "3.4"
+  - "3.5"
+  - "3.6"
 
 install:
-  - pip install tox
-  - if test "$TOXENV" = "coverage"; then pip install coveralls; fi
+  - pip install tox tox-travis pytest-cov
 
 script:
   - tox
 
 after_success:
-  - if test "$TOXENV" = "coverage"; then coveralls; fi
-
-sudo: false
+  - pip install codecov coveralls
+  # coveralls only support one env.
+  - if [ "$TOXENV" = py36 ]; then coveralls; fi
+  - coverage combine
+  - coverage xml
+  - codecov -X search gcov pycov -f coverage.xml
 
 notifications:
   email: false
