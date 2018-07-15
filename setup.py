@@ -17,12 +17,12 @@ install_requires += [
 ]
 
 
-def test_requires():
-    requires = load_requires_from_file('test-requirements.txt')
-    if sys.version_info < (3, 3):
-        # To enable mock in Python < 3.3
-        requires.append('mock == 1.0.1')
-    return requires
+test_requires = [
+    'pytest==3.3.2',
+    'pytest-cov==2.5.1',
+    'coverage==3.7.1',
+    'mock==1.0.1;python_version<"3.3"',
+]
 
 
 def get_version():
@@ -43,7 +43,10 @@ setup(
     url='https://github.com/Kuniwak/vint',
     download_url='https://github.com/Kuniwak/vint/archive/v{version}.tar.gz'.format(version=VERSION),
     install_requires=install_requires,
-    tests_require=test_requires(),
+    tests_require=test_requires,
+    extras_require={
+        'testing': test_requires,
+    },
     packages=find_packages(exclude=['dev_tool', 'test*']),
     package_data={
         'vint': [

@@ -1,3 +1,0 @@
-pytest == 3.3.2
-pytest-cov == 2.5.1
-coverage == 3.7.1
