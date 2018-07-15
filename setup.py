@@ -20,7 +20,7 @@ install_requires += [
 test_requires = [
     'pytest==3.3.2',
     'pytest-cov==2.5.1',
-    'coverage==3.7.1',
+    'coverage==4.5.1',
     'mock==1.0.1;python_version<"3.3"',
 ]
 
