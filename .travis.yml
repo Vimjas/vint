@@ -11,6 +11,13 @@ python:
   - "3.5"
   - "3.6"
 
+# Travis makes it hard to use py37.
+matrix:
+  include:
+    - python: 3.7
+      dist: xenial
+      sudo: true
+
 install:
   - pip install tox tox-travis pytest-cov
 
