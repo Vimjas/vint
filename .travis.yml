@@ -19,7 +19,7 @@ matrix:
       sudo: true
 
 install:
-  - pip install tox tox-travis pytest-cov
+  - pip install tox tox-travis
 
 script:
   - tox
