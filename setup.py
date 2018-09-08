@@ -9,7 +9,7 @@ install_requires = [
     'chardet>=2.3.0',
     'setuptools>=36.2.2',  # for enhanced marker support (used below).
     'enum34>=1.0.4;python_version<"3.4"',
-    'pathlib==1.0.1;python_version<"3.4"',
+    'pathlib>=1.0.1;python_version<"3.4"',
     'typing>=3.6.2;python_version<"3.6"',
 ]
 
