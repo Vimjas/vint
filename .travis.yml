@@ -3,7 +3,7 @@ language: python
 
 env:
   global:
-    PYTEST_ADDOPTS="--cov vint --cov-report=xml --cov-report=term-missing:skip-covered"
+    PYTEST_ADDOPTS="--cov=vint --cov=test --cov-report=xml --cov-report=term-missing:skip-covered"
 
 python:
   - "2.7"
