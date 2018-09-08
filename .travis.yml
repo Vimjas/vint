@@ -25,10 +25,10 @@ script:
   - tox
 
 after_success:
-  - pip install codecov coveralls
+  - pip install codecov
+  - codecov -X search gcov pycov -f coverage.xml --required
   # coveralls only support one env.
-  - if [ "$TOXENV" = py36 ]; then coveralls; fi
-  - codecov -X search gcov pycov -f coverage.xml
+  - if [ "$TOXENV" = py36 ]; then pip install coveralls; coveralls; fi
 
 notifications:
   email: false
