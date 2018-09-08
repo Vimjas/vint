@@ -1,21 +1,17 @@
 #!/usr/bin/env python
-import sys
 import os.path
 from setuptools import setup, find_packages
 
 
-def load_requires_from_file(filepath):
-    return [pkg_name.rstrip('\r\n') for pkg_name in open(filepath).readlines()]
-
-
-install_requires = load_requires_from_file('requirements.txt')
-install_requires += [
+install_requires = [
+    'PyYAML~=3.11',
+    'ansicolor~=0.2.4',
+    'chardet>=2.3.0',
     'setuptools>=36.2.2',  # for enhanced marker support (used below).
     'enum34>=1.0.4;python_version<"3.4"',
     'pathlib==1.0.1;python_version<"3.4"',
     'typing>=3.6.2;python_version<"3.6"',
 ]
-
 
 test_requires = [
     'pytest==3.6.3',
@@ -41,7 +37,7 @@ setup(
     author='Kuniwak',
     author_email='orga.chem.job+vint@gmail.com',
     url='https://github.com/Kuniwak/vint',
-    download_url='https://github.com/Kuniwak/vint/archive/v{version}.tar.gz'.format(version=VERSION),
+    download_url='https://github.com/Kuniwak/vint/archive/v{version}.tar.gz'.format(version=VERSION),  # noqa: E501
     install_requires=install_requires,
     tests_require=test_requires,
     extras_require={
