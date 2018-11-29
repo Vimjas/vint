@@ -1,4 +1,4 @@
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional  # noqa: F401
 from vint.ast.node_type import NodeType
 from vint.ast.plugin.scope_plugin.scope import (
     ScopeVisibility,

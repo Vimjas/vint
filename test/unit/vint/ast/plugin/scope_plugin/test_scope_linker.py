@@ -1,4 +1,4 @@
-from typing import List
+from typing import List  # noqa: F401
 import unittest
 import enum
 from pathlib import Path

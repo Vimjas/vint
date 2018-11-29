@@ -1,4 +1,4 @@
-from typing import List, Dict, Any
+from typing import List, Dict, Any  # noqa: F401
 from pathlib import Path
 from ansicolor import Colors, colorize
 from vint.linting.formatter.abstract_formatter import AbstractFormatter

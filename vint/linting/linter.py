@@ -1,7 +1,7 @@
-from typing import Dict, Any, List
+from typing import Dict, Any, List  # noqa: F401
 import re
 import logging
-from typing import Dict, List, Any
+from typing import Dict, List, Any  # noqa: F401
 from pathlib import Path
 from vint._bundles import vimlparser
 from vint.encodings.decoder import EncodingDetectionError

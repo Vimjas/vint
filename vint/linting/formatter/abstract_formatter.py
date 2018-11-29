@@ -1,4 +1,4 @@
-from typing import List, Dict, Any
+from typing import List, Dict, Any  # noqa: F401
 
 
 class AbstractFormatter(object):

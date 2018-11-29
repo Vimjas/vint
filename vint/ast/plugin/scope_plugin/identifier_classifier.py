@@ -1,4 +1,4 @@
-from typing import List, Dict, Any
+from typing import List, Dict, Any  # noqa: F401
 from vint.ast.traversing import traverse, SKIP_CHILDREN
 from vint.ast.plugin.scope_plugin.redir_assignment_parser import (
     RedirAssignmentParser,

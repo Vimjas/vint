@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional  # noqa: F401
 from pathlib import Path
 from io import BufferedIOBase
 

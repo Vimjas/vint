@@ -1,4 +1,4 @@
-from typing import Dict, Any, List, Union
+from typing import Dict, Any, List, Union  # noqa: F401
 from vint.ast.plugin.scope_plugin.scope import (
     Scope,
     VariableDeclaration,

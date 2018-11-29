@@ -1,4 +1,4 @@
-from typing import Dict, Any, Union, Optional
+from typing import Dict, Any, Union, Optional  # noqa: F401
 from vint.ast.traversing import traverse, SKIP_CHILDREN
 from vint.ast.node_type import NodeType
 from vint.ast.plugin.scope_plugin.identifier_syntax import remove_optional_scope_prefix

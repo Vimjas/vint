@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict  # noqa: F401
 from pathlib import Path
 from vint.utils.array import flat_map
 from vint.asset import get_asset_path

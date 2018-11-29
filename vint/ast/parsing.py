@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Dict, Any  # noqa: F401
 import re
 from vint._bundles import vimlparser
 from vint.ast.traversing import traverse

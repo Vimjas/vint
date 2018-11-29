@@ -1,4 +1,4 @@
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional  # noqa: F401
 
 
 IDENTIFIER_ATTRIBUTE = 'VINT:identifier_attribute'

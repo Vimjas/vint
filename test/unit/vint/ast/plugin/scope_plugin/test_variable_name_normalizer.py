@@ -1,5 +1,5 @@
 import unittest
-from typing import Dict, Any
+from typing import Dict, Any  # noqa: F401
 
 from vint.ast.plugin.scope_plugin.scope import (
     ScopeVisibility,
