@@ -16,7 +16,7 @@ class Parser(object):
         self._enable_neovim = enable_neovim
 
 
-    def parse(self, lint_target): # type: (AbstractLintTarget) -> Dict[str, Any]
+    def parse(self, lint_target):  # type: (AbstractLintTarget) -> Dict[str, Any]
         """ Parse vim script file and return the AST. """
         decoder = Decoder(default_decoding_strategy)
         decoded = decoder.decode(lint_target.read())
@@ -25,7 +25,7 @@ class Parser(object):
         return self.parse_string(decoded_and_lf_normalized)
 
 
-    def parse_string(self, string): # type: (str) -> Dict[str, Any]
+    def parse_string(self, string):  # type: (str) -> Dict[str, Any]
         """ Parse vim script string and return the AST. """
         lines = string.split('\n')
 

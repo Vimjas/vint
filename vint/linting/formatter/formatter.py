@@ -19,7 +19,7 @@ FORMAT_COLOR_MAP = {
 
 
 class Formatter(AbstractFormatter):
-    def __init__(self, config_dict): # type: (Dict[str, Any]) -> None
+    def __init__(self, config_dict):  # type: (Dict[str, Any]) -> None
         if 'cmdargs' in config_dict:
             cmdargs = config_dict['cmdargs']
         else:
@@ -36,14 +36,14 @@ class Formatter(AbstractFormatter):
             self._should_be_colorized = False
 
 
-    def format_violations(self, violations): # type: (List[Dict[str, Any]]) -> str
+    def format_violations(self, violations):  # type: (List[Dict[str, Any]]) -> str
         sorted_violations = _sort_violations(violations)
         formatted_lines = map(self.format_violation, sorted_violations)
 
         return '\n'.join(formatted_lines)
 
 
-    def format_violation(self, violation): # type: (Dict[str, Any]) -> str
+    def format_violation(self, violation):  # type: (Dict[str, Any]) -> str
         if self._should_be_colorized:
             formatter_map = _get_colorize_formatter_map(violation)
         else:

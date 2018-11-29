@@ -5,11 +5,11 @@ from io import BufferedIOBase
 
 
 class AbstractLintTarget(object):
-    def __init__(self, path): # type: (Path) -> None
+    def __init__(self, path):  # type: (Path) -> None
         self.path = path
 
 
-    def read(self): # type: () -> bytes
+    def read(self):  # type: () -> bytes
         raise NotImplementedError()
 
 
@@ -19,7 +19,7 @@ class LintTargetFile(AbstractLintTarget):
         super(LintTargetFile, self).__init__(path)
 
 
-    def read(self): # type: () -> bytes
+    def read(self):  # type: () -> bytes
         with self.path.open('rb') as f:
             return f.read()
 
@@ -31,7 +31,7 @@ class LintTargetBufferedStream(AbstractLintTarget):
         self._buffered_io = buffered_io
 
 
-    def read(self): # type: () -> bytes
+    def read(self):  # type: () -> bytes
         return self._buffered_io.read()
 
 
@@ -43,7 +43,7 @@ class CachedLintTarget(AbstractLintTarget):
         self._cached_bytes = None  # type: Optional[bytes]
 
 
-    def read(self): # type: () -> bytes
+    def read(self):  # type: () -> bytes
         if self._cached_bytes is not None:
             return self._cached_bytes
 

@@ -14,74 +14,74 @@ IDENTIFIER_ATTRIBUTE_LAMBDA_ARGUMENT_FLAG = 'is_lambda_argument'
 IDENTIFIER_ATTRIBUTE_LAMBDA_BODY_CONTEXT = 'is_on_lambda_body'
 
 
-def is_identifier_like_node(node): # type: (Dict[str, Any]) -> bool
+def is_identifier_like_node(node):  # type: (Dict[str, Any]) -> bool
     return IDENTIFIER_ATTRIBUTE in node
 
 
-def is_function_identifier(node): # type: (Dict[str, Any]) -> bool
+def is_function_identifier(node):  # type: (Dict[str, Any]) -> bool
     if not is_identifier_like_node(node):
         return False
 
     return node[IDENTIFIER_ATTRIBUTE][IDENTIFIER_ATTRIBUTE_FUNCTION_FLAG]
 
 
-def is_dynamic_identifier(node): # type: (Dict[str, Any]) -> bool
+def is_dynamic_identifier(node):  # type: (Dict[str, Any]) -> bool
     if not is_identifier_like_node(node):
         return False
 
     return node[IDENTIFIER_ATTRIBUTE][IDENTIFIER_ATTRIBUTE_DYNAMIC_FLAG]
 
 
-def is_declarative_identifier(node): # type: (Dict[str, Any]) -> bool
+def is_declarative_identifier(node):  # type: (Dict[str, Any]) -> bool
     if not is_identifier_like_node(node):
         return False
 
     return node[IDENTIFIER_ATTRIBUTE][IDENTIFIER_ATTRIBUTE_DECLARATION_FLAG]
 
 
-def is_member_identifier(node): # type: (Dict[str, Any]) -> bool
+def is_member_identifier(node):  # type: (Dict[str, Any]) -> bool
     if not is_identifier_like_node(node):
         return False
 
     return node[IDENTIFIER_ATTRIBUTE][IDENTIFIER_ATTRIBUTE_MEMBER_FLAG]
 
 
-def is_autoload_identifier(node): # type: (Dict[str, Any]) -> bool
+def is_autoload_identifier(node):  # type: (Dict[str, Any]) -> bool
     if not is_identifier_like_node(node):
         return False
 
     return node[IDENTIFIER_ATTRIBUTE][IDENTIFIER_ATTRIBUTE_AUTOLOAD_FLAG]
 
 
-def is_function_argument(node): # type: (Dict[str, Any]) -> bool
+def is_function_argument(node):  # type: (Dict[str, Any]) -> bool
     if not is_identifier_like_node(node):
         return False
 
     return node[IDENTIFIER_ATTRIBUTE][IDENTIFIER_ATTRIBUTE_FUNCTION_ARGUMENT_FLAG]
 
 
-def is_on_lambda_string_context(node): # type: (Dict[str, Any]) -> bool
+def is_on_lambda_string_context(node):  # type: (Dict[str, Any]) -> bool
     if not is_identifier_like_node(node):
         return False
 
     return node[IDENTIFIER_ATTRIBUTE][IDENTIFIER_ATTRIBUTE_LAMBDA_STRING_CONTEXT]
 
 
-def is_variadic_symbol(node): # type: (Dict[str, Any]) -> bool
+def is_variadic_symbol(node):  # type: (Dict[str, Any]) -> bool
     if not is_identifier_like_node(node):
         return False
 
     return node[IDENTIFIER_ATTRIBUTE][IDENTIFIER_ATTRIBUTE_VARIADIC_SYMBOL_FLAG]
 
 
-def is_lambda_argument_identifier(node): # type: (Dict[str, Any]) -> bool
+def is_lambda_argument_identifier(node):  # type: (Dict[str, Any]) -> bool
     if not is_identifier_like_node(node):
         return False
 
     return node[IDENTIFIER_ATTRIBUTE][IDENTIFIER_ATTRIBUTE_LAMBDA_ARGUMENT_FLAG]
 
 
-def is_on_lambda_body_context(node): # type: (Dict[str, Any]) -> bool
+def is_on_lambda_body_context(node):  # type: (Dict[str, Any]) -> bool
     if not is_identifier_like_node(node):
         return False
 

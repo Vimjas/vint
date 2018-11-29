@@ -91,7 +91,7 @@ class Linter(object):
         }
 
 
-    def lint(self, lint_target): # type: (AbstractLintTarget) -> List[Dict[str, Any]]
+    def lint(self, lint_target):  # type: (AbstractLintTarget) -> List[Dict[str, Any]]
         logging.debug('checking: `{file_path}`'.format(file_path=lint_target.path))
 
         try:

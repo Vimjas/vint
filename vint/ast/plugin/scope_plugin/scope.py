@@ -34,7 +34,7 @@ class Scope:
         #   - Parent scope is not attached yet
         #   - This scope is root scope
         # But it makes debugging hard, so self.parent is a debug value until the self.parent is set by other.
-        self.parent = 'not attached yet' # type: Optional[Scope]
+        self.parent = 'not attached yet'  # type: Optional[Scope]
 
 
 @enum.unique

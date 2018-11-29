@@ -47,7 +47,7 @@ def start_cli():
     parser.exit(status=1)
 
 
-def _validate(env): # type: (Dict[str, Any]) -> None
+def _validate(env):  # type: (Dict[str, Any]) -> None
     parser = _build_arg_parser()
     paths_to_lint = env['file_paths']
 
@@ -111,7 +111,7 @@ def _build_arg_parser():
     return parser
 
 
-def _build_config_dict(env): # type: (Dict[str, Any]) -> Dict[str, Any]
+def _build_config_dict(env):  # type: (Dict[str, Any]) -> Dict[str, Any]
     config = ConfigContainer(
         ConfigDefaultSource(env),
         ConfigGlobalSource(env),
@@ -122,7 +122,7 @@ def _build_config_dict(env): # type: (Dict[str, Any]) -> Dict[str, Any]
     return config.get_config_dict()
 
 
-def _lint_all(env, config_dict): # type: (Dict[str, Any], Dict[str, Any]) -> List[Dict[str, Any]]
+def _lint_all(env, config_dict):  # type: (Dict[str, Any], Dict[str, Any]) -> List[Dict[str, Any]]
     paths_to_lint = env['file_paths']
     violations = []
     linter = _build_linter(config_dict)
@@ -134,20 +134,20 @@ def _lint_all(env, config_dict): # type: (Dict[str, Any], Dict[str, Any]) -> Lis
     return violations
 
 
-def _build_linter(config_dict): # type: (Dict[str, Any]) -> Linter
+def _build_linter(config_dict):  # type: (Dict[str, Any]) -> Linter
     policy_set = PolicySet(get_policy_classes())
     linter = Linter(policy_set, config_dict)
     return linter
 
 
-def _print_violations(violations, config_dict): # type: (List[Dict[str, Any]], Dict[str, Any]) -> None
+def _print_violations(violations, config_dict):  # type: (List[Dict[str, Any]], Dict[str, Any]) -> None
     formatter = _build_formatter(config_dict)
     output = formatter.format_violations(violations)
 
     print(output)
 
 
-def _build_formatter(config_dict): # type: (Dict[str, Any]) -> AbstractFormatter
+def _build_formatter(config_dict):  # type: (Dict[str, Any]) -> AbstractFormatter
     if 'cmdargs' not in config_dict:
         return Formatter(config_dict)
 
@@ -175,7 +175,7 @@ def _adjust_log_level(env):
     logger.setLevel(log_level)
 
 
-def _build_lint_target(path, config_dict): # type: (Path, Dict[str, Any]) -> AbstractLintTarget
+def _build_lint_target(path, config_dict):  # type: (Path, Dict[str, Any]) -> AbstractLintTarget
     if path == _stdin_symbol:
         stdin_alt_path = get_config_value(config_dict, ['cmdargs', 'stdin_display_name'])
 

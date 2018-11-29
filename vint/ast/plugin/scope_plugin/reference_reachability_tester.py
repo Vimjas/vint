@@ -80,7 +80,7 @@ class ReferenceReachabilityTester(object):
             ref_id_node[REACHABILITY_FLAG] = is_reachable
 
 
-    def get_objective_scope_visibility(self, decl_or_ref_id_node): # type: (Dict[str, Any]) -> ScopeVisibilityHint
+    def get_objective_scope_visibility(self, decl_or_ref_id_node):  # type: (Dict[str, Any]) -> ScopeVisibilityHint
         """ Returns a objective scope visibility by a declarative identifier node or a reference identifier node. """
         context_scope = self._scope_linker.link_registry.get_context_scope_by_identifier(decl_or_ref_id_node)
         possible_visibility_hint = detect_possible_scope_visibility(decl_or_ref_id_node, context_scope)
@@ -110,7 +110,7 @@ class ReferenceReachabilityTester(object):
 
 
 
-    def _reset_referenced_flag(self, scope_tree): # type: (Scope) -> None
+    def _reset_referenced_flag(self, scope_tree):  # type: (Scope) -> None
         for child_scope in scope_tree.child_scopes:
             for functions in child_scope.functions.values():
                 for func in functions:
@@ -174,7 +174,7 @@ class ReferenceReachabilityTester(object):
         return []
 
 
-    def check_reachability(self, ref_id_node): # type: (Dict[str, Any]) -> bool
+    def check_reachability(self, ref_id_node):  # type: (Dict[str, Any]) -> bool
         # NOTE: We can only assume dynamic identifiers can reach.
         if is_dynamic_identifier(ref_id_node):
             return True
@@ -189,7 +189,7 @@ class ReferenceReachabilityTester(object):
         return len(declarative_variables_or_global) > 0
 
 
-    def _is_reference_to_lambda_argument(self, ref_id_node): # type: (Dict[str, Any]) -> bool
+    def _is_reference_to_lambda_argument(self, ref_id_node):  # type: (Dict[str, Any]) -> bool
         # NOTE: We can only assume dynamic identifiers can reach.
         if is_dynamic_identifier(ref_id_node):
             return True

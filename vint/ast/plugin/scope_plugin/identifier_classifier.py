@@ -88,7 +88,7 @@ class IdentifierClassifier(object):
             self._static_declaring_identifiers = None  # type: List[Dict[str, Any]]
 
 
-        def collect_identifiers(self, ast): # type: (Dict[str, Any]) -> CollectedIdentifiers
+        def collect_identifiers(self, ast):  # type: (Dict[str, Any]) -> CollectedIdentifiers
             self._static_referencing_identifiers = []
             self._static_declaring_identifiers = []
 
@@ -115,7 +115,7 @@ class IdentifierClassifier(object):
                 self._static_referencing_identifiers.append(node)
 
 
-    def attach_identifier_attributes(self, ast): # type: (Dict[str, Any]) -> Dict[str, Any]
+    def attach_identifier_attributes(self, ast):  # type: (Dict[str, Any]) -> Dict[str, Any]
         """ Attach 5 flags to the AST.
 
         - is dynamic: True if the identifier name can be determined by static analysis.
