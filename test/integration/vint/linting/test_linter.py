@@ -12,11 +12,9 @@ BROKEN_VIM_SCRIPT = Path('test', 'fixture', 'linter', 'broken.vim')
 
 class TestLinterIntegral(unittest.TestCase):
     class StubPolicy1(AbstractPolicy):
-        def __init__(self):
-            super(TestLinterIntegral.StubPolicy1, self).__init__()
-            self.reference = 'ref1'
-            self.description = 'desc1'
-            self.level = Level.WARNING
+        reference = 'ref1'
+        description = 'desc1'
+        level = Level.WARNING
 
 
         def listen_node_types(self):
@@ -29,11 +27,9 @@ class TestLinterIntegral(unittest.TestCase):
 
 
     class StubPolicy2(AbstractPolicy):
-        def __init__(self):
-            super(TestLinterIntegral.StubPolicy2, self).__init__()
-            self.reference = 'ref2'
-            self.description = 'desc2'
-            self.level = Level.WARNING
+        reference = 'ref2'
+        description = 'desc2'
+        level = Level.WARNING
 
 
         def listen_node_types(self):

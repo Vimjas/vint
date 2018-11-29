@@ -11,10 +11,8 @@ from vint.ast.plugin.scope_plugin import (
 
 @register_policy
 class ProhibitImplicitScopeBuiltinVariable(AbstractPolicy):
-    def __init__(self):
-        super(ProhibitImplicitScopeBuiltinVariable, self).__init__()
-        self.reference = ':help local-variable'
-        self.level = Level.WARNING
+    reference = ':help local-variable'
+    level = Level.WARNING
 
 
     def listen_node_types(self):

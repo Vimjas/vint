@@ -6,11 +6,9 @@ from vint.linting.policy.abstract_policy import AbstractPolicy
 
 
 class ConcretePolicy(AbstractPolicy):
-    def __init__(self):
-        super(ConcretePolicy, self).__init__()
-        self.description = 'Found something invalid'
-        self.reference = 'http://example.com'
-        self.level = 0
+    description = 'Found something invalid'
+    reference = 'http://example.com'
+    level = 0
 
 
 class TestAbstractPolicy(unittest.TestCase):
@@ -76,6 +74,12 @@ class TestAbstractPolicy(unittest.TestCase):
         self.assertEqual(
             policy.get_policy_options(lint_context),
             expected_options)
+
+    def test_get_policy_members(self):
+        policy = ConcretePolicy()
+
+        self.assertEqual(policy.name, 'ConcretePolicy')
+        self.assertEqual(policy.description, 'Found something invalid')
 
 
 if __name__ == '__main__':

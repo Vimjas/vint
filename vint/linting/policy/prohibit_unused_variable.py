@@ -9,10 +9,8 @@ from vint.ast.plugin.scope_plugin import ScopeVisibility
 
 @register_policy
 class ProhibitUnusedVariable(AbstractPolicy):
-    def __init__(self):
-        super(ProhibitUnusedVariable, self).__init__()
-        self.reference = ':help E738'
-        self.level = Level.WARNING
+    reference = ':help E738'
+    level = Level.WARNING
 
 
     def listen_node_types(self):

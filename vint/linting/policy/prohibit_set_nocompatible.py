@@ -7,11 +7,9 @@ from vint.linting.policy_registry import register_policy
 
 @register_policy
 class ProhibitSetNoCompatible(AbstractPolicy):
-    def __init__(self):
-        super(ProhibitSetNoCompatible, self).__init__()
-        self.description = 'Do not use nocompatible which has unexpected effects'
-        self.reference = ':help nocompatible'
-        self.level = Level.WARNING
+    description = 'Do not use nocompatible which has unexpected effects'
+    reference = ':help nocompatible'
+    level = Level.WARNING
 
 
     def listen_node_types(self):

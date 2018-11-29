@@ -10,14 +10,11 @@ from vint.linting.policy_registry import register_policy
 
 @register_policy
 class ProhibitMissingScriptEncoding(AbstractPolicy):
-    def __init__(self):
-        super(ProhibitMissingScriptEncoding, self).__init__()
-        self.description = 'Use scriptencoding when multibyte char exists'
-        self.reference = ':help :scriptencoding'
-        self.level = Level.WARNING
+    description = 'Use scriptencoding when multibyte char exists'
+    reference = ':help :scriptencoding'
+    level = Level.WARNING
 
-        self.has_scriptencoding = False
-
+    has_scriptencoding = False
 
     def listen_node_types(self):
         return [NodeType.TOPLEVEL]
