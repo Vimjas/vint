@@ -1,34 +1,24 @@
 #!/usr/bin/env python
-import sys
 import os.path
 from setuptools import setup, find_packages
 
 
-def load_requires_from_file(filepath):
-    return [pkg_name.rstrip('\r\n') for pkg_name in open(filepath).readlines()]
+install_requires = [
+    'PyYAML~=3.11',
+    'ansicolor~=0.2.4',
+    'chardet>=2.3.0',
+    'setuptools>=36.2.2',  # for enhanced marker support (used below).
+    'enum34>=1.0.4;python_version<"3.4"',
+    'pathlib>=1.0.1;python_version<"3.4"',
+    'typing>=3.6.2;python_version<"3.6"',
+]
 
-
-def install_requires():
-    requires = load_requires_from_file('requirements.txt')
-    if sys.version_info < (3, 4):
-        # To enable Enum in Python < 3.4
-        requires.append('enum34 >= 1.0.4')
-        # To enable pathlib in Python < 3.4
-        requires.append('pathlib == 1.0.1')
-
-    if sys.version_info < (3, 6):
-        # To enable typing in Python < 3.6
-        requires.append('typing >= 3.6.2')
-
-    return requires
-
-
-def test_requires():
-    requires = load_requires_from_file('test-requirements.txt')
-    if sys.version_info < (3, 3):
-        # To enable mock in Python < 3.3
-        requires.append('mock == 1.0.1')
-    return requires
+test_requires = [
+    'pytest==3.6.3',
+    'pytest-cov==2.5.1',
+    'coverage==4.5.1',
+    'mock==1.0.1;python_version<"3.3"',
+]
 
 
 def get_version():
@@ -47,9 +37,12 @@ setup(
     author='Kuniwak',
     author_email='orga.chem.job+vint@gmail.com',
     url='https://github.com/Kuniwak/vint',
-    download_url='https://github.com/Kuniwak/vint/archive/v{version}.tar.gz'.format(version=VERSION),
-    install_requires=install_requires(),
-    tests_require=test_requires(),
+    download_url='https://github.com/Kuniwak/vint/archive/v{version}.tar.gz'.format(version=VERSION),  # noqa: E501
+    install_requires=install_requires,
+    tests_require=test_requires,
+    extras_require={
+        'testing': test_requires,
+    },
     packages=find_packages(exclude=['dev_tool', 'test*']),
     package_data={
         'vint': [

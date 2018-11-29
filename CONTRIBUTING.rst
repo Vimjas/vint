@@ -94,23 +94,20 @@ How to Add New Policy
       ``NodeType.STRING``. Use ``NodeType.TOPLEVEL`` if you need to lint
       only once.
 
-5. Run the test
+5. Running the tests
 
-   You can test by `tox <https://tox.readthedocs.org/en/latest/>`__ or
-   `py.test <http://pytest.org/latest/>`__ or the default unittest
-   module.
-
-   There are test command examples;
+   The recommended way to run the tests is by using tox
+   `tox <https://tox.readthedocs.org/en/latest/>`__, but you can use pytest
+   directly also, e.g.
 
    ::
 
-       $ pyenv local 2.7.8 3.4.1
-       $ tox
+       $ tox -e py37
 
-   If you want to test by py.test, you should add ``vint/bin`` to
-   ``$PATH`` to make acceptance tests pass.
+   If you want to test using pytest, you should add ``vint/bin`` to
+   ``$PATH`` to make acceptance tests pass:
 
    ::
 
-       $ pip install -r requirements.txt -r test-requirements.txt`
-       $ PATH="./bin:$PATH" py.test test`
+       $ pip install -e '.[testing]'
+       $ PATH="./bin:$PATH" pytest
