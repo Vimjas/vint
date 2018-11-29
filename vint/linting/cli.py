@@ -161,13 +161,7 @@ def _build_formatter(config_dict): # type: (Dict[str, Any]) -> AbstractFormatter
 
 
 def _get_version():
-    # In unit tests, pkg_resources cannot find vim-vint.
-    # So, I decided to return dummy version
-    try:
-        version = pkg_resources.require('vim-vint')[0].version
-    except pkg_resources.DistributionNotFound:
-        version = 'test_mode'
-
+    from ..__version__ import version
     return version
 
 

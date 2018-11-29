@@ -1,6 +1,5 @@
 include README.markdown
 include LICENSE.txt
-include VERSION.txt
 include MANIFEST.in
 recursive-include vint/asset *
 recursive-exclude * __pycache__

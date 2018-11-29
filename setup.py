@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import os.path
 from setuptools import setup, find_packages
 
 
@@ -21,23 +20,19 @@ test_requires = [
 ]
 
 
-def get_version():
-    vint_root = os.path.dirname(__file__)
-    version_file = open(os.path.join(vint_root, 'VERSION.txt'))
-    return version_file.read().strip()
-
-
-VERSION = get_version()
-
-
 setup(
     name='vim-vint',
-    version=VERSION,
     description='Lint tool for Vim script Language',
     author='Kuniwak',
     author_email='orga.chem.job+vint@gmail.com',
     url='https://github.com/Kuniwak/vint',
-    download_url='https://github.com/Kuniwak/vint/archive/v{version}.tar.gz'.format(version=VERSION),  # noqa: E501
+    download_url='https://github.com/Kuniwak/vint/releases',
+    use_scm_version={
+        'write_to': 'vint/__version__.py',
+    },
+    setup_requires=[
+        'setuptools_scm',
+    ],
     install_requires=install_requires,
     tests_require=test_requires,
     extras_require={
