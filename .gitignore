@@ -5,3 +5,6 @@
 .tox
 .python-version
 dist
+
+# Managed by setuptools_scm.
+vint/__version__.py

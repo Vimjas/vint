@@ -161,8 +161,8 @@ def _build_formatter(config_dict): # type: (Dict[str, Any]) -> AbstractFormatter
 
 
 def _get_version():
-    from ..__version__ import __version__
-    return __version__
+    from ..__version__ import version
+    return version
 
 
 def _adjust_log_level(env):
