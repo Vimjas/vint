@@ -55,7 +55,7 @@ The default configuration is defined in
 User config
 ~~~~~~~~~~~
 
-You can configure global Vint config by ``~/.vintrc.yaml`` as following:
+You can configure global Vint config by ``~/.vintrc.yml`` as following:
 
 .. code:: yaml
 
@@ -85,7 +85,7 @@ summary <https://github.com/Kuniwak/vint/wiki/Vint-linting-policy-summary>`__.
 Project config
 ~~~~~~~~~~~~~~
 
-You can configure project local Vint config by ``.vintrc.yaml`` as
+You can configure project local Vint config by ``.vintrc.yml`` as
 following:
 
 .. code:: yaml
