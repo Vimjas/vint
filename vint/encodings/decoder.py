@@ -1,10 +1,10 @@
 import sys
+import re
 from typing import Dict, Any
 from pprint import pformat
 from vint.encodings.decoding_strategy import DecodingStrategy
 
 
-SCRIPTENCODING_PREFIX = bytearray('scriptencoding', encoding='ascii')
 
 
 
@@ -39,22 +39,24 @@ def _split_by_scriptencoding(bytes_seq):
     start_index = 0
     bytes_seq_and_loc_list = []
 
-    while True:
-        end_index = bytes_seq.find(SCRIPTENCODING_PREFIX, start_index + 1)
+    for m in re.finditer(b'^\s*(scriptencoding)', bytes_seq, re.MULTILINE):
+        end_index = m.start(1)
 
-        if end_index < 0:
-            end_index = max_end_index
+        if end_index == 0:
+            continue
 
         bytes_seq_and_loc_list.append((
             "{start_index}:{end_index}".format(start_index=start_index, end_index=end_index),
             bytes_seq[start_index:end_index]
         ))
+        start_index = end_index
 
-        if end_index < max_end_index:
-            start_index = end_index
-            continue
+    bytes_seq_and_loc_list.append((
+        "{start_index}:{end_index}".format(start_index=start_index, end_index=max_end_index),
+        bytes_seq[start_index:max_end_index]
+    ))
 
-        return bytes_seq_and_loc_list
+    return bytes_seq_and_loc_list
 
 
 class EncodingDetectionError(Exception):
