@@ -95,3 +95,4 @@ class NodeType(Enum):
     CURLYNAMEPART = 90
     CURLYNAMEEXPR = 91
     LAMBDA = 92
+    BLOB = 93
