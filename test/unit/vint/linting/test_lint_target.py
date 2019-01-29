@@ -49,12 +49,12 @@ class TestLintTarget(unittest.TestCase):
 
 
 class LintTargetStub(AbstractLintTarget):
-    def __init__(self, path, bytes_seq): # type: (Path, bytes) -> None
+    def __init__(self, path, bytes_seq):  # type: (Path, bytes) -> None
         super(LintTargetStub, self).__init__(path)
         self.bytes_seq = bytes_seq
 
 
-    def read(self): # type: () -> bytes
+    def read(self):  # type: () -> bytes
         return self.bytes_seq
 
 

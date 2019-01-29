@@ -1,9 +1,9 @@
-from typing import List, Dict, Any
+from typing import List, Dict, Any  # noqa: F401
 from vint.linting.formatter.formatter import Formatter
 
 
 class StatisticFormatter(Formatter):
-    def format_violations(self, violations): # type: (List[Dict[str, Any]]) -> str
+    def format_violations(self, violations):  # type: (List[Dict[str, Any]]) -> str
         violations_count = len(violations)
 
         output = super(StatisticFormatter, self).format_violations(violations) + '\n'

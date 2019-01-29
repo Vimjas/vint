@@ -47,6 +47,6 @@ class ProhibitMissingScriptEncoding(AbstractPolicy):
 
 
 def _has_multibyte_char(lint_context):
-    lint_target = lint_context['lint_target'] # type: AbstractLintTarget
+    lint_target = lint_context['lint_target']  # type: AbstractLintTarget
     byte_seq = lint_target.read()
     return len(byte_seq) > 0 and chardet.detect(byte_seq)['encoding'] != 'ascii'

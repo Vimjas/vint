@@ -1,4 +1,4 @@
-from typing import Dict, Any, Union, Optional
+from typing import Dict, Any, Union, Optional  # noqa: F401
 from vint.ast.traversing import traverse, SKIP_CHILDREN
 from vint.ast.node_type import NodeType
 from vint.ast.plugin.scope_plugin.identifier_syntax import remove_optional_scope_prefix
@@ -55,7 +55,7 @@ class ScopeLinker(object):
             self._add_symbol_table_variables(global_scope)
 
 
-        def enter_new_scope(self, scope_visibility): # type: (ScopeVisibility) -> None
+        def enter_new_scope(self, scope_visibility):  # type: (ScopeVisibility) -> None
             current_scope = self.get_current_scope()
             new_scope = Scope(scope_visibility)
             self._add_symbol_table_variables(new_scope)
@@ -65,28 +65,28 @@ class ScopeLinker(object):
             self._scope_stack.append(new_scope)
 
 
-        def leave_current_scope(self): # type: () -> None
+        def leave_current_scope(self):  # type: () -> None
             self._scope_stack.pop()
 
 
-        def get_global_scope(self): # type: () -> Scope
+        def get_global_scope(self):  # type: () -> Scope
             return self._scope_stack[0]
 
 
-        def get_script_local_scope(self): # type: () -> Scope
+        def get_script_local_scope(self):  # type: () -> Scope
             return self._scope_stack[1]
 
 
-        def get_current_scope(self): # type: () -> Scope
+        def get_current_scope(self):  # type: () -> Scope
             return self._scope_stack[-1]
 
 
-        def handle_new_parameter_found(self, id_node, is_lambda_argument): # type: (Dict[str, Any], bool) -> None
+        def handle_new_parameter_found(self, id_node, is_lambda_argument):  # type: (Dict[str, Any], bool) -> None
             current_scope = self.get_current_scope()
             self._add_parameter(current_scope, id_node, is_lambda_argument)
 
 
-        def handle_new_range_parameters_found(self): # type: () -> None
+        def handle_new_range_parameters_found(self):  # type: () -> None
             # We can access "a:firstline" and "a:lastline" if the function is
             # declared with an attribute "range". See :func-range
             firstline_node = _create_virtual_identifier_node('firstline')
@@ -97,14 +97,14 @@ class ScopeLinker(object):
             self._add_parameter(current_scope, lastline_node, is_explicit_lambda_argument=False)
 
 
-        def handle_new_dict_parameter_found(self): # type: () -> None
+        def handle_new_dict_parameter_found(self):  # type: () -> None
             # We can access "l:self" is declared with an attribute "dict".
             # See :help self
             current_scope = self.get_current_scope()
             self._add_self_variable(current_scope)
 
 
-        def handle_new_parameters_list_and_length_found(self): # type: () -> None
+        def handle_new_parameters_list_and_length_found(self):  # type: () -> None
             # We can always access a:0 and a:000
             # See :help internal-variables
             param_length_node = _create_virtual_identifier_node('0')
@@ -115,7 +115,7 @@ class ScopeLinker(object):
             self._add_parameter(current_scope, param_list_node, is_explicit_lambda_argument=False)
 
 
-        def handle_new_index_parameters_found(self, params_number): # type: (int) -> None
+        def handle_new_index_parameters_found(self, params_number):  # type: (int) -> None
             current_scope = self.get_current_scope()
 
             # Max parameters number is 20. See :help E740
@@ -125,7 +125,7 @@ class ScopeLinker(object):
                 self._add_parameter(current_scope, variadic_param, is_explicit_lambda_argument=False)
 
 
-        def handle_new_variable_found(self, id_node): # type: (Dict[str, Any]) -> None
+        def handle_new_variable_found(self, id_node):  # type: (Dict[str, Any]) -> None
             current_scope = self.get_current_scope()
             scope_visibility_hint = detect_possible_scope_visibility(id_node, current_scope)
 
@@ -149,7 +149,7 @@ class ScopeLinker(object):
                                scope_visibility_hint.explicity)
 
 
-        def _get_objective_scope(self, node): # type: (Dict[str, Any]) -> Scope
+        def _get_objective_scope(self, node):  # type: (Dict[str, Any]) -> Scope
 
             current_scope = self.get_current_scope()
             scope_visibility_hint = detect_possible_scope_visibility(
@@ -166,7 +166,7 @@ class ScopeLinker(object):
             return current_scope
 
 
-        def handle_referencing_identifier_found(self, node): # type: (Dict[str, Any]) -> None
+        def handle_referencing_identifier_found(self, node):  # type: (Dict[str, Any]) -> None
             current_scope = self.get_current_scope()
 
             self.link_registry.link_identifier_to_context_scope(node, current_scope)
@@ -193,7 +193,7 @@ class ScopeLinker(object):
             )
 
 
-        def _add_self_variable(self, objective_scope): # type: (Scope) -> None
+        def _add_self_variable(self, objective_scope):  # type: (Scope) -> None
             variable_name = remove_optional_scope_prefix('l:self')
             virtual_node = _create_virtual_identifier_node(variable_name)
 
@@ -238,7 +238,7 @@ class ScopeLinker(object):
             )
 
 
-        def _add_symbol_table_variables(self, objective_scope): # type: (Scope) -> None
+        def _add_symbol_table_variables(self, objective_scope):  # type: (Scope) -> None
             # We can always access any symbol tables such as: "g:", "s:", "l:".
             # See :help internal-variables
             scope_visibility = objective_scope.scope_visibility
@@ -297,19 +297,19 @@ class ScopeLinker(object):
             self._vars_to_declarative_ids_map[id(variable)] = declaring_id_node
 
 
-        def get_declarative_identifier_by_variable(self, variable): # type: (VariableDeclaration) -> Dict[str, Any]
+        def get_declarative_identifier_by_variable(self, variable):  # type: (VariableDeclaration) -> Dict[str, Any]
             variable_id = id(variable)
             return self._vars_to_declarative_ids_map.get(variable_id)
 
 
-        def link_identifier_to_context_scope(self, decl_or_ref_id_node, scope): # type: (Dict[str, Any], Scope) -> None
+        def link_identifier_to_context_scope(self, decl_or_ref_id_node, scope):  # type: (Dict[str, Any], Scope) -> None
             """ Link declarative identifier node or reference identifier node to
             the lexical context scope that the identifier is presented at. """
             node_id = id(decl_or_ref_id_node)
             self._ids_to_scopes_map[node_id] = scope
 
 
-        def get_context_scope_by_identifier(self, decl_or_ref_id_node): # type: (Dict[str, Any]) -> Scope
+        def get_context_scope_by_identifier(self, decl_or_ref_id_node):  # type: (Dict[str, Any]) -> Scope
             """ Return the lexical context scope that the identifier is presented at by
             a declarative identifier node or a reference identifier node """
             node_id = id(decl_or_ref_id_node)
@@ -323,7 +323,7 @@ class ScopeLinker(object):
         self._scope_tree_builder = ScopeLinker.ScopeTreeBuilder()
 
 
-    def process(self, ast): # type: (Dict[str, Any]) -> None
+    def process(self, ast):  # type: (Dict[str, Any]) -> None
         """ Build a scope tree and links between scopes and identifiers by the
         specified ast. You can access the built scope tree and the built links
         by .scope_tree and .link_registry.
@@ -342,7 +342,7 @@ class ScopeLinker(object):
         self.link_registry = self._scope_tree_builder.link_registry
 
 
-    def _find_variable_like_nodes(self, node): # type: (Dict[str, Any]) -> None
+    def _find_variable_like_nodes(self, node):  # type: (Dict[str, Any]) -> None
         if not is_analyzable_identifier(node):
             return
 
@@ -353,7 +353,7 @@ class ScopeLinker(object):
         self._scope_tree_builder.handle_referencing_identifier_found(node)
 
 
-    def _enter_handler(self, node): # type: (Dict[str, Any]) -> None
+    def _enter_handler(self, node):  # type: (Dict[str, Any]) -> None
         node_type = NodeType(node['type'])
 
         if node_type is NodeType.FUNCTION:
@@ -364,7 +364,7 @@ class ScopeLinker(object):
         self._find_variable_like_nodes(node)
 
 
-    def _handle_function_node(self, func_node): # type: (Dict[str, Any]) -> None
+    def _handle_function_node(self, func_node):  # type: (Dict[str, Any]) -> None
         # We should interrupt traversing, because a node of the function
         # name should be added to the parent scope before the current
         # scope switched to a new scope of the function.
@@ -428,7 +428,7 @@ class ScopeLinker(object):
         return SKIP_CHILDREN
 
 
-    def _handle_lambda_node(self, lambda_node): # type: (Dict[str, Any]) -> Optional[str]
+    def _handle_lambda_node(self, lambda_node):  # type: (Dict[str, Any]) -> Optional[str]
         # This method do the following 4 steps:
         #   1. Create a new scope of the lambda
         #   2. The current scope point to the new scope
@@ -470,7 +470,7 @@ class ScopeLinker(object):
         return SKIP_CHILDREN
 
 
-    def _leave_handler(self, node): # type: (Dict[str, Any]) -> None
+    def _leave_handler(self, node):  # type: (Dict[str, Any]) -> None
         node_type = NodeType(node['type'])
 
         if node_type is NodeType.FUNCTION:
@@ -480,7 +480,7 @@ class ScopeLinker(object):
             self._scope_tree_builder.leave_current_scope()
 
 
-def _create_virtual_identifier_node(id_value): # type: (str) -> Dict[str, Any]
+def _create_virtual_identifier_node(id_value):  # type: (str) -> Dict[str, Any]
     """ Returns a virtual identifier.
     Virtual identifier is a virtual node for implicitly declared
     variables such as: a:0, a:000, a:firstline.

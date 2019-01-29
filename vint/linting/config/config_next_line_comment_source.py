@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Any
+from typing import Dict, Any  # noqa: F401
 from vint.linting.config.config_abstract_dynamic_source import ConfigAbstractDynamicSource
 from vint.linting.config.config_comment_parser import parse_config_comment_node_if_exists
 

@@ -1,7 +1,7 @@
-from typing import Dict, Any, List
+from typing import Dict, Any, List  # noqa: F401
 import re
 import logging
-from typing import Dict, List, Any
+from typing import Dict, List, Any  # noqa: F401
 from pathlib import Path
 from vint._bundles import vimlparser
 from vint.encodings.decoder import EncodingDetectionError
@@ -91,7 +91,7 @@ class Linter(object):
         }
 
 
-    def lint(self, lint_target): # type: (AbstractLintTarget) -> List[Dict[str, Any]]
+    def lint(self, lint_target):  # type: (AbstractLintTarget) -> List[Dict[str, Any]]
         logging.debug('checking: `{file_path}`'.format(file_path=lint_target.path))
 
         try:

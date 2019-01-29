@@ -1,5 +1,5 @@
 import sys
-from typing import Dict, Any
+from typing import Dict, Any  # noqa: F401
 from pprint import pformat
 from vint.encodings.decoding_strategy import DecodingStrategy
 

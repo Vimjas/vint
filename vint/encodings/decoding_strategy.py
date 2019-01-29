@@ -1,5 +1,5 @@
 import chardet
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any  # noqa: F401
 
 
 SCRIPTENCODING_PREFIX = bytearray('scriptencoding', encoding='ascii')

@@ -1,4 +1,4 @@
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional  # noqa: F401
 from vint.ast.plugin.scope_plugin.scope import (
     ScopeVisibility,
     ExplicityOfScopeVisibility,
@@ -66,7 +66,7 @@ IdentifierLikeNodeTypes = {
 }
 
 
-def is_builtin_variable(id_node): # type: (Dict[str, Any]) -> bool
+def is_builtin_variable(id_node):  # type: (Dict[str, Any]) -> bool
     """ Whether the specified node is a builtin identifier. """
     # Builtin variables are always IDENTIFIER.
     if NodeType(id_node['type']) is not NodeType.IDENTIFIER:
@@ -90,7 +90,7 @@ def is_builtin_variable(id_node): # type: (Dict[str, Any]) -> bool
     return id_value in BuiltinVariablesCanHaveImplicitScope
 
 
-def is_builtin_function(id_node): # type: (Dict[str, Any]) -> bool
+def is_builtin_function(id_node):  # type: (Dict[str, Any]) -> bool
     """ Whether the specified node is a builtin function name identifier.
     The given identifier should be a child node of NodeType.CALL.
     """
@@ -112,7 +112,7 @@ def is_builtin_function(id_node): # type: (Dict[str, Any]) -> bool
     return id_value in BuiltinFunctions
 
 
-def is_analyzable_identifier(node): # type: (Dict[str, Any]) -> bool
+def is_analyzable_identifier(node):  # type: (Dict[str, Any]) -> bool
     """ Whether the specified node is an analyzable identifier.
 
     Node declarative-identifier-like is analyzable if it is not dynamic
@@ -131,7 +131,7 @@ def is_analyzable_identifier(node): # type: (Dict[str, Any]) -> bool
     return not (is_dynamic_identifier(node) or is_member_identifier(node))
 
 
-def is_analyzable_declarative_identifier(node): # type: (Dict[str, Any]) -> bool
+def is_analyzable_declarative_identifier(node):  # type: (Dict[str, Any]) -> bool
     """ Whether the specified node is an analyzable declarative identifier.
     Node declarative-identifier-like is analyzable if it is not dynamic
     and not a member variable, because we can do static scope analysis.
@@ -147,7 +147,7 @@ def is_analyzable_declarative_identifier(node): # type: (Dict[str, Any]) -> bool
     return is_declarative_identifier(node) and is_analyzable_identifier(node)
 
 
-def detect_possible_scope_visibility(node, context_scope): # type: (Dict[str, Any], Scope) -> ScopeVisibilityHint
+def detect_possible_scope_visibility(node, context_scope):  # type: (Dict[str, Any], Scope) -> ScopeVisibilityHint
     """ Returns a *possible* variable visibility by the specified node.
     The "possible" means that we can not determine a scope visibility of lambda arguments until reachability check.
     """
@@ -264,7 +264,7 @@ def _detect_possible_identifier_scope_visibility(id_node, context_scope):
     )
 
 
-def _get_explicit_scope_visibility(id_node): # type: (Dict[str, Any]) -> Optional[ScopeVisibility]
+def _get_explicit_scope_visibility(id_node):  # type: (Dict[str, Any]) -> Optional[ScopeVisibility]
     # See :help internal-variables
     scope_prefix = id_node['value'][0:2]
 
@@ -274,6 +274,6 @@ def _get_explicit_scope_visibility(id_node): # type: (Dict[str, Any]) -> Optiona
         return VariableIdentifierScopePrefixToScopeVisibility.get(scope_prefix)
 
 
-def _is_just_global(id_node): # type: (Dict[str, Any]) -> bool
+def _is_just_global(id_node):  # type: (Dict[str, Any]) -> bool
     # See :help internal-variables
     return id_node['value'][0:2] == 'g:'
