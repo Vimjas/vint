@@ -1,4 +1,4 @@
-from typing import TypeVar, List, Callable
+from typing import TypeVar, List, Callable  # noqa: F401
 from functools import reduce
 from operator import add
 

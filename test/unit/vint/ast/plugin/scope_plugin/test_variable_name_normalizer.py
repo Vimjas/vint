@@ -1,5 +1,5 @@
 import unittest
-from typing import Dict, Any
+from typing import Dict, Any  # noqa: F401
 
 from vint.ast.plugin.scope_plugin.scope import (
     ScopeVisibility,
@@ -26,7 +26,7 @@ class ReferenceReachabilityTesterStub:
         self.hint = hint
 
 
-    def get_objective_scope_visibility(self, _): # type: (Dict[str, Any]) -> ScopeVisibilityHint
+    def get_objective_scope_visibility(self, _):  # type: (Dict[str, Any]) -> ScopeVisibilityHint
         return self.hint
 
 
@@ -222,7 +222,7 @@ class VariableNameNormalizer(unittest.TestCase):
         ]
 
         for scope_visibility_hint, node, expected_variable_name in test_cases:
-            reachability_tester = ReferenceReachabilityTesterStub(hint=scope_visibility_hint) # type: ReferenceReachabilityTester
+            reachability_tester = ReferenceReachabilityTesterStub(hint=scope_visibility_hint)  # type: ReferenceReachabilityTester
             normalized_variable_name = normalize_variable_name(node, reachability_tester)
 
             self.assertEqual(

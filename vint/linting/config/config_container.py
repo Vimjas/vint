@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Dict, Any  # noqa: F401
 from functools import reduce
 from vint.linting.config.config_source import ConfigSource
 

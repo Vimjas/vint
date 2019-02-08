@@ -1,5 +1,5 @@
 from vint.ast.node_type import NodeType
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional  # noqa: F401
 import re
 CONFIG_COMMENT_PATTERN = re.compile(r'^\s*vint:\s*')
 POLICY_SWITCH_PATTERN = re.compile(r'(?:^|\s)[-+]\S+')

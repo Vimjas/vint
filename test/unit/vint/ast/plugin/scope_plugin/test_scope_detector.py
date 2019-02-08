@@ -15,7 +15,7 @@ Vis = ScopeVisibility
 Explicity = ExplicityOfScopeVisibility
 
 
-def create_scope(visibility): # type: (ScopeVisibility) -> Scope
+def create_scope(visibility):  # type: (ScopeVisibility) -> Scope
     return Scope(scope_visibility=visibility)
 
 
