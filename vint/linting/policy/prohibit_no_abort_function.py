@@ -7,7 +7,7 @@ from vint.linting.policy_registry import register_policy
 
 @register_policy
 class ProhibitNoAbortFunction(AbstractPolicy):
-    description = 'Use the abort attribute for functions in autoload'
+    description = 'Use the abort attribute and ! for functions in autoload'
     reference = get_reference_source('FUNCTIONS')
     level = Level.WARNING
 
