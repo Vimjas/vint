@@ -20,9 +20,15 @@ test_requires = [
 ]
 
 
+def read_readme():
+    with open('README.rst', 'r') as f:
+        return f.read()
+
+
 setup(
     name='vim-vint',
     description='Lint tool for Vim script Language',
+    long_description=read_readme(),
     author='Kuniwak',
     author_email='orga.chem.job+vint@gmail.com',
     url='https://github.com/Kuniwak/vint',
