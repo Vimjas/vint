@@ -129,14 +129,14 @@ And you can see all available options by using `--help`:
     $ vint --help
     usage: vint [-h] [-v] [-V] [-e] [-w] [-s] [-m MAX_VIOLATIONS] [-c]
                 [--no-color] [-j] [-t] [--enable-neovim] [-f FORMAT]
-                [--stdin-alt-path STDIN_ALT_PATH]
+                [--stdin-display-name STDIN_DISPLAY_NAME]
                 [files [files ...]]
-    
+
     Lint Vim script
-    
+
     positional arguments:
       files                 file or directory path to lint
-    
+
     optional arguments:
       -h, --help            show this help message and exit
       -v, --version         show program's version number and exit
