@@ -32,30 +32,27 @@ You can use Vint with
 Configure
 ---------
 
-Vint will read config files on the following priority order:
+Vint will read config files from files named ``.vintrc.yaml``, ``.vintrc.yml``,
+or ``.vintrc``.
 
--  `User config <#user-config>`__:
--  e.g. ``~/.vintrc.yaml`` (the filename can be ``.vintrc.yml`` or ``.vintrc``)
+1. any of these files is read from your home directory.
 
--  `Project config <#project-config>`__:
--  e.g. ``path/to/proj/.vintrc.yaml`` (the filename can be ``.vintrc.yml`` or ``.vintrc``)
+2. any of these files is read based on the current directory, which allows for
+   project specific settings.
 
--  `Command line config <#command-line-config>`__:
--  e.g. ``$ vint --error``, ``$ vint --max-violations 10``
+3. `Command line options <#command-line-options>`__, e.g. ``--error``, or
+   ``--max-violations``.
 
--  `Comment config <#comment-config>`__ (highest priority):
--  e.g. ``" vint: -ProhibitAbbreviationOption +ProhibitSetNoCompatible``
+4.  `Comment directives <#comment-directives>`__ (highest priority), e.g.
+    ``" vint: -ProhibitAbbreviationOption +ProhibitSetNoCompatible``.
 
-You can see all options on `Wiki <https://github.com/Kuniwak/vint/wiki/Config>`__.
+The config options are documented in the `Wiki <https://github.com/Kuniwak/vint/wiki/Config>`__.
 
 The default configuration is defined in
 `default_config.yaml <vint/asset/default_config.yaml>`_.
 
-
-User config
-~~~~~~~~~~~
-
-You can configure global Vint config by ``~/.vintrc.yaml`` as following:
+Example configuration file
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: yaml
 
@@ -79,50 +76,13 @@ You can configure global Vint config by ``~/.vintrc.yaml`` as following:
       ProhibitSomethingBad:
         enabled: true
 
-You can see all policy names on `Vint linting policy
+The policy names are documented in `Vint linting policy
 summary <https://github.com/Kuniwak/vint/wiki/Vint-linting-policy-summary>`__.
 
-Project config
-~~~~~~~~~~~~~~
+Command line options
+~~~~~~~~~~~~~~~~~~~~
 
-You can configure project local Vint config by ``.vintrc.yaml`` as
-following:
-
-.. code:: yaml
-
-    cmdargs:
-      # Checking more strictly
-      severity: style_problem
-
-      # Enable coloring
-      color: true
-
-      # Enable Neovim syntax
-      env:
-        neovim: true
-
-    policies:
-      # Disable a violation
-      ProhibitSomethingEvil:
-        enabled: false
-
-      # Enable a violation
-      ProhibitSomethingBad:
-        enabled: true
-
-You can see all policy names on `Vint linting policy
-summary <https://github.com/Kuniwak/vint/wiki/Vint-linting-policy-summary>`__.
-
-Command line config
-~~~~~~~~~~~~~~~~~~~
-
-You can configure linting severity, max errors, ... as following:
-
-::
-
-    $ vint --color --style ~/.vimrc
-
-And you can see all available options by using `--help`:
+The following command line options are available:
 
 ::
 
@@ -157,10 +117,10 @@ And you can see all available options by using `--help`:
                             specify a file path that is used for reporting when
                             linting standard inputs
 
-Comment config
-~~~~~~~~~~~~~~
+Comment directives
+~~~~~~~~~~~~~~~~~~
 
-You can enable/disable linting policies by a comment as following:
+You can enable/disable linting policies through code comments as follows:
 
 .. code:: vim
 
@@ -178,7 +138,7 @@ You can enable/disable linting policies by a comment as following:
     let &cpo = s:save_cpo
     unlet s:save_cpo
 
-And you can use line config comments. It can enable/disable linting policies in only one line by the postfix comment:
+You can also configure policies only for the following line:
 
 .. code:: vim
 
@@ -186,8 +146,10 @@ And you can use line config comments. It can enable/disable linting policies in 
     let s:foobar = 'x'
     echo s:{'foo' . 'bar'}
 
-This syntax is: `" vint: [next-line] [+-]<PolicyName> [+-]<PolicyName> ...`.
-You can see all policy names on `Vint linting policy summary <https://github.com/Kuniwak/vint/wiki/Vint-linting-policy-summary>`__.
+The syntax is: `" vint: [next-line] [+-]<PolicyName> [+-]<PolicyName> ...`.
+
+The policy names are documented in `Vint linting policy
+summary <https://github.com/Kuniwak/vint/wiki/Vint-linting-policy-summary>`__.
 
 Code health
 -----------
