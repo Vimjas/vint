@@ -2,6 +2,7 @@ import unittest
 from pathlib import Path
 import json
 import subprocess
+import sys
 
 
 class TestCLI(unittest.TestCase):
@@ -14,13 +15,13 @@ class TestCLI(unittest.TestCase):
         super(TestCLI, self).assertRegex(string, pattern)
 
 
-    def assertReturnedStdoutEqual(self, expected_stdout, cmd):
+    def assertReturnedStdoutEqual(self, expected_stdout, args):
         got_stdout = '(no stdout)'
-
+        cmd = [sys.executable, '-m', 'vint'] + args
         try:
             got_stdout = subprocess.check_output(cmd, universal_newlines=True)
         except subprocess.CalledProcessError as err:
-            print('Got stderr: `{err_message}'.format(err_message=err.output))
+            print('Got stderr: `{err_message}`'.format(err_message=err))
         finally:
             print('Got stdout: `{stdout}`'.format(stdout=got_stdout))
 
@@ -29,25 +30,23 @@ class TestCLI(unittest.TestCase):
 
     def test_exec_vint_with_valid_file_on_project_root(self):
         valid_file = str(Path('test', 'fixture', 'cli', 'valid1.vim'))
-        cmd = ['bin/vint', valid_file]
 
         expected_output = ''
 
-        self.assertReturnedStdoutEqual(expected_output, cmd)
+        self.assertReturnedStdoutEqual(expected_output, [valid_file])
 
 
     def test_exec_vint_with_valid_file_encoded_cp932_on_project_root(self):
         valid_file = str(Path('test', 'fixture', 'cli', 'valid-cp932.vim'))
-        cmd = ['bin/vint', valid_file]
 
         expected_output = ''
 
-        self.assertReturnedStdoutEqual(expected_output, cmd)
+        self.assertReturnedStdoutEqual(expected_output, [valid_file])
 
 
     def test_exec_vint_with_invalid_file_on_project_root(self):
         invalid_file = str(Path('test', 'fixture', 'cli', 'invalid1.vim'))
-        cmd = ['bin/vint', invalid_file]
+        cmd = [sys.executable, '-m', 'vint', invalid_file]
 
         with self.assertRaises(subprocess.CalledProcessError) as context_manager:
             subprocess.check_output(cmd, universal_newlines=True)
@@ -59,7 +58,7 @@ class TestCLI(unittest.TestCase):
 
 
     def test_exec_vint_with_no_args(self):
-        cmd = ['bin/vint']
+        cmd = [sys.executable, '-m', 'vint']
 
         with self.assertRaises(subprocess.CalledProcessError) as context_manager:
             subprocess.check_output(cmd,
@@ -73,7 +72,7 @@ class TestCLI(unittest.TestCase):
 
 
     def test_exec_vint_with_unexistent_file(self):
-        cmd = ['bin/vint', '/path/to/unexistent']
+        cmd = [sys.executable, '-m', 'vint', '/path/to/unexistent']
 
         with self.assertRaises(subprocess.CalledProcessError) as context_manager:
             subprocess.check_output(cmd,
@@ -88,7 +87,7 @@ class TestCLI(unittest.TestCase):
 
     def test_exec_vint_with_stat_flag(self):
         invalid_file = str(Path('test', 'fixture', 'cli', 'invalid1.vim'))
-        cmd = ['bin/vint', '--stat', invalid_file]
+        cmd = [sys.executable, '-m', 'vint', '--stat', invalid_file]
 
         with self.assertRaises(subprocess.CalledProcessError) as context_manager:
             subprocess.check_output(cmd,
@@ -105,7 +104,7 @@ class TestCLI(unittest.TestCase):
 
     def test_exec_vint_with_json_flag(self):
         invalid_file = str(Path('test', 'fixture', 'cli', 'invalid1.vim'))
-        cmd = ['bin/vint', '--json', invalid_file]
+        cmd = [sys.executable, '-m', 'vint', '--json', invalid_file]
 
         with self.assertRaises(subprocess.CalledProcessError) as context_manager:
             # We should not capture STRERR because coverage plugin use it.
@@ -120,7 +119,7 @@ class TestCLI(unittest.TestCase):
 
     def test_exec_vint_with_verbose_flag(self):
         valid_file = str(Path('test', 'fixture', 'cli', 'valid1.vim'))
-        cmd = ['bin/vint', '--verbose', valid_file]
+        cmd = [sys.executable, '-m', 'vint', '--verbose', valid_file]
 
         got_output = subprocess.check_output(cmd,
                                              universal_newlines=True,
@@ -133,7 +132,7 @@ class TestCLI(unittest.TestCase):
     @unittest.skip('Does drone.io not like ANSI color?')
     def test_exec_vint_with_color_flag(self):
         invalid_file = str(Path('test', 'fixture', 'cli', 'invalid1.vim'))
-        cmd = ['bin/vint', '--color', invalid_file]
+        cmd = [sys.executable, '-m', 'vint', '--color', invalid_file]
 
         with self.assertRaises(subprocess.CalledProcessError) as context_manager:
             subprocess.check_output(cmd, universal_newlines=True)
