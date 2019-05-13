@@ -3,8 +3,8 @@ from setuptools import setup, find_packages
 
 
 install_requires = [
-    'PyYAML~=3.11',
-    'ansicolor~=0.2.4',
+    'PyYAML>=3.11',
+    'ansicolor>=0.2.4',
     'chardet>=2.3.0',
     'setuptools>=36.2.2',  # for enhanced marker support (used below).
     'enum34>=1.0.4;python_version<"3.4"',
