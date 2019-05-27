@@ -80,6 +80,9 @@ pat_vim2py = {
   "^[a-z]$" : "^[a-z]$",
   "^[vgslabwt]:$\\|^\\([vgslabwt]:\\)\\?[A-Za-z_][0-9A-Za-z_#]*$" : "^[vgslabwt]:$|^([vgslabwt]:)?[A-Za-z_][0-9A-Za-z_#]*$",
   "^[0-7]$" : "^[0-7]$",
+  "^[0-9A-Fa-f][0-9A-Fa-f]$" : "^[0-9A-Fa-f][0-9A-Fa-f]$",
+  "^\.[0-9A-Fa-f]$" : "^\.[0-9A-Fa-f]$",
+  "^[0-9A-Fa-f][^0-9A-Fa-f]$" : "^[0-9A-Fa-f][^0-9A-Fa-f]$",
 }
 
 def viml_add(lst, item):
@@ -1863,7 +1866,7 @@ class ExprTokenizer:
             s += r.read_bdigit()
             return self.token(TOKEN_NUMBER, s, pos)
         elif c == "0" and (r.p(1) == "Z" or r.p(1) == "z") and r.p(2) != ".":
-            s = r.getn(3)
+            s = r.getn(2)
             s += r.read_blob()
             return self.token(TOKEN_BLOB, s, pos)
         elif isdigit(c):
@@ -3070,10 +3073,15 @@ class StringReader:
     def read_blob(self):
         r = ""
         while 1:
-            c = self.peekn(1)
-            if not isxdigit(c) and c != ".":
+            s = self.peekn(2)
+            if viml_eqregh(s, "^[0-9A-Fa-f][0-9A-Fa-f]$"):
+                r += self.getn(2)
+            elif viml_eqregh(s, "^\\.[0-9A-Fa-f]$"):
+                r += self.getn(1)
+            elif viml_eqregh(s, "^[0-9A-Fa-f][^0-9A-Fa-f]$"):
+                raise VimLParserException(Err("E973: Blob literal should have an even number of hex characters:" + s, self.getpos()))
+            else:
                 break
-            r += self.getn(1)
         return r
 
     def read_xdigit(self):
