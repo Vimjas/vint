@@ -175,21 +175,6 @@ def viml_has_key(obj, key):
 def viml_stridx(a, b):
     return a.find(b)
 
-def viml_type(obj):
-    if isinstance(obj, int):
-        return 0
-    elif isinstance(obj, str):
-        return 1
-    elif inspect.isfunction(obj):
-        return 2
-    elif isinstance(obj, list):
-        return 3
-    elif isinstance(obj, dict):
-        return 4
-    elif isinstance(obj, float):
-        return 5
-    raise VimLParserException('Unknown Type')
-
 NIL = []
 TRUE = 1
 FALSE = 0
@@ -352,6 +337,7 @@ TOKEN_SHARP = 64
 TOKEN_ARROW = 65
 TOKEN_BLOB = 66
 TOKEN_LITCOPEN = 67
+TOKEN_DOTDOT = 68
 MAX_FUNC_ARGS = 20
 def isalpha(c):
     return viml_eqregh(c, "^[A-Za-z]$")
@@ -1427,8 +1413,11 @@ class VimLParser:
         self.reader.skip_white()
         s1 = self.reader.peekn(1)
         s2 = self.reader.peekn(2)
+        # TODO check scriptversion?
+        if s2 == "..":
+            s2 = self.reader.peekn(3)
         # :let {var-name} ..
-        if self.ends_excmds(s1) or s2 != "+=" and s2 != "-=" and s2 != ".=" and s2 != "*=" and s2 != "/=" and s2 != "%=" and s1 != "=":
+        if self.ends_excmds(s1) or s2 != "+=" and s2 != "-=" and s2 != ".=" and s2 != "..=" and s2 != "*=" and s2 != "/=" and s2 != "%=" and s1 != "=":
             self.reader.seek_set(pos)
             self.parse_cmd_common()
             return
@@ -1441,8 +1430,8 @@ class VimLParser:
         node.list = lhs.list
         node.rest = lhs.rest
         node.right = NIL
-        if s2 == "+=" or s2 == "-=" or s2 == ".=" or s2 == "*=" or s2 == "/=" or s2 == "%=":
-            self.reader.getn(2)
+        if s2 == "+=" or s2 == "-=" or s2 == ".=" or s2 == "..=" or s2 == "*=" or s2 == "/=" or s2 == "%=":
+            self.reader.getn(viml_len(s2))
             node.op = s2
         elif s1 == "=":
             self.reader.getn(1)
@@ -2002,9 +1991,14 @@ class ExprTokenizer:
             if r.p(1) == "." and r.p(2) == ".":
                 r.seek_cur(3)
                 return self.token(TOKEN_DOTDOTDOT, "...", pos)
+            elif r.p(1) == ".":
+                r.seek_cur(2)
+                return self.token(TOKEN_DOTDOT, "..", pos)
+                # TODO check scriptversion?
             else:
                 r.seek_cur(1)
                 return self.token(TOKEN_DOT, ".", pos)
+                # TODO check scriptversion?
         elif c == "*":
             r.seek_cur(1)
             return self.token(TOKEN_STAR, "*", pos)
@@ -2141,7 +2135,7 @@ class ExprTokenizer:
         r = self.reader
         c = r.peek()
         if not isalnum(c) and c != "_" and c != "-":
-            raise VimLParserException(Err(viml_printf("unexpected token: %s", token.value), token.pos))
+            raise VimLParserException(Err(viml_printf("unexpected character: %s", c), self.reader.getpos()))
         s = c
         self.reader.seek_cur(1)
         while TRUE:
@@ -2421,6 +2415,7 @@ class ExprParser:
 # expr5: expr6 + expr6 ..
 #        expr6 - expr6 ..
 #        expr6 . expr6 ..
+#        expr6 .. expr6 ..
     def parse_expr5(self):
         left = self.parse_expr6()
         while TRUE:
@@ -2438,7 +2433,15 @@ class ExprParser:
                 node.left = left
                 node.right = self.parse_expr6()
                 left = node
+            elif token.type == TOKEN_DOTDOT:
+                # TODO check scriptversion?
+                node = Node(NODE_CONCAT)
+                node.pos = token.pos
+                node.left = left
+                node.right = self.parse_expr6()
+                left = node
             elif token.type == TOKEN_DOT:
+                # TODO check scriptversion?
                 node = Node(NODE_CONCAT)
                 node.pos = token.pos
                 node.left = left
@@ -2582,6 +2585,7 @@ class ExprParser:
                 left = node
                 del node
             elif not iswhite(c) and token.type == TOKEN_DOT:
+                # TODO check scriptversion?
                 node = self.parse_dot(token, left)
                 if node is NIL:
                     self.reader.seek_set(pos)
@@ -2805,6 +2809,27 @@ class ExprParser:
             # foo.s:bar or foo.bar#baz
             return NIL
         node = Node(NODE_DOT)
+        node.pos = token.pos
+        node.left = left
+        node.right = Node(NODE_IDENTIFIER)
+        node.right.pos = pos
+        node.right.value = name
+        return node
+
+# CONCAT
+#   str  ".." expr6         => (concat str expr6)
+    def parse_concat(self, token, left):
+        if left.type != NODE_IDENTIFIER and left.type != NODE_CURLYNAME and left.type != NODE_DICT and left.type != NODE_SUBSCRIPT and left.type != NODE_CALL and left.type != NODE_DOT:
+            return NIL
+        if not iswordc(self.reader.p(0)):
+            return NIL
+        pos = self.reader.getpos()
+        name = self.reader.read_word()
+        if isnamec(self.reader.p(0)):
+            # XXX: foo is str => ok, foo is obj => invalid expression
+            # foo.s:bar or foo.bar#baz
+            return NIL
+        node = Node(NODE_CONCAT)
         node.pos = token.pos
         node.left = left
         node.right = Node(NODE_IDENTIFIER)
@@ -4151,16 +4176,16 @@ class RegexpParser:
                 return ["\\n", 0]
             elif c == "r":
                 self.reader.seek_cur(1)
-                return ["\\r", viml_char2nr("\r")]
+                return ["\\r", 13]
             elif c == "t":
                 self.reader.seek_cur(1)
-                return ["\\t", viml_char2nr("\t")]
+                return ["\\t", 9]
             elif c == "e":
                 self.reader.seek_cur(1)
-                return ["\\e", viml_char2nr("\e")]
+                return ["\\e", 27]
             elif c == "b":
                 self.reader.seek_cur(1)
-                return ["\\b", viml_char2nr("\b")]
+                return ["\\b", 8]
             elif viml_stridx("]^-\\", c) != -1:
                 self.reader.seek_cur(1)
                 return ["\\" + c, viml_char2nr(c)]
