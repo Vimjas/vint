@@ -1,6 +1,7 @@
 [run]
 source = .
 branch = true
+omit = vint/_bundles/*
 
 [report]
 show_missing = true

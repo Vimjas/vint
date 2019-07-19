@@ -1,29 +1,44 @@
-sudo: false
 language: python
 dist: xenial
 
+git:
+  submodules: false
+
 env:
   global:
-    PYTEST_ADDOPTS="--cov=vint --cov=test --cov-report=xml --cov-report=term-missing:skip-covered"
+    PYTEST_ADDOPTS="--cov-report=xml"
 
-python:
-  - "2.7"
-  - "3.4"
-  - "3.5"
-  - "3.6"
-  - "3.7"
+jobs:
+  include:
+    - name: Python 3.7 (integration)
+      python: "3.7"
+      env: TOXENV=py37-cov
+      git:
+        # Check out vital.vim for test_cli_vital.
+        submodules: true
+    - name: Python 2.7
+      python: "2.7"
+      env: TOXENV=py27-cov
+    - name: Python 3.6
+      python: "3.6"
+      env: TOXENV=py36-cov
+    - name: Python 3.5
+      python: "3.5"
+      env: TOXENV=py35-cov
+    - name: Python 3.4
+      python: "3.4"
+      env: TOXENV=py34-cov
 
 install:
-  - pip install tox tox-travis
+  - pip install tox
 
 script:
   - tox
 
 after_success:
-  - pip install codecov
-  - codecov -X search gcov pycov -f coverage.xml --required
+  - bash <(curl -s https://codecov.io/bash) -f coverage.xml -X fix
   # coveralls only support one env.
-  - if [ "$TOXENV" = py36 ]; then pip install coveralls; coveralls; fi
+  - if [ "$TOXENV" = py37-cov ]; then pip install coveralls; coveralls; fi
 
 notifications:
   email: false
