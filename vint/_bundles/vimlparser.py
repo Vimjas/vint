@@ -351,6 +351,7 @@ TOKEN_DOTDOTDOT = 63
 TOKEN_SHARP = 64
 TOKEN_ARROW = 65
 TOKEN_BLOB = 66
+TOKEN_LITCOPEN = 67
 MAX_FUNC_ARGS = 20
 def isalpha(c):
     return viml_eqregh(c, "^[A-Za-z]$")
@@ -2023,8 +2024,12 @@ class ExprTokenizer:
             r.seek_cur(1)
             return self.token(TOKEN_COLON, ":", pos)
         elif c == "#":
-            r.seek_cur(1)
-            return self.token(TOKEN_SHARP, "#", pos)
+            if r.p(1) == "{":
+                r.seek_cur(2)
+                return self.token(TOKEN_LITCOPEN, "#{", pos)
+            else:
+                r.seek_cur(1)
+                return self.token(TOKEN_SHARP, "#", pos)
         elif c == "(":
             r.seek_cur(1)
             return self.token(TOKEN_POPEN, "(", pos)
@@ -2129,6 +2134,24 @@ class ExprTokenizer:
             else:
                 self.reader.seek_cur(1)
                 s += c
+        return s
+
+    def get_dict_literal_key(self):
+        self.reader.skip_white()
+        r = self.reader
+        c = r.peek()
+        if not isalnum(c) and c != "_" and c != "-":
+            raise VimLParserException(Err(viml_printf("unexpected token: %s", token.value), token.pos))
+        s = c
+        self.reader.seek_cur(1)
+        while TRUE:
+            c = self.reader.p(0)
+            if c == "<EOF>" or c == "<EOL>":
+                raise VimLParserException(Err("unexpectd EOL", self.reader.getpos()))
+            if not isalnum(c) and c != "_" and c != "-":
+                break
+            self.reader.seek_cur(1)
+            s += c
         return s
 
 class ExprParser:
@@ -2575,6 +2598,7 @@ class ExprParser:
 #        'string'
 #        [expr1, ...]
 #        {expr1: expr1, ...}
+#        #{literal_key1: expr1, ...}
 #        {args -> expr1}
 #        &option
 #        (expr1)
@@ -2627,7 +2651,8 @@ class ExprParser:
                         break
                     else:
                         raise VimLParserException(Err(viml_printf("unexpected token: %s", token.value), token.pos))
-        elif token.type == TOKEN_COPEN:
+        elif token.type == TOKEN_COPEN or token.type == TOKEN_LITCOPEN:
+            is_litdict = token.type == TOKEN_LITCOPEN
             savepos = self.reader.tell()
             nodepos = token.pos
             token = self.tokenizer.get()
@@ -2703,7 +2728,7 @@ class ExprParser:
                 self.tokenizer.get()
                 return node
             while 1:
-                key = self.parse_expr1()
+                key = self.parse_dict_literal_key() if is_litdict else self.parse_expr1()
                 token = self.tokenizer.get()
                 if token.type == TOKEN_CCLOSE:
                     if not viml_empty(node.value):
@@ -2757,6 +2782,12 @@ class ExprParser:
             node.value = token.value
         else:
             raise VimLParserException(Err(viml_printf("unexpected token: %s", token.value), token.pos))
+        return node
+
+    def parse_dict_literal_key(self):
+        node = Node(NODE_STRING)
+        node.pos = self.reader.tell()
+        node.value = "'" + self.tokenizer.get_dict_literal_key() + "'"
         return node
 
 # SUBSCRIPT or CONCAT
