@@ -3,10 +3,10 @@
 
 import sys
 import re
-import inspect
+
 
 def main():
-    use_neovim = sys.argv[1] == '--neovim'
+    use_neovim = sys.argv[1] == "--neovim"
 
     r = StringReader(viml_readfile(sys.argv[-1]))
     p = VimLParser(use_neovim)
@@ -18,99 +18,115 @@ def main():
         print(e)
         sys.exit(1)
 
+
 class VimLParserException(Exception):
     pass
+
 
 class AttributeDict(dict):
     __getattr__ = dict.__getitem__
     __setattr__ = dict.__setitem__
     __delattr__ = dict.__delitem__
 
+
 pat_vim2py = {
-  "[0-9a-zA-Z]" : "[0-9a-zA-Z]",
-  "[@*!=><&~#]" : "[@*!=><&~#]",
-  "\\<ARGOPT\\>" : "\\bARGOPT\\b",
-  "\\<BANG\\>" : "\\bBANG\\b",
-  "\\<EDITCMD\\>" : "\\bEDITCMD\\b",
-  "\\<NOTRLCOM\\>" : "\\bNOTRLCOM\\b",
-  "\\<TRLBAR\\>" : "\\bTRLBAR\\b",
-  "\\<USECTRLV\\>" : "\\bUSECTRLV\\b",
-  "\\<USERCMD\\>" : "\\bUSERCMD\\b",
-  "\\<\\(XFILE\\|FILES\\|FILE1\\)\\>" : "\\b(XFILE|FILES|FILE1)\\b",
-  "\\S" : "\\S",
-  "\\a" : "[A-Za-z]",
-  "\\d" : "\\d",
-  "\\h" : "[A-Za-z_]",
-  "\\s" : "\\s",
-  "\\v^d%[elete][lp]$" : "^d(elete|elet|ele|el|e)[lp]$",
-  "\\v^s%(c[^sr][^i][^p]|g|i[^mlg]|I|r[^e])" : "^s(c[^sr][^i][^p]|g|i[^mlg]|I|r[^e])",
-  "\\w" : "[0-9A-Za-z_]",
-  "\\w\\|[:#]" : "[0-9A-Za-z_]|[:#]",
-  "\\x" : "[0-9A-Fa-f]",
-  "^++" : "^\+\+",
-  "^++bad=\\(keep\\|drop\\|.\\)\\>" : "^\\+\\+bad=(keep|drop|.)\\b",
-  "^++bad=drop" : "^\\+\\+bad=drop",
-  "^++bad=keep" : "^\\+\\+bad=keep",
-  "^++bin\\>" : "^\\+\\+bin\\b",
-  "^++edit\\>" : "^\\+\\+edit\\b",
-  "^++enc=\\S" : "^\\+\\+enc=\\S",
-  "^++encoding=\\S" : "^\\+\\+encoding=\\S",
-  "^++ff=\\(dos\\|unix\\|mac\\)\\>" : "^\\+\\+ff=(dos|unix|mac)\\b",
-  "^++fileformat=\\(dos\\|unix\\|mac\\)\\>" : "^\\+\\+fileformat=(dos|unix|mac)\\b",
-  "^++nobin\\>" : "^\\+\\+nobin\\b",
-  "^[A-Z]" : "^[A-Z]",
-  "^\\$\\w\\+" : "^\\$[0-9A-Za-z_]+",
-  "^\\(!\\|global\\|vglobal\\)$" : "^(!|global|vglobal)$",
-  "^\\(WHILE\\|FOR\\)$" : "^(WHILE|FOR)$",
-  "^\\(vimgrep\\|vimgrepadd\\|lvimgrep\\|lvimgrepadd\\)$" : "^(vimgrep|vimgrepadd|lvimgrep|lvimgrepadd)$",
-  "^\\d" : "^\\d",
-  "^\\h" : "^[A-Za-z_]",
-  "^\\s" : "^\\s",
-  "^\\s*\\\\" : "^\\s*\\\\",
-  "^[ \\t]$" : "^[ \\t]$",
-  "^[A-Za-z]$" : "^[A-Za-z]$",
-  "^[0-9A-Za-z]$" : "^[0-9A-Za-z]$",
-  "^[0-9]$" : "^[0-9]$",
-  "^[0-9A-Fa-f]$" : "^[0-9A-Fa-f]$",
-  "^[0-9A-Za-z_]$" : "^[0-9A-Za-z_]$",
-  "^[A-Za-z_]$" : "^[A-Za-z_]$",
-  "^[0-9A-Za-z_:#]$" : "^[0-9A-Za-z_:#]$",
-  "^[A-Za-z_][0-9A-Za-z_]*$" : "^[A-Za-z_][0-9A-Za-z_]*$",
-  "^[A-Z]$" : "^[A-Z]$",
-  "^[a-z]$" : "^[a-z]$",
-  "^[vgslabwt]:$\\|^\\([vgslabwt]:\\)\\?[A-Za-z_][0-9A-Za-z_#]*$" : "^[vgslabwt]:$|^([vgslabwt]:)?[A-Za-z_][0-9A-Za-z_#]*$",
-  "^[0-7]$" : "^[0-7]$",
-  "^[0-9A-Fa-f][0-9A-Fa-f]$" : "^[0-9A-Fa-f][0-9A-Fa-f]$",
-  "^\.[0-9A-Fa-f]$" : "^\.[0-9A-Fa-f]$",
-  "^[0-9A-Fa-f][^0-9A-Fa-f]$" : "^[0-9A-Fa-f][^0-9A-Fa-f]$",
+    "[0-9a-zA-Z]": "[0-9a-zA-Z]",
+    "[@*!=><&~#]": "[@*!=><&~#]",
+    "\\<ARGOPT\\>": "\\bARGOPT\\b",
+    "\\<BANG\\>": "\\bBANG\\b",
+    "\\<EDITCMD\\>": "\\bEDITCMD\\b",
+    "\\<NOTRLCOM\\>": "\\bNOTRLCOM\\b",
+    "\\<TRLBAR\\>": "\\bTRLBAR\\b",
+    "\\<USECTRLV\\>": "\\bUSECTRLV\\b",
+    "\\<USERCMD\\>": "\\bUSERCMD\\b",
+    "\\<\\(XFILE\\|FILES\\|FILE1\\)\\>": "\\b(XFILE|FILES|FILE1)\\b",
+    "\\S": "\\S",
+    "\\a": "[A-Za-z]",
+    "\\d": "\\d",
+    "\\h": "[A-Za-z_]",
+    "\\s": "\\s",
+    "\\v^d%[elete][lp]$": "^d(elete|elet|ele|el|e)[lp]$",
+    "\\v^s%(c[^sr][^i][^p]|g|i[^mlg]|I|r[^e])":
+        "^s(c[^sr][^i][^p]|g|i[^mlg]|I|r[^e])",
+    "\\w": "[0-9A-Za-z_]",
+    "\\w\\|[:#]": "[0-9A-Za-z_]|[:#]",
+    "\\x": "[0-9A-Fa-f]",
+    "^++": r"^\+\+",
+    "^++bad=\\(keep\\|drop\\|.\\)\\>": "^\\+\\+bad=(keep|drop|.)\\b",
+    "^++bad=drop": "^\\+\\+bad=drop",
+    "^++bad=keep": "^\\+\\+bad=keep",
+    "^++bin\\>": "^\\+\\+bin\\b",
+    "^++edit\\>": "^\\+\\+edit\\b",
+    "^++enc=\\S": "^\\+\\+enc=\\S",
+    "^++encoding=\\S": "^\\+\\+encoding=\\S",
+    "^++ff=\\(dos\\|unix\\|mac\\)\\>": "^\\+\\+ff=(dos|unix|mac)\\b",
+    "^++fileformat=\\(dos\\|unix\\|mac\\)\\>":
+        "^\\+\\+fileformat=(dos|unix|mac)\\b",
+    "^++nobin\\>": "^\\+\\+nobin\\b",
+    "^[A-Z]": "^[A-Z]",
+    "^\\$\\w\\+": "^\\$[0-9A-Za-z_]+",
+    "^\\(!\\|global\\|vglobal\\)$": "^(!|global|vglobal)$",
+    "^\\(WHILE\\|FOR\\)$": "^(WHILE|FOR)$",
+    "^\\(vimgrep\\|vimgrepadd\\|lvimgrep\\|lvimgrepadd\\)$":
+        "^(vimgrep|vimgrepadd|lvimgrep|lvimgrepadd)$",
+    "^\\d": "^\\d",
+    "^\\h": "^[A-Za-z_]",
+    "^\\s": "^\\s",
+    "^\\s*\\\\": "^\\s*\\\\",
+    "^[ \\t]$": "^[ \\t]$",
+    "^[A-Za-z]$": "^[A-Za-z]$",
+    "^[0-9A-Za-z]$": "^[0-9A-Za-z]$",
+    "^[0-9]$": "^[0-9]$",
+    "^[0-9A-Fa-f]$": "^[0-9A-Fa-f]$",
+    "^[0-9A-Za-z_]$": "^[0-9A-Za-z_]$",
+    "^[A-Za-z_]$": "^[A-Za-z_]$",
+    "^[0-9A-Za-z_:#]$": "^[0-9A-Za-z_:#]$",
+    "^[A-Za-z_][0-9A-Za-z_]*$": "^[A-Za-z_][0-9A-Za-z_]*$",
+    "^[A-Z]$": "^[A-Z]$",
+    "^[a-z]$": "^[a-z]$",
+    "^[vgslabwt]:$\\|^\\([vgslabwt]:\\)\\?[A-Za-z_][0-9A-Za-z_#]*$":
+        "^[vgslabwt]:$|^([vgslabwt]:)?[A-Za-z_][0-9A-Za-z_#]*$",
+    "^[0-7]$": "^[0-7]$",
+    "^[0-9A-Fa-f][0-9A-Fa-f]$": "^[0-9A-Fa-f][0-9A-Fa-f]$",
+    r"^\.[0-9A-Fa-f]$": r"^\.[0-9A-Fa-f]$",
+    "^[0-9A-Fa-f][^0-9A-Fa-f]$": "^[0-9A-Fa-f][^0-9A-Fa-f]$",
 }
+
 
 def viml_add(lst, item):
     lst.append(item)
 
+
 def viml_call(func, *args):
     func(*args)
+
 
 def viml_char2nr(c):
     return ord(c)
 
+
 def viml_empty(obj):
     return len(obj) == 0
+
 
 def viml_equalci(a, b):
     return a.lower() == b.lower()
 
+
 def viml_eqreg(s, reg):
     return re.search(pat_vim2py[reg], s, re.IGNORECASE)
+
 
 def viml_eqregh(s, reg):
     return re.search(pat_vim2py[reg], s)
 
+
 def viml_eqregq(s, reg):
     return re.search(pat_vim2py[reg], s, re.IGNORECASE)
 
+
 def viml_escape(s, chars):
-    r = ''
+    r = ""
     for c in s:
         if c in chars:
             r += "\\" + c
@@ -118,22 +134,32 @@ def viml_escape(s, chars):
             r += c
     return r
 
+
 def viml_extend(obj, item):
     obj.extend(item)
 
-def viml_insert(lst, item, idx = 0):
+
+def viml_insert(lst, item, idx=0):
     lst.insert(idx, item)
+
 
 def viml_join(lst, sep):
     return sep.join(lst)
 
+
 def viml_keys(obj):
     return obj.keys()
 
+
 def viml_len(obj):
     if type(obj) is str:
-        return len(obj.encode('utf-8'))
+        if sys.version_info < (3, 0):
+            b = bytes(obj)
+        else:
+            b = bytes(obj, "utf8")
+        return len(b)
     return len(obj)
+
 
 def viml_printf(*args):
     if len(args) == 1:
@@ -141,11 +167,13 @@ def viml_printf(*args):
     else:
         return args[0] % args[1:]
 
+
 def viml_range(start, end=None):
     if end is None:
         return range(start)
     else:
         return range(start, end + 1)
+
 
 def viml_readfile(path):
     lines = []
@@ -155,25 +183,32 @@ def viml_readfile(path):
     f.close()
     return lines
 
+
 def viml_remove(lst, idx):
     del lst[idx]
+
 
 def viml_split(s, sep):
     if sep == "\\zs":
         return s
     raise VimLParserException("NotImplemented")
 
+
 def viml_str2nr(s, base=10):
     return int(s, base)
+
 
 def viml_string(obj):
     return str(obj)
 
+
 def viml_has_key(obj, key):
     return key in obj
 
+
 def viml_stridx(a, b):
     return a.find(b)
+
 
 NIL = []
 TRUE = 1
@@ -270,6 +305,7 @@ NODE_CURLYNAMEPART = 90
 NODE_CURLYNAMEEXPR = 91
 NODE_LAMBDA = 92
 NODE_BLOB = 93
+NODE_CONST = 94
 TOKEN_EOF = 1
 TOKEN_EOL = 2
 TOKEN_SPACE = 3
@@ -339,51 +375,68 @@ TOKEN_BLOB = 66
 TOKEN_LITCOPEN = 67
 TOKEN_DOTDOT = 68
 MAX_FUNC_ARGS = 20
+
+
 def isalpha(c):
     return viml_eqregh(c, "^[A-Za-z]$")
+
 
 def isalnum(c):
     return viml_eqregh(c, "^[0-9A-Za-z]$")
 
+
 def isdigit(c):
     return viml_eqregh(c, "^[0-9]$")
+
 
 def isodigit(c):
     return viml_eqregh(c, "^[0-7]$")
 
+
 def isxdigit(c):
     return viml_eqregh(c, "^[0-9A-Fa-f]$")
+
 
 def iswordc(c):
     return viml_eqregh(c, "^[0-9A-Za-z_]$")
 
+
 def iswordc1(c):
     return viml_eqregh(c, "^[A-Za-z_]$")
+
 
 def iswhite(c):
     return viml_eqregh(c, "^[ \\t]$")
 
+
 def isnamec(c):
     return viml_eqregh(c, "^[0-9A-Za-z_:#]$")
+
 
 def isnamec1(c):
     return viml_eqregh(c, "^[A-Za-z_]$")
 
+
 def isargname(s):
     return viml_eqregh(s, "^[A-Za-z_][0-9A-Za-z_]*$")
 
+
 def isvarname(s):
     return viml_eqregh(s, "^[vgslabwt]:$\\|^\\([vgslabwt]:\\)\\?[A-Za-z_][0-9A-Za-z_#]*$")
+
 
 # FIXME:
 def isidc(c):
     return viml_eqregh(c, "^[0-9A-Za-z_]$")
 
+
 def isupper(c):
     return viml_eqregh(c, "^[A-Z]$")
 
+
 def islower(c):
     return viml_eqregh(c, "^[a-z]$")
+
 
 def ExArg():
     ea = AttributeDict({})
@@ -413,6 +466,7 @@ def ExArg():
     ea.argcmd = AttributeDict({})
     return ea
 
+
 # struct node {
 #   int     type
 #   pos     pos
@@ -437,6 +491,7 @@ def ExArg():
 # RETURN .ea .left
 # EXCALL .ea .left
 # LET .ea .op .left .list .rest .right
+# CONST .ea .op .left .list .rest .right
 # UNLET .ea .list
 # LOCKVAR .ea .depth .list
 # UNLOCKVAR .ea .depth .list
@@ -521,12 +576,15 @@ def ExArg():
 # CURLYNAMEEXPR .value
 # LAMBDA .rlist .left
 def Node(type):
-    return AttributeDict({"type":type})
+    return AttributeDict({"type": type})
+
 
 def Err(msg, pos):
     return viml_printf("vimlparser: %s: line %d col %d", msg, pos.lnum, pos.col)
 
+
 class VimLParser:
+
     def __init__(self, *a000):
         if viml_len(a000) > 0:
             self.neovim = a000[0]
@@ -608,7 +666,7 @@ class VimLParser:
         self.parse_command()
         self.parse_trail()
 
-# FIXME:
+    # FIXME:
     def parse_command_modifiers(self):
         modifiers = []
         while TRUE:
@@ -622,88 +680,88 @@ class VimLParser:
             self.reader.skip_white()
             if viml_stridx("aboveleft", k) == 0 and viml_len(k) >= 3:
                 # abo\%[veleft]
-                viml_add(modifiers, AttributeDict({"name":"aboveleft"}))
+                viml_add(modifiers, AttributeDict({"name": "aboveleft"}))
             elif viml_stridx("belowright", k) == 0 and viml_len(k) >= 3:
                 # bel\%[owright]
-                viml_add(modifiers, AttributeDict({"name":"belowright"}))
+                viml_add(modifiers, AttributeDict({"name": "belowright"}))
             elif viml_stridx("browse", k) == 0 and viml_len(k) >= 3:
                 # bro\%[wse]
-                viml_add(modifiers, AttributeDict({"name":"browse"}))
+                viml_add(modifiers, AttributeDict({"name": "browse"}))
             elif viml_stridx("botright", k) == 0 and viml_len(k) >= 2:
                 # bo\%[tright]
-                viml_add(modifiers, AttributeDict({"name":"botright"}))
+                viml_add(modifiers, AttributeDict({"name": "botright"}))
             elif viml_stridx("confirm", k) == 0 and viml_len(k) >= 4:
                 # conf\%[irm]
-                viml_add(modifiers, AttributeDict({"name":"confirm"}))
+                viml_add(modifiers, AttributeDict({"name": "confirm"}))
             elif viml_stridx("keepmarks", k) == 0 and viml_len(k) >= 3:
                 # kee\%[pmarks]
-                viml_add(modifiers, AttributeDict({"name":"keepmarks"}))
+                viml_add(modifiers, AttributeDict({"name": "keepmarks"}))
             elif viml_stridx("keepalt", k) == 0 and viml_len(k) >= 5:
                 # keepa\%[lt]
-                viml_add(modifiers, AttributeDict({"name":"keepalt"}))
+                viml_add(modifiers, AttributeDict({"name": "keepalt"}))
             elif viml_stridx("keepjumps", k) == 0 and viml_len(k) >= 5:
                 # keepj\%[umps]
-                viml_add(modifiers, AttributeDict({"name":"keepjumps"}))
+                viml_add(modifiers, AttributeDict({"name": "keepjumps"}))
             elif viml_stridx("keeppatterns", k) == 0 and viml_len(k) >= 5:
                 # keepp\%[atterns]
-                viml_add(modifiers, AttributeDict({"name":"keeppatterns"}))
+                viml_add(modifiers, AttributeDict({"name": "keeppatterns"}))
             elif viml_stridx("hide", k) == 0 and viml_len(k) >= 3:
-                #hid\%[e]
+                # hid\%[e]
                 if self.ends_excmds(c):
                     break
-                viml_add(modifiers, AttributeDict({"name":"hide"}))
+                viml_add(modifiers, AttributeDict({"name": "hide"}))
             elif viml_stridx("lockmarks", k) == 0 and viml_len(k) >= 3:
                 # loc\%[kmarks]
-                viml_add(modifiers, AttributeDict({"name":"lockmarks"}))
+                viml_add(modifiers, AttributeDict({"name": "lockmarks"}))
             elif viml_stridx("leftabove", k) == 0 and viml_len(k) >= 5:
                 # lefta\%[bove]
-                viml_add(modifiers, AttributeDict({"name":"leftabove"}))
+                viml_add(modifiers, AttributeDict({"name": "leftabove"}))
             elif viml_stridx("noautocmd", k) == 0 and viml_len(k) >= 3:
                 # noa\%[utocmd]
-                viml_add(modifiers, AttributeDict({"name":"noautocmd"}))
+                viml_add(modifiers, AttributeDict({"name": "noautocmd"}))
             elif viml_stridx("noswapfile", k) == 0 and viml_len(k) >= 3:
                 # :nos\%[wapfile]
-                viml_add(modifiers, AttributeDict({"name":"noswapfile"}))
+                viml_add(modifiers, AttributeDict({"name": "noswapfile"}))
             elif viml_stridx("rightbelow", k) == 0 and viml_len(k) >= 6:
-                #rightb\%[elow]
-                viml_add(modifiers, AttributeDict({"name":"rightbelow"}))
+                # rightb\%[elow]
+                viml_add(modifiers, AttributeDict({"name": "rightbelow"}))
             elif viml_stridx("sandbox", k) == 0 and viml_len(k) >= 3:
                 # san\%[dbox]
-                viml_add(modifiers, AttributeDict({"name":"sandbox"}))
+                viml_add(modifiers, AttributeDict({"name": "sandbox"}))
             elif viml_stridx("silent", k) == 0 and viml_len(k) >= 3:
                 # sil\%[ent]
                 if c == "!":
                     self.reader.get()
-                    viml_add(modifiers, AttributeDict({"name":"silent", "bang":1}))
+                    viml_add(modifiers, AttributeDict({"name": "silent", "bang": 1}))
                 else:
-                    viml_add(modifiers, AttributeDict({"name":"silent", "bang":0}))
+                    viml_add(modifiers, AttributeDict({"name": "silent", "bang": 0}))
             elif k == "tab":
                 # tab
                 if d != "":
-                    viml_add(modifiers, AttributeDict({"name":"tab", "count":viml_str2nr(d, 10)}))
+                    viml_add(modifiers, AttributeDict({"name": "tab", "count": viml_str2nr(d, 10)}))
                 else:
-                    viml_add(modifiers, AttributeDict({"name":"tab"}))
+                    viml_add(modifiers, AttributeDict({"name": "tab"}))
             elif viml_stridx("topleft", k) == 0 and viml_len(k) >= 2:
                 # to\%[pleft]
-                viml_add(modifiers, AttributeDict({"name":"topleft"}))
+                viml_add(modifiers, AttributeDict({"name": "topleft"}))
             elif viml_stridx("unsilent", k) == 0 and viml_len(k) >= 3:
                 # uns\%[ilent]
-                viml_add(modifiers, AttributeDict({"name":"unsilent"}))
+                viml_add(modifiers, AttributeDict({"name": "unsilent"}))
             elif viml_stridx("vertical", k) == 0 and viml_len(k) >= 4:
                 # vert\%[ical]
-                viml_add(modifiers, AttributeDict({"name":"vertical"}))
+                viml_add(modifiers, AttributeDict({"name": "vertical"}))
             elif viml_stridx("verbose", k) == 0 and viml_len(k) >= 4:
                 # verb\%[ose]
                 if d != "":
-                    viml_add(modifiers, AttributeDict({"name":"verbose", "count":viml_str2nr(d, 10)}))
+                    viml_add(modifiers, AttributeDict({"name": "verbose", "count": viml_str2nr(d, 10)}))
                 else:
-                    viml_add(modifiers, AttributeDict({"name":"verbose", "count":1}))
+                    viml_add(modifiers, AttributeDict({"name": "verbose", "count": 1}))
             else:
                 self.reader.seek_set(pos)
                 break
         self.ea.modifiers = modifiers
 
-# FIXME:
+    # FIXME:
     def parse_range(self):
         tokens = []
         while TRUE:
@@ -763,7 +821,7 @@ class VimLParser:
             break
         self.ea.range = tokens
 
-# FIXME:
+    # FIXME:
     def parse_pattern(self, delimiter):
         pattern = ""
         endc = ""
@@ -838,6 +896,7 @@ class VimLParser:
             self.parse_argcmd()
         self._parse_command(self.ea.cmd.parser)
 
+    # TODO: self[a:parser]
     def _parse_command(self, parser):
         if parser == "parse_cmd_append":
             self.parse_cmd_append()
@@ -893,6 +952,8 @@ class VimLParser:
             self.parse_cmd_insert()
         elif parser == "parse_cmd_let":
             self.parse_cmd_let()
+        elif parser == "parse_cmd_const":
+            self.parse_cmd_const()
         elif parser == "parse_cmd_loadkeymap":
             self.parse_cmd_loadkeymap()
         elif parser == "parse_cmd_lockvar":
@@ -979,16 +1040,16 @@ class VimLParser:
         if (cmd is NIL or cmd.name == "Print") and viml_eqregh(name, "^[A-Z]"):
             name += self.reader.read_alnum()
             del cmd
-            cmd = AttributeDict({"name":name, "flags":"USERCMD", "parser":"parse_cmd_usercmd"})
+            cmd = AttributeDict({"name": name, "flags": "USERCMD", "parser": "parse_cmd_usercmd"})
         self.find_command_cache[name] = cmd
         return cmd
 
-# TODO:
+    # TODO:
     def parse_hashbang(self):
         self.reader.getn(-1)
 
-# TODO:
-# ++opt=val
+    # TODO:
+    # ++opt=val
     def parse_argopt(self):
         while self.reader.p(0) == "+" and self.reader.p(1) == "+":
             s = self.reader.peekn(20)
@@ -1027,8 +1088,8 @@ class VimLParser:
                 break
             self.reader.skip_white()
 
-# TODO:
-# +command
+    # TODO:
+    # +command
     def parse_argcmd(self):
         if self.reader.peekn(1) == "+":
             self.reader.getn(1)
@@ -1075,7 +1136,7 @@ class VimLParser:
         else:
             raise VimLParserException(Err(viml_printf("E488: Trailing characters: %s", c), self.reader.getpos()))
 
-# modifier or range only command line
+    # modifier or range only command line
     def parse_cmd_modifier_range(self):
         node = Node(NODE_EXCMD)
         node.pos = self.ea.cmdpos
@@ -1083,7 +1144,7 @@ class VimLParser:
         node.str = self.reader.getstr(self.ea.linepos, self.reader.getpos())
         self.add_node(node)
 
-# TODO:
+    # TODO:
     def parse_cmd_common(self):
         end = self.reader.getpos()
         if viml_eqregh(self.ea.cmd.flags, "\\<TRLBAR\\>") and not self.ea.usefilter:
@@ -1147,7 +1208,7 @@ class VimLParser:
             end = nospend
         return end
 
-# FIXME
+    # FIXME
     def skip_vimgrep_pat(self):
         if self.reader.peekn(1) == "":
             # pass
@@ -1255,7 +1316,7 @@ class VimLParser:
         if self.context[0].type == NODE_TOPLEVEL:
             self.reader.seek_end(0)
 
-# FIXME
+    # FIXME
     def parse_cmd_usercmd(self):
         self.parse_cmd_common()
 
@@ -1277,7 +1338,7 @@ class VimLParser:
         if left.type == NODE_IDENTIFIER:
             s = left.value
             ss = viml_split(s, "\\zs")
-            if ss[0] != "<" and not isupper(ss[0]) and viml_stridx(s, ":") == -1 and viml_stridx(s, "#") == -1:
+            if ss[0] != "<" and ss[0] != "_" and not isupper(ss[0]) and viml_stridx(s, ":") == -1 and viml_stridx(s, "#") == -1:
                 raise VimLParserException(Err(viml_printf("E128: Function name must start with a capital or contain a colon: %s", s), left.pos))
         # :function {name}
         if self.reader.peekn(1) != "(":
@@ -1291,7 +1352,7 @@ class VimLParser:
         node.ea = self.ea
         node.left = left
         node.rlist = []
-        node.attr = AttributeDict({"range":0, "abort":0, "dict":0, "closure":0})
+        node.attr = AttributeDict({"range": 0, "abort": 0, "dict": 0, "closure": 0})
         node.endfunction = NIL
         self.reader.getn(1)
         tokenizer = ExprTokenizer(self.reader)
@@ -1438,6 +1499,34 @@ class VimLParser:
             node.op = s1
         else:
             raise VimLParserException("NOT REACHED")
+        node.right = self.parse_expr()
+        self.add_node(node)
+
+    def parse_cmd_const(self):
+        pos = self.reader.tell()
+        self.reader.skip_white()
+        # :const
+        if self.ends_excmds(self.reader.peek()):
+            self.reader.seek_set(pos)
+            self.parse_cmd_common()
+            return
+        lhs = self.parse_constlhs()
+        self.reader.skip_white()
+        s1 = self.reader.peekn(1)
+        # :const {var-name}
+        if self.ends_excmds(s1) or s1 != "=":
+            self.reader.seek_set(pos)
+            self.parse_cmd_common()
+            return
+        # :const left op right
+        node = Node(NODE_CONST)
+        node.pos = self.ea.cmdpos
+        node.ea = self.ea
+        self.reader.getn(1)
+        node.op = s1
+        node.left = lhs.left
+        node.list = lhs.list
+        node.rest = lhs.rest
         node.right = self.parse_expr()
         self.add_node(node)
 
@@ -1708,7 +1797,7 @@ class VimLParser:
             return node
         raise VimLParserException(Err("Invalid Expression", node.pos))
 
-# FIXME:
+    # FIXME:
     def parse_lvalue(self):
         p = LvalueParser(self.reader)
         node = p.parse()
@@ -1717,6 +1806,25 @@ class VimLParser:
                 raise VimLParserException(Err(viml_printf("E461: Illegal variable name: %s", node.value), node.pos))
         if node.type == NODE_IDENTIFIER or node.type == NODE_CURLYNAME or node.type == NODE_SUBSCRIPT or node.type == NODE_SLICE or node.type == NODE_DOT or node.type == NODE_OPTION or node.type == NODE_ENV or node.type == NODE_REG:
             return node
+        raise VimLParserException(Err("Invalid Expression", node.pos))
+
+    # TODO: merge with s:VimLParser.parse_lvalue()
+    def parse_constlvalue(self):
+        p = LvalueParser(self.reader)
+        node = p.parse()
+        if node.type == NODE_IDENTIFIER:
+            if not isvarname(node.value):
+                raise VimLParserException(Err(viml_printf("E461: Illegal variable name: %s", node.value), node.pos))
+        if node.type == NODE_IDENTIFIER or node.type == NODE_CURLYNAME:
+            return node
+        elif node.type == NODE_SUBSCRIPT or node.type == NODE_SLICE or node.type == NODE_DOT:
+            raise VimLParserException(Err("E996: Cannot lock a list or dict", node.pos))
+        elif node.type == NODE_OPTION:
+            raise VimLParserException(Err("E996: Cannot lock an option", node.pos))
+        elif node.type == NODE_ENV:
+            raise VimLParserException(Err("E996: Cannot lock an environment variable", node.pos))
+        elif node.type == NODE_REG:
+            raise VimLParserException(Err("E996: Cannot lock a register", node.pos))
         raise VimLParserException(Err("Invalid Expression", node.pos))
 
     def parse_lvaluelist(self):
@@ -1731,9 +1839,9 @@ class VimLParser:
             viml_add(list, node)
         return list
 
-# FIXME:
+    # FIXME:
     def parse_letlhs(self):
-        lhs = AttributeDict({"left":NIL, "list":NIL, "rest":NIL})
+        lhs = AttributeDict({"left": NIL, "list": NIL, "rest": NIL})
         tokenizer = ExprTokenizer(self.reader)
         if tokenizer.peek().type == TOKEN_SQOPEN:
             tokenizer.get()
@@ -1760,10 +1868,39 @@ class VimLParser:
             lhs.left = self.parse_lvalue()
         return lhs
 
+    # TODO: merge with s:VimLParser.parse_letlhs() ?
+    def parse_constlhs(self):
+        lhs = AttributeDict({"left": NIL, "list": NIL, "rest": NIL})
+        tokenizer = ExprTokenizer(self.reader)
+        if tokenizer.peek().type == TOKEN_SQOPEN:
+            tokenizer.get()
+            lhs.list = []
+            while TRUE:
+                node = self.parse_lvalue()
+                viml_add(lhs.list, node)
+                token = tokenizer.get()
+                if token.type == TOKEN_SQCLOSE:
+                    break
+                elif token.type == TOKEN_COMMA:
+                    continue
+                elif token.type == TOKEN_SEMICOLON:
+                    node = self.parse_lvalue()
+                    lhs.rest = node
+                    token = tokenizer.get()
+                    if token.type == TOKEN_SQCLOSE:
+                        break
+                    else:
+                        raise VimLParserException(Err(viml_printf("E475 Invalid argument: %s", token.value), token.pos))
+                else:
+                    raise VimLParserException(Err(viml_printf("E475 Invalid argument: %s", token.value), token.pos))
+        else:
+            lhs.left = self.parse_constlvalue()
+        return lhs
+
     def ends_excmds(self, c):
         return c == "" or c == "|" or c == "\"" or c == "<EOF>" or c == "<EOL>"
 
-# FIXME: validate argument
+    # FIXME: validate argument
     def parse_wincmd(self):
         c = self.reader.getn(1)
         if c == "":
@@ -1783,7 +1920,7 @@ class VimLParser:
         node.str = self.reader.getstr(self.ea.linepos, end)
         self.add_node(node)
 
-# FIXME: validate argument
+    # FIXME: validate argument
     def parse_cmd_syntax(self):
         end = self.reader.getpos()
         while TRUE:
@@ -1803,19 +1940,22 @@ class VimLParser:
         node.ea = self.ea
         node.str = self.reader.getstr(self.ea.linepos, end)
         self.add_node(node)
+    neovim_additional_commands = [AttributeDict({"name": "rshada", "minlen": 3, "flags": "BANG|FILE1|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "wshada", "minlen": 3, "flags": "BANG|FILE1|TRLBAR|CMDWIN", "parser": "parse_cmd_common"})]
+    neovim_removed_commands = [AttributeDict({"name": "Print", "minlen": 1, "flags": "RANGE|WHOLEFOLD|COUNT|EXFLAGS|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "fixdel", "minlen": 3, "flags": "TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "helpfind", "minlen": 5, "flags": "EXTRA|NOTRLCOM", "parser": "parse_cmd_common"}), AttributeDict({"name": "open", "minlen": 1, "flags": "RANGE|BANG|EXTRA", "parser": "parse_cmd_common"}), AttributeDict({"name": "shell", "minlen": 2, "flags": "TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "tearoff", "minlen": 2, "flags": "NEEDARG|EXTRA|TRLBAR|NOTRLCOM|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "gvim", "minlen": 2, "flags": "BANG|FILES|EDITCMD|ARGOPT|TRLBAR|CMDWIN", "parser": "parse_cmd_common"})]
+    # To find new builtin_commands, run the below script.
+    # $ scripts/update_builtin_commands.sh /path/to/vim/src/ex_cmds.h
+    builtin_commands = [AttributeDict({"name": "append", "minlen": 1, "flags": "BANG|RANGE|ZEROR|TRLBAR|CMDWIN|MODIFY", "parser": "parse_cmd_append"}), AttributeDict({"name": "abbreviate", "minlen": 2, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "abclear", "minlen": 3, "flags": "EXTRA|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "aboveleft", "minlen": 3, "flags": "NEEDARG|EXTRA|NOTRLCOM", "parser": "parse_cmd_common"}), AttributeDict({"name": "all", "minlen": 2, "flags": "BANG|RANGE|NOTADR|COUNT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "amenu", "minlen": 2, "flags": "RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "anoremenu", "minlen": 2, "flags": "RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "args", "minlen": 2, "flags": "BANG|FILES|EDITCMD|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "argadd", "minlen": 4, "flags": "BANG|NEEDARG|RANGE|NOTADR|ZEROR|FILES|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "argdelete", "minlen": 4, "flags": "BANG|RANGE|NOTADR|FILES|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "argedit", "minlen": 4, "flags": "BANG|NEEDARG|RANGE|NOTADR|FILE1|EDITCMD|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "argdo", "minlen": 5, "flags": "BANG|NEEDARG|EXTRA|NOTRLCOM", "parser": "parse_cmd_common"}), AttributeDict({"name": "argglobal", "minlen": 4, "flags": "BANG|FILES|EDITCMD|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "arglocal", "minlen": 4, "flags": "BANG|FILES|EDITCMD|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "argument", "minlen": 4, "flags": "BANG|RANGE|NOTADR|COUNT|EXTRA|EDITCMD|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "ascii", "minlen": 2, "flags": "TRLBAR|SBOXOK|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "autocmd", "minlen": 2, "flags": "BANG|EXTRA|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "augroup", "minlen": 3, "flags": "BANG|WORD1|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "aunmenu", "minlen": 3, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "buffer", "minlen": 1, "flags": "BANG|RANGE|NOTADR|BUFNAME|BUFUNL|COUNT|EXTRA|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "bNext", "minlen": 2, "flags": "BANG|RANGE|NOTADR|COUNT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "ball", "minlen": 2, "flags": "RANGE|NOTADR|COUNT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "badd", "minlen": 3, "flags": "NEEDARG|FILE1|EDITCMD|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "bdelete", "minlen": 2, "flags": "BANG|RANGE|NOTADR|BUFNAME|COUNT|EXTRA|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "behave", "minlen": 2, "flags": "NEEDARG|WORD1|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "belowright", "minlen": 3, "flags": "NEEDARG|EXTRA|NOTRLCOM", "parser": "parse_cmd_common"}), AttributeDict({"name": "bfirst", "minlen": 2, "flags": "BANG|RANGE|NOTADR|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "blast", "minlen": 2, "flags": "BANG|RANGE|NOTADR|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "bmodified", "minlen": 2, "flags": "BANG|RANGE|NOTADR|COUNT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "bnext", "minlen": 2, "flags": "BANG|RANGE|NOTADR|COUNT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "botright", "minlen": 2, "flags": "NEEDARG|EXTRA|NOTRLCOM", "parser": "parse_cmd_common"}), AttributeDict({"name": "bprevious", "minlen": 2, "flags": "BANG|RANGE|NOTADR|COUNT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "brewind", "minlen": 2, "flags": "BANG|RANGE|NOTADR|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "break", "minlen": 4, "flags": "TRLBAR|SBOXOK|CMDWIN", "parser": "parse_cmd_break"}), AttributeDict({"name": "breakadd", "minlen": 6, "flags": "EXTRA|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "breakdel", "minlen": 6, "flags": "EXTRA|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "breaklist", "minlen": 6, "flags": "EXTRA|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "browse", "minlen": 3, "flags": "NEEDARG|EXTRA|NOTRLCOM|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "bufdo", "minlen": 5, "flags": "BANG|NEEDARG|EXTRA|NOTRLCOM", "parser": "parse_cmd_common"}), AttributeDict({"name": "buffers", "minlen": 7, "flags": "BANG|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "bunload", "minlen": 3, "flags": "BANG|RANGE|NOTADR|BUFNAME|COUNT|EXTRA|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "bwipeout", "minlen": 2, "flags": "BANG|RANGE|NOTADR|BUFNAME|BUFUNL|COUNT|EXTRA|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "change", "minlen": 1, "flags": "BANG|WHOLEFOLD|RANGE|COUNT|TRLBAR|CMDWIN|MODIFY", "parser": "parse_cmd_common"}), AttributeDict({"name": "cNext", "minlen": 2, "flags": "RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser": "parse_cmd_common"}), AttributeDict({"name": "cNfile", "minlen": 3, "flags": "RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser": "parse_cmd_common"}), AttributeDict({"name": "cabbrev", "minlen": 2, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "cabclear", "minlen": 4, "flags": "EXTRA|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "caddbuffer", "minlen": 3, "flags": "RANGE|NOTADR|WORD1|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "caddexpr", "minlen": 5, "flags": "NEEDARG|WORD1|NOTRLCOM|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "caddfile", "minlen": 5, "flags": "TRLBAR|FILE1", "parser": "parse_cmd_common"}), AttributeDict({"name": "call", "minlen": 3, "flags": "RANGE|NEEDARG|EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser": "parse_cmd_call"}), AttributeDict({"name": "catch", "minlen": 3, "flags": "EXTRA|SBOXOK|CMDWIN", "parser": "parse_cmd_catch"}), AttributeDict({"name": "cbuffer", "minlen": 2, "flags": "BANG|RANGE|NOTADR|WORD1|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "cc", "minlen": 2, "flags": "RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser": "parse_cmd_common"}), AttributeDict({"name": "cclose", "minlen": 3, "flags": "RANGE|NOTADR|COUNT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "cd", "minlen": 2, "flags": "BANG|FILE1|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "center", "minlen": 2, "flags": "TRLBAR|RANGE|WHOLEFOLD|EXTRA|CMDWIN|MODIFY", "parser": "parse_cmd_common"}), AttributeDict({"name": "cexpr", "minlen": 3, "flags": "NEEDARG|WORD1|NOTRLCOM|TRLBAR|BANG", "parser": "parse_cmd_common"}), AttributeDict({"name": "cfile", "minlen": 2, "flags": "TRLBAR|FILE1|BANG", "parser": "parse_cmd_common"}), AttributeDict({"name": "cfirst", "minlen": 4, "flags": "RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser": "parse_cmd_common"}), AttributeDict({"name": "cgetbuffer", "minlen": 5, "flags": "RANGE|NOTADR|WORD1|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "cgetexpr", "minlen": 5, "flags": "NEEDARG|WORD1|NOTRLCOM|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "cgetfile", "minlen": 2, "flags": "TRLBAR|FILE1", "parser": "parse_cmd_common"}), AttributeDict({"name": "changes", "minlen": 7, "flags": "TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "chdir", "minlen": 3, "flags": "BANG|FILE1|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "checkpath", "minlen": 3, "flags": "TRLBAR|BANG|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "checktime", "minlen": 6, "flags": "RANGE|NOTADR|BUFNAME|COUNT|EXTRA|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "clist", "minlen": 2, "flags": "BANG|EXTRA|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "clast", "minlen": 3, "flags": "RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser": "parse_cmd_common"}), AttributeDict({"name": "close", "minlen": 3, "flags": "BANG|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "cmap", "minlen": 2, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "cmapclear", "minlen": 5, "flags": "EXTRA|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "cmenu", "minlen": 3, "flags": "RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "cnext", "minlen": 2, "flags": "RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser": "parse_cmd_common"}), AttributeDict({"name": "cnewer", "minlen": 4, "flags": "RANGE|NOTADR|COUNT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "cnfile", "minlen": 3, "flags": "RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser": "parse_cmd_common"}), AttributeDict({"name": "cnoremap", "minlen": 3, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "cnoreabbrev", "minlen": 6, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "cnoremenu", "minlen": 7, "flags": "RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "copy", "minlen": 2, "flags": "RANGE|WHOLEFOLD|EXTRA|TRLBAR|CMDWIN|MODIFY", "parser": "parse_cmd_common"}), AttributeDict({"name": "colder", "minlen": 3, "flags": "RANGE|NOTADR|COUNT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "colorscheme", "minlen": 4, "flags": "WORD1|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "command", "minlen": 3, "flags": "EXTRA|BANG|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "comclear", "minlen": 4, "flags": "TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "compiler", "minlen": 4, "flags": "BANG|TRLBAR|WORD1|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "continue", "minlen": 3, "flags": "TRLBAR|SBOXOK|CMDWIN", "parser": "parse_cmd_continue"}), AttributeDict({"name": "confirm", "minlen": 4, "flags": "NEEDARG|EXTRA|NOTRLCOM|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "copen", "minlen": 4, "flags": "RANGE|NOTADR|COUNT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "cprevious", "minlen": 2, "flags": "RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser": "parse_cmd_common"}), AttributeDict({"name": "cpfile", "minlen": 3, "flags": "RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser": "parse_cmd_common"}), AttributeDict({"name": "cquit", "minlen": 2, "flags": "TRLBAR|BANG", "parser": "parse_cmd_common"}), AttributeDict({"name": "crewind", "minlen": 2, "flags": "RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser": "parse_cmd_common"}), AttributeDict({"name": "cscope", "minlen": 2, "flags": "EXTRA|NOTRLCOM|XFILE", "parser": "parse_cmd_common"}), AttributeDict({"name": "cstag", "minlen": 3, "flags": "BANG|TRLBAR|WORD1", "parser": "parse_cmd_common"}), AttributeDict({"name": "cunmap", "minlen": 2, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "cunabbrev", "minlen": 4, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "cunmenu", "minlen": 5, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "cwindow", "minlen": 2, "flags": "RANGE|NOTADR|COUNT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "delete", "minlen": 1, "flags": "RANGE|WHOLEFOLD|REGSTR|COUNT|TRLBAR|CMDWIN|MODIFY", "parser": "parse_cmd_common"}), AttributeDict({"name": "delmarks", "minlen": 4, "flags": "BANG|EXTRA|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "debug", "minlen": 3, "flags": "NEEDARG|EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "debuggreedy", "minlen": 6, "flags": "RANGE|NOTADR|ZEROR|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "delcommand", "minlen": 4, "flags": "NEEDARG|WORD1|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "delfunction", "minlen": 4, "flags": "BANG|NEEDARG|WORD1|CMDWIN", "parser": "parse_cmd_delfunction"}), AttributeDict({"name": "diffupdate", "minlen": 3, "flags": "BANG|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "diffget", "minlen": 5, "flags": "RANGE|EXTRA|TRLBAR|MODIFY", "parser": "parse_cmd_common"}), AttributeDict({"name": "diffoff", "minlen": 5, "flags": "BANG|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "diffpatch", "minlen": 5, "flags": "EXTRA|FILE1|TRLBAR|MODIFY", "parser": "parse_cmd_common"}), AttributeDict({"name": "diffput", "minlen": 6, "flags": "RANGE|EXTRA|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "diffsplit", "minlen": 5, "flags": "EXTRA|FILE1|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "diffthis", "minlen": 5, "flags": "TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "digraphs", "minlen": 3, "flags": "EXTRA|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "display", "minlen": 2, "flags": "EXTRA|NOTRLCOM|TRLBAR|SBOXOK|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "djump", "minlen": 2, "flags": "BANG|RANGE|DFLALL|WHOLEFOLD|EXTRA", "parser": "parse_cmd_common"}), AttributeDict({"name": "dlist", "minlen": 2, "flags": "BANG|RANGE|DFLALL|WHOLEFOLD|EXTRA|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "doautocmd", "minlen": 2, "flags": "EXTRA|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "doautoall", "minlen": 7, "flags": "EXTRA|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "drop", "minlen": 2, "flags": "FILES|EDITCMD|NEEDARG|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "dsearch", "minlen": 2, "flags": "BANG|RANGE|DFLALL|WHOLEFOLD|EXTRA|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "dsplit", "minlen": 3, "flags": "BANG|RANGE|DFLALL|WHOLEFOLD|EXTRA", "parser": "parse_cmd_common"}), AttributeDict({"name": "edit", "minlen": 1, "flags": "BANG|FILE1|EDITCMD|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "earlier", "minlen": 2, "flags": "TRLBAR|EXTRA|NOSPC|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "echo", "minlen": 2, "flags": "EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser": "parse_cmd_echo"}), AttributeDict({"name": "echoerr", "minlen": 5, "flags": "EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser": "parse_cmd_echoerr"}), AttributeDict({"name": "echohl", "minlen": 5, "flags": "EXTRA|TRLBAR|SBOXOK|CMDWIN", "parser": "parse_cmd_echohl"}), AttributeDict({"name": "echomsg", "minlen": 5, "flags": "EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser": "parse_cmd_echomsg"}), AttributeDict({"name": "echon", "minlen": 5, "flags": "EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser": "parse_cmd_echon"}), AttributeDict({"name": "else", "minlen": 2, "flags": "TRLBAR|SBOXOK|CMDWIN", "parser": "parse_cmd_else"}), AttributeDict({"name": "elseif", "minlen": 5, "flags": "EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser": "parse_cmd_elseif"}), AttributeDict({"name": "emenu", "minlen": 2, "flags": "NEEDARG|EXTRA|TRLBAR|NOTRLCOM|RANGE|NOTADR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "endif", "minlen": 2, "flags": "TRLBAR|SBOXOK|CMDWIN", "parser": "parse_cmd_endif"}), AttributeDict({"name": "endfor", "minlen": 5, "flags": "TRLBAR|SBOXOK|CMDWIN", "parser": "parse_cmd_endfor"}), AttributeDict({"name": "endfunction", "minlen": 4, "flags": "TRLBAR|CMDWIN", "parser": "parse_cmd_endfunction"}), AttributeDict({"name": "endtry", "minlen": 4, "flags": "TRLBAR|SBOXOK|CMDWIN", "parser": "parse_cmd_endtry"}), AttributeDict({"name": "endwhile", "minlen": 4, "flags": "TRLBAR|SBOXOK|CMDWIN", "parser": "parse_cmd_endwhile"}), AttributeDict({"name": "enew", "minlen": 3, "flags": "BANG|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "ex", "minlen": 2, "flags": "BANG|FILE1|EDITCMD|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "execute", "minlen": 3, "flags": "EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser": "parse_cmd_execute"}), AttributeDict({"name": "exit", "minlen": 3, "flags": "RANGE|WHOLEFOLD|BANG|FILE1|ARGOPT|DFLALL|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "exusage", "minlen": 3, "flags": "TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "file", "minlen": 1, "flags": "RANGE|NOTADR|ZEROR|BANG|FILE1|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "files", "minlen": 5, "flags": "BANG|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "filetype", "minlen": 5, "flags": "EXTRA|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "find", "minlen": 3, "flags": "RANGE|NOTADR|BANG|FILE1|EDITCMD|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "finally", "minlen": 4, "flags": "TRLBAR|SBOXOK|CMDWIN", "parser": "parse_cmd_finally"}), AttributeDict({"name": "finish", "minlen": 4, "flags": "TRLBAR|SBOXOK|CMDWIN", "parser": "parse_cmd_finish"}), AttributeDict({"name": "first", "minlen": 3, "flags": "EXTRA|BANG|EDITCMD|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "fixdel", "minlen": 3, "flags": "TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "fold", "minlen": 2, "flags": "RANGE|WHOLEFOLD|TRLBAR|SBOXOK|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "foldclose", "minlen": 5, "flags": "RANGE|BANG|WHOLEFOLD|TRLBAR|SBOXOK|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "folddoopen", "minlen": 5, "flags": "RANGE|DFLALL|NEEDARG|EXTRA|NOTRLCOM", "parser": "parse_cmd_common"}), AttributeDict({"name": "folddoclosed", "minlen": 7, "flags": "RANGE|DFLALL|NEEDARG|EXTRA|NOTRLCOM", "parser": "parse_cmd_common"}), AttributeDict({"name": "foldopen", "minlen": 5, "flags": "RANGE|BANG|WHOLEFOLD|TRLBAR|SBOXOK|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "for", "minlen": 3, "flags": "EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser": "parse_cmd_for"}), AttributeDict({"name": "function", "minlen": 2, "flags": "EXTRA|BANG|CMDWIN", "parser": "parse_cmd_function"}), AttributeDict({"name": "global", "minlen": 1, "flags": "RANGE|WHOLEFOLD|BANG|EXTRA|DFLALL|SBOXOK|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "goto", "minlen": 2, "flags": "RANGE|NOTADR|COUNT|TRLBAR|SBOXOK|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "grep", "minlen": 2, "flags": "RANGE|NOTADR|BANG|NEEDARG|EXTRA|NOTRLCOM|TRLBAR|XFILE", "parser": "parse_cmd_common"}), AttributeDict({"name": "grepadd", "minlen": 5, "flags": "RANGE|NOTADR|BANG|NEEDARG|EXTRA|NOTRLCOM|TRLBAR|XFILE", "parser": "parse_cmd_common"}), AttributeDict({"name": "gui", "minlen": 2, "flags": "BANG|FILES|EDITCMD|ARGOPT|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "gvim", "minlen": 2, "flags": "BANG|FILES|EDITCMD|ARGOPT|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "hardcopy", "minlen": 2, "flags": "RANGE|COUNT|EXTRA|TRLBAR|DFLALL|BANG", "parser": "parse_cmd_common"}), AttributeDict({"name": "help", "minlen": 1, "flags": "BANG|EXTRA|NOTRLCOM", "parser": "parse_cmd_common"}), AttributeDict({"name": "helpfind", "minlen": 5, "flags": "EXTRA|NOTRLCOM", "parser": "parse_cmd_common"}), AttributeDict({"name": "helpgrep", "minlen": 5, "flags": "EXTRA|NOTRLCOM|NEEDARG", "parser": "parse_cmd_common"}), AttributeDict({"name": "helptags", "minlen": 5, "flags": "NEEDARG|FILES|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "highlight", "minlen": 2, "flags": "BANG|EXTRA|TRLBAR|SBOXOK|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "hide", "minlen": 3, "flags": "BANG|EXTRA|NOTRLCOM", "parser": "parse_cmd_common"}), AttributeDict({"name": "history", "minlen": 3, "flags": "EXTRA|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "insert", "minlen": 1, "flags": "BANG|RANGE|TRLBAR|CMDWIN|MODIFY", "parser": "parse_cmd_insert"}), AttributeDict({"name": "iabbrev", "minlen": 2, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "iabclear", "minlen": 4, "flags": "EXTRA|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "if", "minlen": 2, "flags": "EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser": "parse_cmd_if"}), AttributeDict({"name": "ijump", "minlen": 2, "flags": "BANG|RANGE|DFLALL|WHOLEFOLD|EXTRA", "parser": "parse_cmd_common"}), AttributeDict({"name": "ilist", "minlen": 2, "flags": "BANG|RANGE|DFLALL|WHOLEFOLD|EXTRA|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "imap", "minlen": 2, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "imapclear", "minlen": 5, "flags": "EXTRA|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "imenu", "minlen": 3, "flags": "RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "inoremap", "minlen": 3, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "inoreabbrev", "minlen": 6, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "inoremenu", "minlen": 7, "flags": "RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "intro", "minlen": 3, "flags": "TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "isearch", "minlen": 2, "flags": "BANG|RANGE|DFLALL|WHOLEFOLD|EXTRA|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "isplit", "minlen": 3, "flags": "BANG|RANGE|DFLALL|WHOLEFOLD|EXTRA", "parser": "parse_cmd_common"}), AttributeDict({"name": "iunmap", "minlen": 2, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "iunabbrev", "minlen": 4, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "iunmenu", "minlen": 5, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "join", "minlen": 1, "flags": "BANG|RANGE|WHOLEFOLD|COUNT|EXFLAGS|TRLBAR|CMDWIN|MODIFY", "parser": "parse_cmd_common"}), AttributeDict({"name": "jumps", "minlen": 2, "flags": "TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "k", "minlen": 1, "flags": "RANGE|WORD1|TRLBAR|SBOXOK|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "keepalt", "minlen": 5, "flags": "NEEDARG|EXTRA|NOTRLCOM", "parser": "parse_cmd_common"}), AttributeDict({"name": "keepmarks", "minlen": 3, "flags": "NEEDARG|EXTRA|NOTRLCOM", "parser": "parse_cmd_common"}), AttributeDict({"name": "keepjumps", "minlen": 5, "flags": "NEEDARG|EXTRA|NOTRLCOM", "parser": "parse_cmd_common"}), AttributeDict({"name": "keeppatterns", "minlen": 5, "flags": "NEEDARG|EXTRA|NOTRLCOM", "parser": "parse_cmd_common"}), AttributeDict({"name": "lNext", "minlen": 2, "flags": "RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser": "parse_cmd_common"}), AttributeDict({"name": "lNfile", "minlen": 3, "flags": "RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser": "parse_cmd_common"}), AttributeDict({"name": "list", "minlen": 1, "flags": "RANGE|WHOLEFOLD|COUNT|EXFLAGS|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "laddexpr", "minlen": 3, "flags": "NEEDARG|WORD1|NOTRLCOM|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "laddbuffer", "minlen": 5, "flags": "RANGE|NOTADR|WORD1|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "laddfile", "minlen": 5, "flags": "TRLBAR|FILE1", "parser": "parse_cmd_common"}), AttributeDict({"name": "last", "minlen": 2, "flags": "EXTRA|BANG|EDITCMD|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "language", "minlen": 3, "flags": "EXTRA|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "later", "minlen": 3, "flags": "TRLBAR|EXTRA|NOSPC|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "lbuffer", "minlen": 2, "flags": "BANG|RANGE|NOTADR|WORD1|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "lcd", "minlen": 2, "flags": "BANG|FILE1|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "lchdir", "minlen": 3, "flags": "BANG|FILE1|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "lclose", "minlen": 3, "flags": "RANGE|NOTADR|COUNT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "lcscope", "minlen": 3, "flags": "EXTRA|NOTRLCOM|XFILE", "parser": "parse_cmd_common"}), AttributeDict({"name": "left", "minlen": 2, "flags": "TRLBAR|RANGE|WHOLEFOLD|EXTRA|CMDWIN|MODIFY", "parser": "parse_cmd_common"}), AttributeDict({"name": "leftabove", "minlen": 5, "flags": "NEEDARG|EXTRA|NOTRLCOM", "parser": "parse_cmd_common"}), AttributeDict({"name": "let", "minlen": 3, "flags": "EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser": "parse_cmd_let"}), AttributeDict({"name": "const", "minlen": 4, "flags": "EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser": "parse_cmd_const"}), AttributeDict({"name": "lexpr", "minlen": 3, "flags": "NEEDARG|WORD1|NOTRLCOM|TRLBAR|BANG", "parser": "parse_cmd_common"}), AttributeDict({"name": "lfile", "minlen": 2, "flags": "TRLBAR|FILE1|BANG", "parser": "parse_cmd_common"}), AttributeDict({"name": "lfirst", "minlen": 4, "flags": "RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser": "parse_cmd_common"}), AttributeDict({"name": "lgetbuffer", "minlen": 5, "flags": "RANGE|NOTADR|WORD1|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "lgetexpr", "minlen": 5, "flags": "NEEDARG|WORD1|NOTRLCOM|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "lgetfile", "minlen": 2, "flags": "TRLBAR|FILE1", "parser": "parse_cmd_common"}), AttributeDict({"name": "lgrep", "minlen": 3, "flags": "RANGE|NOTADR|BANG|NEEDARG|EXTRA|NOTRLCOM|TRLBAR|XFILE", "parser": "parse_cmd_common"}), AttributeDict({"name": "lgrepadd", "minlen": 6, "flags": "RANGE|NOTADR|BANG|NEEDARG|EXTRA|NOTRLCOM|TRLBAR|XFILE", "parser": "parse_cmd_common"}), AttributeDict({"name": "lhelpgrep", "minlen": 2, "flags": "EXTRA|NOTRLCOM|NEEDARG", "parser": "parse_cmd_common"}), AttributeDict({"name": "ll", "minlen": 2, "flags": "RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser": "parse_cmd_common"}), AttributeDict({"name": "llast", "minlen": 3, "flags": "RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser": "parse_cmd_common"}), AttributeDict({"name": "list", "minlen": 3, "flags": "BANG|EXTRA|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "lmake", "minlen": 4, "flags": "BANG|EXTRA|NOTRLCOM|TRLBAR|XFILE", "parser": "parse_cmd_common"}), AttributeDict({"name": "lmap", "minlen": 2, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "lmapclear", "minlen": 5, "flags": "EXTRA|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "lnext", "minlen": 3, "flags": "RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser": "parse_cmd_common"}), AttributeDict({"name": "lnewer", "minlen": 4, "flags": "RANGE|NOTADR|COUNT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "lnfile", "minlen": 3, "flags": "RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser": "parse_cmd_common"}), AttributeDict({"name": "lnoremap", "minlen": 2, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "loadkeymap", "minlen": 5, "flags": "CMDWIN", "parser": "parse_cmd_loadkeymap"}), AttributeDict({"name": "loadview", "minlen": 2, "flags": "FILE1|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "lockmarks", "minlen": 3, "flags": "NEEDARG|EXTRA|NOTRLCOM", "parser": "parse_cmd_common"}), AttributeDict({"name": "lockvar", "minlen": 5, "flags": "BANG|EXTRA|NEEDARG|SBOXOK|CMDWIN", "parser": "parse_cmd_lockvar"}), AttributeDict({"name": "lolder", "minlen": 3, "flags": "RANGE|NOTADR|COUNT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "lopen", "minlen": 3, "flags": "RANGE|NOTADR|COUNT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "lprevious", "minlen": 2, "flags": "RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser": "parse_cmd_common"}), AttributeDict({"name": "lpfile", "minlen": 3, "flags": "RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser": "parse_cmd_common"}), AttributeDict({"name": "lrewind", "minlen": 2, "flags": "RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser": "parse_cmd_common"}), AttributeDict({"name": "ls", "minlen": 2, "flags": "BANG|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "ltag", "minlen": 2, "flags": "NOTADR|TRLBAR|BANG|WORD1", "parser": "parse_cmd_common"}), AttributeDict({"name": "lunmap", "minlen": 2, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "lua", "minlen": 3, "flags": "RANGE|EXTRA|NEEDARG|CMDWIN", "parser": "parse_cmd_lua"}), AttributeDict({"name": "luado", "minlen": 4, "flags": "RANGE|DFLALL|EXTRA|NEEDARG|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "luafile", "minlen": 4, "flags": "RANGE|FILE1|NEEDARG|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "lvimgrep", "minlen": 2, "flags": "RANGE|NOTADR|BANG|NEEDARG|EXTRA|NOTRLCOM|TRLBAR|XFILE", "parser": "parse_cmd_common"}), AttributeDict({"name": "lvimgrepadd", "minlen": 9, "flags": "RANGE|NOTADR|BANG|NEEDARG|EXTRA|NOTRLCOM|TRLBAR|XFILE", "parser": "parse_cmd_common"}), AttributeDict({"name": "lwindow", "minlen": 2, "flags": "RANGE|NOTADR|COUNT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "move", "minlen": 1, "flags": "RANGE|WHOLEFOLD|EXTRA|TRLBAR|CMDWIN|MODIFY", "parser": "parse_cmd_common"}), AttributeDict({"name": "mark", "minlen": 2, "flags": "RANGE|WORD1|TRLBAR|SBOXOK|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "make", "minlen": 3, "flags": "BANG|EXTRA|NOTRLCOM|TRLBAR|XFILE", "parser": "parse_cmd_common"}), AttributeDict({"name": "map", "minlen": 3, "flags": "BANG|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "mapclear", "minlen": 4, "flags": "EXTRA|BANG|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "marks", "minlen": 5, "flags": "EXTRA|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "match", "minlen": 3, "flags": "RANGE|NOTADR|EXTRA|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "menu", "minlen": 2, "flags": "RANGE|NOTADR|ZEROR|BANG|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "menutranslate", "minlen": 5, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "messages", "minlen": 3, "flags": "TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "mkexrc", "minlen": 2, "flags": "BANG|FILE1|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "mksession", "minlen": 3, "flags": "BANG|FILE1|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "mkspell", "minlen": 4, "flags": "BANG|NEEDARG|EXTRA|NOTRLCOM|TRLBAR|XFILE", "parser": "parse_cmd_common"}), AttributeDict({"name": "mkvimrc", "minlen": 3, "flags": "BANG|FILE1|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "mkview", "minlen": 5, "flags": "BANG|FILE1|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "mode", "minlen": 3, "flags": "WORD1|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "mzscheme", "minlen": 2, "flags": "RANGE|EXTRA|DFLALL|NEEDARG|CMDWIN|SBOXOK", "parser": "parse_cmd_mzscheme"}), AttributeDict({"name": "mzfile", "minlen": 3, "flags": "RANGE|FILE1|NEEDARG|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "nbclose", "minlen": 3, "flags": "TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "nbkey", "minlen": 2, "flags": "EXTRA|NOTADR|NEEDARG", "parser": "parse_cmd_common"}), AttributeDict({"name": "nbstart", "minlen": 3, "flags": "WORD1|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "next", "minlen": 1, "flags": "RANGE|NOTADR|BANG|FILES|EDITCMD|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "new", "minlen": 3, "flags": "BANG|FILE1|RANGE|NOTADR|EDITCMD|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "nmap", "minlen": 2, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "nmapclear", "minlen": 5, "flags": "EXTRA|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "nmenu", "minlen": 3, "flags": "RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "nnoremap", "minlen": 2, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "nnoremenu", "minlen": 7, "flags": "RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "noautocmd", "minlen": 3, "flags": "NEEDARG|EXTRA|NOTRLCOM", "parser": "parse_cmd_common"}), AttributeDict({"name": "noremap", "minlen": 2, "flags": "BANG|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "nohlsearch", "minlen": 3, "flags": "TRLBAR|SBOXOK|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "noreabbrev", "minlen": 5, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "noremenu", "minlen": 6, "flags": "RANGE|NOTADR|ZEROR|BANG|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "normal", "minlen": 4, "flags": "RANGE|BANG|EXTRA|NEEDARG|NOTRLCOM|USECTRLV|SBOXOK|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "number", "minlen": 2, "flags": "RANGE|WHOLEFOLD|COUNT|EXFLAGS|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "nunmap", "minlen": 3, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "nunmenu", "minlen": 5, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "oldfiles", "minlen": 2, "flags": "BANG|TRLBAR|SBOXOK|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "open", "minlen": 1, "flags": "RANGE|BANG|EXTRA", "parser": "parse_cmd_common"}), AttributeDict({"name": "omap", "minlen": 2, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "omapclear", "minlen": 5, "flags": "EXTRA|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "omenu", "minlen": 3, "flags": "RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "only", "minlen": 2, "flags": "BANG|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "onoremap", "minlen": 3, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "onoremenu", "minlen": 7, "flags": "RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "options", "minlen": 3, "flags": "TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "ounmap", "minlen": 2, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "ounmenu", "minlen": 5, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "ownsyntax", "minlen": 2, "flags": "EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "pclose", "minlen": 2, "flags": "BANG|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "pedit", "minlen": 3, "flags": "BANG|FILE1|EDITCMD|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "perl", "minlen": 2, "flags": "RANGE|EXTRA|DFLALL|NEEDARG|SBOXOK|CMDWIN", "parser": "parse_cmd_perl"}), AttributeDict({"name": "print", "minlen": 1, "flags": "RANGE|WHOLEFOLD|COUNT|EXFLAGS|TRLBAR|CMDWIN|SBOXOK", "parser": "parse_cmd_common"}), AttributeDict({"name": "profdel", "minlen": 5, "flags": "EXTRA|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "profile", "minlen": 4, "flags": "BANG|EXTRA|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "promptfind", "minlen": 3, "flags": "EXTRA|NOTRLCOM|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "promptrepl", "minlen": 7, "flags": "EXTRA|NOTRLCOM|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "perldo", "minlen": 5, "flags": "RANGE|EXTRA|DFLALL|NEEDARG|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "pop", "minlen": 2, "flags": "RANGE|NOTADR|BANG|COUNT|TRLBAR|ZEROR", "parser": "parse_cmd_common"}), AttributeDict({"name": "popup", "minlen": 4, "flags": "NEEDARG|EXTRA|BANG|TRLBAR|NOTRLCOM|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "ppop", "minlen": 2, "flags": "RANGE|NOTADR|BANG|COUNT|TRLBAR|ZEROR", "parser": "parse_cmd_common"}), AttributeDict({"name": "preserve", "minlen": 3, "flags": "TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "previous", "minlen": 4, "flags": "EXTRA|RANGE|NOTADR|COUNT|BANG|EDITCMD|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "psearch", "minlen": 2, "flags": "BANG|RANGE|WHOLEFOLD|DFLALL|EXTRA", "parser": "parse_cmd_common"}), AttributeDict({"name": "ptag", "minlen": 2, "flags": "RANGE|NOTADR|BANG|WORD1|TRLBAR|ZEROR", "parser": "parse_cmd_common"}), AttributeDict({"name": "ptNext", "minlen": 3, "flags": "RANGE|NOTADR|BANG|TRLBAR|ZEROR", "parser": "parse_cmd_common"}), AttributeDict({"name": "ptfirst", "minlen": 3, "flags": "RANGE|NOTADR|BANG|TRLBAR|ZEROR", "parser": "parse_cmd_common"}), AttributeDict({"name": "ptjump", "minlen": 3, "flags": "BANG|TRLBAR|WORD1", "parser": "parse_cmd_common"}), AttributeDict({"name": "ptlast", "minlen": 3, "flags": "BANG|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "ptnext", "minlen": 3, "flags": "RANGE|NOTADR|BANG|TRLBAR|ZEROR", "parser": "parse_cmd_common"}), AttributeDict({"name": "ptprevious", "minlen": 3, "flags": "RANGE|NOTADR|BANG|TRLBAR|ZEROR", "parser": "parse_cmd_common"}), AttributeDict({"name": "ptrewind", "minlen": 3, "flags": "RANGE|NOTADR|BANG|TRLBAR|ZEROR", "parser": "parse_cmd_common"}), AttributeDict({"name": "ptselect", "minlen": 3, "flags": "BANG|TRLBAR|WORD1", "parser": "parse_cmd_common"}), AttributeDict({"name": "put", "minlen": 2, "flags": "RANGE|WHOLEFOLD|BANG|REGSTR|TRLBAR|ZEROR|CMDWIN|MODIFY", "parser": "parse_cmd_common"}), AttributeDict({"name": "pwd", "minlen": 2, "flags": "TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "py3", "minlen": 3, "flags": "RANGE|EXTRA|NEEDARG|CMDWIN", "parser": "parse_cmd_python3"}), AttributeDict({"name": "python3", "minlen": 7, "flags": "RANGE|EXTRA|NEEDARG|CMDWIN", "parser": "parse_cmd_python3"}), AttributeDict({"name": "py3file", "minlen": 4, "flags": "RANGE|FILE1|NEEDARG|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "python", "minlen": 2, "flags": "RANGE|EXTRA|NEEDARG|CMDWIN", "parser": "parse_cmd_python"}), AttributeDict({"name": "pyfile", "minlen": 3, "flags": "RANGE|FILE1|NEEDARG|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "pydo", "minlen": 3, "flags": "RANGE|DFLALL|EXTRA|NEEDARG|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "py3do", "minlen": 4, "flags": "RANGE|DFLALL|EXTRA|NEEDARG|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "quit", "minlen": 1, "flags": "BANG|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "quitall", "minlen": 5, "flags": "BANG|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "qall", "minlen": 2, "flags": "BANG|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "read", "minlen": 1, "flags": "BANG|RANGE|WHOLEFOLD|FILE1|ARGOPT|TRLBAR|ZEROR|CMDWIN|MODIFY", "parser": "parse_cmd_common"}), AttributeDict({"name": "recover", "minlen": 3, "flags": "BANG|FILE1|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "redo", "minlen": 3, "flags": "TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "redir", "minlen": 4, "flags": "BANG|FILES|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "redraw", "minlen": 4, "flags": "BANG|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "redrawstatus", "minlen": 7, "flags": "BANG|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "registers", "minlen": 3, "flags": "EXTRA|NOTRLCOM|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "resize", "minlen": 3, "flags": "RANGE|NOTADR|TRLBAR|WORD1", "parser": "parse_cmd_common"}), AttributeDict({"name": "retab", "minlen": 3, "flags": "TRLBAR|RANGE|WHOLEFOLD|DFLALL|BANG|WORD1|CMDWIN|MODIFY", "parser": "parse_cmd_common"}), AttributeDict({"name": "return", "minlen": 4, "flags": "EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser": "parse_cmd_return"}), AttributeDict({"name": "rewind", "minlen": 3, "flags": "EXTRA|BANG|EDITCMD|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "right", "minlen": 2, "flags": "TRLBAR|RANGE|WHOLEFOLD|EXTRA|CMDWIN|MODIFY", "parser": "parse_cmd_common"}), AttributeDict({"name": "rightbelow", "minlen": 6, "flags": "NEEDARG|EXTRA|NOTRLCOM", "parser": "parse_cmd_common"}), AttributeDict({"name": "ruby", "minlen": 3, "flags": "RANGE|EXTRA|NEEDARG|CMDWIN", "parser": "parse_cmd_ruby"}), AttributeDict({"name": "rubydo", "minlen": 5, "flags": "RANGE|DFLALL|EXTRA|NEEDARG|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "rubyfile", "minlen": 5, "flags": "RANGE|FILE1|NEEDARG|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "rundo", "minlen": 4, "flags": "NEEDARG|FILE1", "parser": "parse_cmd_common"}), AttributeDict({"name": "runtime", "minlen": 2, "flags": "BANG|NEEDARG|FILES|TRLBAR|SBOXOK|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "rviminfo", "minlen": 2, "flags": "BANG|FILE1|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "substitute", "minlen": 1, "flags": "RANGE|WHOLEFOLD|EXTRA|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "sNext", "minlen": 2, "flags": "EXTRA|RANGE|NOTADR|COUNT|BANG|EDITCMD|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "sandbox", "minlen": 3, "flags": "NEEDARG|EXTRA|NOTRLCOM", "parser": "parse_cmd_common"}), AttributeDict({"name": "sargument", "minlen": 2, "flags": "BANG|RANGE|NOTADR|COUNT|EXTRA|EDITCMD|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "sall", "minlen": 3, "flags": "BANG|RANGE|NOTADR|COUNT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "saveas", "minlen": 3, "flags": "BANG|DFLALL|FILE1|ARGOPT|CMDWIN|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "sbuffer", "minlen": 2, "flags": "BANG|RANGE|NOTADR|BUFNAME|BUFUNL|COUNT|EXTRA|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "sbNext", "minlen": 3, "flags": "RANGE|NOTADR|COUNT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "sball", "minlen": 3, "flags": "RANGE|NOTADR|COUNT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "sbfirst", "minlen": 3, "flags": "TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "sblast", "minlen": 3, "flags": "TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "sbmodified", "minlen": 3, "flags": "RANGE|NOTADR|COUNT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "sbnext", "minlen": 3, "flags": "RANGE|NOTADR|COUNT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "sbprevious", "minlen": 3, "flags": "RANGE|NOTADR|COUNT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "sbrewind", "minlen": 3, "flags": "TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "scriptnames", "minlen": 3, "flags": "TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "scriptencoding", "minlen": 7, "flags": "WORD1|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "scscope", "minlen": 3, "flags": "EXTRA|NOTRLCOM", "parser": "parse_cmd_common"}), AttributeDict({"name": "set", "minlen": 2, "flags": "TRLBAR|EXTRA|CMDWIN|SBOXOK", "parser": "parse_cmd_common"}), AttributeDict({"name": "setfiletype", "minlen": 4, "flags": "TRLBAR|EXTRA|NEEDARG|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "setglobal", "minlen": 4, "flags": "TRLBAR|EXTRA|CMDWIN|SBOXOK", "parser": "parse_cmd_common"}), AttributeDict({"name": "setlocal", "minlen": 4, "flags": "TRLBAR|EXTRA|CMDWIN|SBOXOK", "parser": "parse_cmd_common"}), AttributeDict({"name": "sfind", "minlen": 2, "flags": "BANG|FILE1|RANGE|NOTADR|EDITCMD|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "sfirst", "minlen": 4, "flags": "EXTRA|BANG|EDITCMD|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "shell", "minlen": 2, "flags": "TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "simalt", "minlen": 3, "flags": "NEEDARG|WORD1|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "sign", "minlen": 3, "flags": "NEEDARG|RANGE|NOTADR|EXTRA|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "silent", "minlen": 3, "flags": "NEEDARG|EXTRA|BANG|NOTRLCOM|SBOXOK|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "sleep", "minlen": 2, "flags": "RANGE|NOTADR|COUNT|EXTRA|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "slast", "minlen": 3, "flags": "EXTRA|BANG|EDITCMD|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "smagic", "minlen": 2, "flags": "RANGE|WHOLEFOLD|EXTRA|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "smap", "minlen": 4, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "smapclear", "minlen": 5, "flags": "EXTRA|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "smenu", "minlen": 3, "flags": "RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "snext", "minlen": 2, "flags": "RANGE|NOTADR|BANG|FILES|EDITCMD|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "sniff", "minlen": 3, "flags": "EXTRA|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "snomagic", "minlen": 3, "flags": "RANGE|WHOLEFOLD|EXTRA|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "snoremap", "minlen": 4, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "snoremenu", "minlen": 7, "flags": "RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "sort", "minlen": 3, "flags": "RANGE|DFLALL|WHOLEFOLD|BANG|EXTRA|NOTRLCOM|MODIFY", "parser": "parse_cmd_common"}), AttributeDict({"name": "source", "minlen": 2, "flags": "BANG|FILE1|TRLBAR|SBOXOK|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "spelldump", "minlen": 6, "flags": "BANG|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "spellgood", "minlen": 3, "flags": "BANG|RANGE|NOTADR|NEEDARG|EXTRA|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "spellinfo", "minlen": 6, "flags": "TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "spellrepall", "minlen": 6, "flags": "TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "spellundo", "minlen": 6, "flags": "BANG|RANGE|NOTADR|NEEDARG|EXTRA|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "spellwrong", "minlen": 6, "flags": "BANG|RANGE|NOTADR|NEEDARG|EXTRA|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "split", "minlen": 2, "flags": "BANG|FILE1|RANGE|NOTADR|EDITCMD|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "sprevious", "minlen": 3, "flags": "EXTRA|RANGE|NOTADR|COUNT|BANG|EDITCMD|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "srewind", "minlen": 3, "flags": "EXTRA|BANG|EDITCMD|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "stop", "minlen": 2, "flags": "TRLBAR|BANG|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "stag", "minlen": 3, "flags": "RANGE|NOTADR|BANG|WORD1|TRLBAR|ZEROR", "parser": "parse_cmd_common"}), AttributeDict({"name": "startinsert", "minlen": 4, "flags": "BANG|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "startgreplace", "minlen": 6, "flags": "BANG|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "startreplace", "minlen": 6, "flags": "BANG|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "stopinsert", "minlen": 5, "flags": "BANG|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "stjump", "minlen": 3, "flags": "BANG|TRLBAR|WORD1", "parser": "parse_cmd_common"}), AttributeDict({"name": "stselect", "minlen": 3, "flags": "BANG|TRLBAR|WORD1", "parser": "parse_cmd_common"}), AttributeDict({"name": "sunhide", "minlen": 3, "flags": "RANGE|NOTADR|COUNT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "sunmap", "minlen": 4, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "sunmenu", "minlen": 5, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "suspend", "minlen": 3, "flags": "TRLBAR|BANG|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "sview", "minlen": 2, "flags": "BANG|FILE1|RANGE|NOTADR|EDITCMD|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "swapname", "minlen": 2, "flags": "TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "syntax", "minlen": 2, "flags": "EXTRA|NOTRLCOM|CMDWIN", "parser": "parse_cmd_syntax"}), AttributeDict({"name": "syntime", "minlen": 5, "flags": "NEEDARG|WORD1|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "syncbind", "minlen": 4, "flags": "TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "t", "minlen": 1, "flags": "RANGE|WHOLEFOLD|EXTRA|TRLBAR|CMDWIN|MODIFY", "parser": "parse_cmd_common"}), AttributeDict({"name": "tNext", "minlen": 2, "flags": "RANGE|NOTADR|BANG|TRLBAR|ZEROR", "parser": "parse_cmd_common"}), AttributeDict({"name": "tabNext", "minlen": 4, "flags": "RANGE|NOTADR|COUNT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "tabclose", "minlen": 4, "flags": "RANGE|NOTADR|COUNT|BANG|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "tabdo", "minlen": 4, "flags": "NEEDARG|EXTRA|NOTRLCOM", "parser": "parse_cmd_common"}), AttributeDict({"name": "tabedit", "minlen": 4, "flags": "BANG|FILE1|RANGE|NOTADR|ZEROR|EDITCMD|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "tabfind", "minlen": 4, "flags": "BANG|FILE1|RANGE|NOTADR|ZEROR|EDITCMD|ARGOPT|NEEDARG|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "tabfirst", "minlen": 6, "flags": "TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "tablast", "minlen": 4, "flags": "TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "tabmove", "minlen": 4, "flags": "RANGE|NOTADR|ZEROR|EXTRA|NOSPC|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "tabnew", "minlen": 6, "flags": "BANG|FILE1|RANGE|NOTADR|ZEROR|EDITCMD|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "tabnext", "minlen": 4, "flags": "RANGE|NOTADR|COUNT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "tabonly", "minlen": 4, "flags": "BANG|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "tabprevious", "minlen": 4, "flags": "RANGE|NOTADR|COUNT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "tabrewind", "minlen": 4, "flags": "TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "tabs", "minlen": 4, "flags": "TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "tab", "minlen": 3, "flags": "NEEDARG|EXTRA|NOTRLCOM", "parser": "parse_cmd_common"}), AttributeDict({"name": "tag", "minlen": 2, "flags": "RANGE|NOTADR|BANG|WORD1|TRLBAR|ZEROR", "parser": "parse_cmd_common"}), AttributeDict({"name": "tags", "minlen": 4, "flags": "TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "tcl", "minlen": 2, "flags": "RANGE|EXTRA|NEEDARG|CMDWIN", "parser": "parse_cmd_tcl"}), AttributeDict({"name": "tcldo", "minlen": 4, "flags": "RANGE|DFLALL|EXTRA|NEEDARG|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "tclfile", "minlen": 4, "flags": "RANGE|FILE1|NEEDARG|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "tearoff", "minlen": 2, "flags": "NEEDARG|EXTRA|TRLBAR|NOTRLCOM|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "tfirst", "minlen": 2, "flags": "RANGE|NOTADR|BANG|TRLBAR|ZEROR", "parser": "parse_cmd_common"}), AttributeDict({"name": "throw", "minlen": 2, "flags": "EXTRA|NEEDARG|SBOXOK|CMDWIN", "parser": "parse_cmd_throw"}), AttributeDict({"name": "tjump", "minlen": 2, "flags": "BANG|TRLBAR|WORD1", "parser": "parse_cmd_common"}), AttributeDict({"name": "tlast", "minlen": 2, "flags": "BANG|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "tmenu", "minlen": 2, "flags": "RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "tnext", "minlen": 2, "flags": "RANGE|NOTADR|BANG|TRLBAR|ZEROR", "parser": "parse_cmd_common"}), AttributeDict({"name": "topleft", "minlen": 2, "flags": "NEEDARG|EXTRA|NOTRLCOM", "parser": "parse_cmd_common"}), AttributeDict({"name": "tprevious", "minlen": 2, "flags": "RANGE|NOTADR|BANG|TRLBAR|ZEROR", "parser": "parse_cmd_common"}), AttributeDict({"name": "trewind", "minlen": 2, "flags": "RANGE|NOTADR|BANG|TRLBAR|ZEROR", "parser": "parse_cmd_common"}), AttributeDict({"name": "try", "minlen": 3, "flags": "TRLBAR|SBOXOK|CMDWIN", "parser": "parse_cmd_try"}), AttributeDict({"name": "tselect", "minlen": 2, "flags": "BANG|TRLBAR|WORD1", "parser": "parse_cmd_common"}), AttributeDict({"name": "tunmenu", "minlen": 2, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "undo", "minlen": 1, "flags": "RANGE|NOTADR|COUNT|ZEROR|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "undojoin", "minlen": 5, "flags": "TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "undolist", "minlen": 5, "flags": "TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "unabbreviate", "minlen": 3, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "unhide", "minlen": 3, "flags": "RANGE|NOTADR|COUNT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "unlet", "minlen": 3, "flags": "BANG|EXTRA|NEEDARG|SBOXOK|CMDWIN", "parser": "parse_cmd_unlet"}), AttributeDict({"name": "unlockvar", "minlen": 4, "flags": "BANG|EXTRA|NEEDARG|SBOXOK|CMDWIN", "parser": "parse_cmd_unlockvar"}), AttributeDict({"name": "unmap", "minlen": 3, "flags": "BANG|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "unmenu", "minlen": 4, "flags": "BANG|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "unsilent", "minlen": 3, "flags": "NEEDARG|EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "update", "minlen": 2, "flags": "RANGE|WHOLEFOLD|BANG|FILE1|ARGOPT|DFLALL|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "vglobal", "minlen": 1, "flags": "RANGE|WHOLEFOLD|EXTRA|DFLALL|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "version", "minlen": 2, "flags": "EXTRA|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "verbose", "minlen": 4, "flags": "NEEDARG|RANGE|NOTADR|EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "vertical", "minlen": 4, "flags": "NEEDARG|EXTRA|NOTRLCOM", "parser": "parse_cmd_common"}), AttributeDict({"name": "vimgrep", "minlen": 3, "flags": "RANGE|NOTADR|BANG|NEEDARG|EXTRA|NOTRLCOM|TRLBAR|XFILE", "parser": "parse_cmd_common"}), AttributeDict({"name": "vimgrepadd", "minlen": 8, "flags": "RANGE|NOTADR|BANG|NEEDARG|EXTRA|NOTRLCOM|TRLBAR|XFILE", "parser": "parse_cmd_common"}), AttributeDict({"name": "visual", "minlen": 2, "flags": "BANG|FILE1|EDITCMD|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "viusage", "minlen": 3, "flags": "TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "view", "minlen": 3, "flags": "BANG|FILE1|EDITCMD|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "vmap", "minlen": 2, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "vmapclear", "minlen": 5, "flags": "EXTRA|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "vmenu", "minlen": 3, "flags": "RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "vnew", "minlen": 3, "flags": "BANG|FILE1|RANGE|NOTADR|EDITCMD|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "vnoremap", "minlen": 2, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "vnoremenu", "minlen": 7, "flags": "RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "vsplit", "minlen": 2, "flags": "BANG|FILE1|RANGE|NOTADR|EDITCMD|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "vunmap", "minlen": 2, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "vunmenu", "minlen": 5, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "windo", "minlen": 5, "flags": "BANG|NEEDARG|EXTRA|NOTRLCOM", "parser": "parse_cmd_common"}), AttributeDict({"name": "write", "minlen": 1, "flags": "RANGE|WHOLEFOLD|BANG|FILE1|ARGOPT|DFLALL|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "wNext", "minlen": 2, "flags": "RANGE|WHOLEFOLD|NOTADR|BANG|FILE1|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "wall", "minlen": 2, "flags": "BANG|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "while", "minlen": 2, "flags": "EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser": "parse_cmd_while"}), AttributeDict({"name": "winsize", "minlen": 2, "flags": "EXTRA|NEEDARG|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "wincmd", "minlen": 4, "flags": "NEEDARG|WORD1|RANGE|NOTADR", "parser": "parse_wincmd"}), AttributeDict({"name": "winpos", "minlen": 4, "flags": "EXTRA|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "wnext", "minlen": 2, "flags": "RANGE|NOTADR|BANG|FILE1|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "wprevious", "minlen": 2, "flags": "RANGE|NOTADR|BANG|FILE1|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "wq", "minlen": 2, "flags": "RANGE|WHOLEFOLD|BANG|FILE1|ARGOPT|DFLALL|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "wqall", "minlen": 3, "flags": "BANG|FILE1|ARGOPT|DFLALL|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "wsverb", "minlen": 2, "flags": "EXTRA|NOTADR|NEEDARG", "parser": "parse_cmd_common"}), AttributeDict({"name": "wundo", "minlen": 2, "flags": "BANG|NEEDARG|FILE1", "parser": "parse_cmd_common"}), AttributeDict({"name": "wviminfo", "minlen": 2, "flags": "BANG|FILE1|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "xit", "minlen": 1, "flags": "RANGE|WHOLEFOLD|BANG|FILE1|ARGOPT|DFLALL|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "xall", "minlen": 2, "flags": "BANG|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "xmapclear", "minlen": 5, "flags": "EXTRA|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "xmap", "minlen": 2, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "xmenu", "minlen": 3, "flags": "RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "xnoremap", "minlen": 2, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "xnoremenu", "minlen": 7, "flags": "RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "xunmap", "minlen": 2, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "xunmenu", "minlen": 5, "flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "yank", "minlen": 1, "flags": "RANGE|WHOLEFOLD|REGSTR|COUNT|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "z", "minlen": 1, "flags": "RANGE|WHOLEFOLD|EXTRA|EXFLAGS|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "!", "minlen": 1, "flags": "RANGE|WHOLEFOLD|BANG|FILES|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "#", "minlen": 1, "flags": "RANGE|WHOLEFOLD|COUNT|EXFLAGS|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "&", "minlen": 1, "flags": "RANGE|WHOLEFOLD|EXTRA|CMDWIN|MODIFY", "parser": "parse_cmd_common"}), AttributeDict({"name": "*", "minlen": 1, "flags": "RANGE|WHOLEFOLD|EXTRA|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "<", "minlen": 1, "flags": "RANGE|WHOLEFOLD|COUNT|EXFLAGS|TRLBAR|CMDWIN|MODIFY", "parser": "parse_cmd_common"}), AttributeDict({"name": "=", "minlen": 1, "flags": "RANGE|TRLBAR|DFLALL|EXFLAGS|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": ">", "minlen": 1, "flags": "RANGE|WHOLEFOLD|COUNT|EXFLAGS|TRLBAR|CMDWIN|MODIFY", "parser": "parse_cmd_common"}), AttributeDict({"name": "@", "minlen": 1, "flags": "RANGE|WHOLEFOLD|EXTRA|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "Next", "minlen": 1, "flags": "EXTRA|RANGE|NOTADR|COUNT|BANG|EDITCMD|ARGOPT|TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "Print", "minlen": 1, "flags": "RANGE|WHOLEFOLD|COUNT|EXFLAGS|TRLBAR|CMDWIN", "parser": "parse_cmd_common"}), AttributeDict({"name": "X", "minlen": 1, "flags": "TRLBAR", "parser": "parse_cmd_common"}), AttributeDict({"name": "~", "minlen": 1, "flags": "RANGE|WHOLEFOLD|EXTRA|CMDWIN|MODIFY", "parser": "parse_cmd_common"}), AttributeDict({"flags": "TRLBAR", "minlen": 3, "name": "cbottom", "parser": "parse_cmd_common"}), AttributeDict({"flags": "BANG|NEEDARG|EXTRA|NOTRLCOM|RANGE|NOTADR|DFLALL", "minlen": 3, "name": "cdo", "parser": "parse_cmd_common"}), AttributeDict({"flags": "BANG|NEEDARG|EXTRA|NOTRLCOM|RANGE|NOTADR|DFLALL", "minlen": 3, "name": "cfdo", "parser": "parse_cmd_common"}), AttributeDict({"flags": "TRLBAR", "minlen": 3, "name": "chistory", "parser": "parse_cmd_common"}), AttributeDict({"flags": "TRLBAR|CMDWIN", "minlen": 3, "name": "clearjumps", "parser": "parse_cmd_common"}), AttributeDict({"flags": "BANG|NEEDARG|EXTRA|NOTRLCOM", "minlen": 4, "name": "filter", "parser": "parse_cmd_common"}), AttributeDict({"flags": "RANGE|NOTADR|COUNT|TRLBAR", "minlen": 5, "name": "helpclose", "parser": "parse_cmd_common"}), AttributeDict({"flags": "TRLBAR", "minlen": 3, "name": "lbottom", "parser": "parse_cmd_common"}), AttributeDict({"flags": "BANG|NEEDARG|EXTRA|NOTRLCOM|RANGE|NOTADR|DFLALL", "minlen": 2, "name": "ldo", "parser": "parse_cmd_common"}), AttributeDict({"flags": "BANG|NEEDARG|EXTRA|NOTRLCOM|RANGE|NOTADR|DFLALL", "minlen": 3, "name": "lfdo", "parser": "parse_cmd_common"}), AttributeDict({"flags": "TRLBAR", "minlen": 3, "name": "lhistory", "parser": "parse_cmd_common"}), AttributeDict({"flags": "BANG|EXTRA|TRLBAR|CMDWIN", "minlen": 3, "name": "llist", "parser": "parse_cmd_common"}), AttributeDict({"flags": "NEEDARG|EXTRA|NOTRLCOM", "minlen": 3, "name": "noswapfile", "parser": "parse_cmd_common"}), AttributeDict({"flags": "BANG|FILE1|NEEDARG|TRLBAR|SBOXOK|CMDWIN", "minlen": 2, "name": "packadd", "parser": "parse_cmd_common"}), AttributeDict({"flags": "BANG|TRLBAR|SBOXOK|CMDWIN", "minlen": 5, "name": "packloadall", "parser": "parse_cmd_common"}), AttributeDict({"flags": "TRLBAR|CMDWIN|SBOXOK", "minlen": 3, "name": "smile", "parser": "parse_cmd_common"}), AttributeDict({"flags": "RANGE|EXTRA|NEEDARG|CMDWIN", "minlen": 3, "name": "pyx", "parser": "parse_cmd_common"}), AttributeDict({"flags": "RANGE|DFLALL|EXTRA|NEEDARG|CMDWIN", "minlen": 4, "name": "pyxdo", "parser": "parse_cmd_common"}), AttributeDict({"flags": "RANGE|EXTRA|NEEDARG|CMDWIN", "minlen": 7, "name": "pythonx", "parser": "parse_cmd_common"}), AttributeDict({"flags": "RANGE|FILE1|NEEDARG|CMDWIN", "minlen": 4, "name": "pyxfile", "parser": "parse_cmd_common"}), AttributeDict({"flags": "RANGE|BANG|FILES|CMDWIN", "minlen": 3, "name": "terminal", "parser": "parse_cmd_common"}), AttributeDict({"flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "minlen": 3, "name": "tmap", "parser": "parse_cmd_common"}), AttributeDict({"flags": "EXTRA|TRLBAR|CMDWIN", "minlen": 5, "name": "tmapclear", "parser": "parse_cmd_common"}), AttributeDict({"flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "minlen": 3, "name": "tnoremap", "parser": "parse_cmd_common"}), AttributeDict({"flags": "EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "minlen": 5, "name": "tunmap", "parser": "parse_cmd_common"}), AttributeDict({"flags": "EX_RANGE|EX_COUNT|EX_TRLBAR", "minlen": 4, "name": "cabove", "parser": "parse_cmd_common"}), AttributeDict({"flags": "EX_RANGE|EX_COUNT|EX_TRLBAR", "minlen": 3, "name": "cafter", "parser": "parse_cmd_common"}), AttributeDict({"flags": "EX_RANGE|EX_COUNT|EX_TRLBAR", "minlen": 3, "name": "cbefore", "parser": "parse_cmd_common"}), AttributeDict({"flags": "EX_RANGE|EX_COUNT|EX_TRLBAR", "minlen": 4, "name": "cbelow", "parser": "parse_cmd_common"}), AttributeDict({"flags": "EX_EXTRA|EX_NOTRLCOM|EX_SBOXOK|EX_CMDWIN", "minlen": 4, "name": "const", "parser": "parse_cmd_common"}), AttributeDict({"flags": "EX_RANGE|EX_COUNT|EX_TRLBAR", "minlen": 3, "name": "labove", "parser": "parse_cmd_common"}), AttributeDict({"flags": "EX_RANGE|EX_COUNT|EX_TRLBAR", "minlen": 3, "name": "lafter", "parser": "parse_cmd_common"}), AttributeDict({"flags": "EX_RANGE|EX_COUNT|EX_TRLBAR", "minlen": 3, "name": "lbefore", "parser": "parse_cmd_common"}), AttributeDict({"flags": "EX_RANGE|EX_COUNT|EX_TRLBAR", "minlen": 4, "name": "lbelow", "parser": "parse_cmd_common"}), AttributeDict({"flags": "EX_TRLBAR|EX_CMDWIN", "minlen": 7, "name": "redrawtabline", "parser": "parse_cmd_common"}), AttributeDict({"flags": "EX_WORD1|EX_TRLBAR|EX_CMDWIN", "minlen": 7, "name": "scriptversion", "parser": "parse_cmd_common"}), AttributeDict({"flags": "EX_BANG|EX_FILE1|EX_TRLBAR|EX_CMDWIN", "minlen": 2, "name": "tcd", "parser": "parse_cmd_common"}), AttributeDict({"flags": "EX_BANG|EX_FILE1|EX_TRLBAR|EX_CMDWIN", "minlen": 3, "name": "tchdir", "parser": "parse_cmd_common"}), AttributeDict({"flags": "EX_RANGE|EX_ZEROR|EX_EXTRA|EX_TRLBAR|EX_NOTRLCOM|EX_CTRLV|EX_CMDWIN", "minlen": 3, "name": "tlmenu", "parser": "parse_cmd_common"}), AttributeDict({"flags": "EX_RANGE|EX_ZEROR|EX_EXTRA|EX_TRLBAR|EX_NOTRLCOM|EX_CTRLV|EX_CMDWIN", "minlen": 3, "name": "tlnoremenu", "parser": "parse_cmd_common"}), AttributeDict({"flags": "EX_RANGE|EX_ZEROR|EX_EXTRA|EX_TRLBAR|EX_NOTRLCOM|EX_CTRLV|EX_CMDWIN", "minlen": 3, "name": "tlunmenu", "parser": "parse_cmd_common"}), AttributeDict({"flags": "EX_EXTRA|EX_TRLBAR|EX_CMDWIN", "minlen": 2, "name": "xrestore", "parser": "parse_cmd_common"})]
+    builtin_functions = [AttributeDict({"name": "abs", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "acos", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "add", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "and", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "append", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "appendbufline", "min_argc": 3, "max_argc": 3}), AttributeDict({"name": "argc", "min_argc": 0, "max_argc": 1}), AttributeDict({"name": "argidx", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "arglistid", "min_argc": 0, "max_argc": 2}), AttributeDict({"name": "argv", "min_argc": 0, "max_argc": 2}), AttributeDict({"name": "asin", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "assert_beeps", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "assert_equal", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "assert_equalfile", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "assert_exception", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "assert_fails", "min_argc": 1, "max_argc": 3}), AttributeDict({"name": "assert_false", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "assert_inrange", "min_argc": 3, "max_argc": 4}), AttributeDict({"name": "assert_match", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "assert_notequal", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "assert_notmatch", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "assert_report", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "assert_true", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "atan", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "atan2", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "balloon_gettext", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "balloon_show", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "balloon_split", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "browse", "min_argc": 4, "max_argc": 4}), AttributeDict({"name": "browsedir", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "bufadd", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "bufexists", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "buffer_exists", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "buffer_name", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "buffer_number", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "buflisted", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "bufload", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "bufloaded", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "bufname", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "bufnr", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "bufwinid", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "bufwinnr", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "byte2line", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "byteidx", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "byteidxcomp", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "call", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "ceil", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "ch_canread", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "ch_close", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "ch_close_in", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "ch_evalexpr", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "ch_evalraw", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "ch_getbufnr", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "ch_getjob", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "ch_info", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "ch_log", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "ch_logfile", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "ch_open", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "ch_read", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "ch_readblob", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "ch_readraw", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "ch_sendexpr", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "ch_sendraw", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "ch_setoptions", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "ch_status", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "changenr", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "char2nr", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "chdir", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "cindent", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "clearmatches", "min_argc": 0, "max_argc": 1}), AttributeDict({"name": "col", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "complete", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "complete_add", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "complete_check", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "complete_info", "min_argc": 0, "max_argc": 1}), AttributeDict({"name": "confirm", "min_argc": 1, "max_argc": 4}), AttributeDict({"name": "copy", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "cos", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "cosh", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "count", "min_argc": 2, "max_argc": 4}), AttributeDict({"name": "cscope_connection", "min_argc": 0, "max_argc": 3}), AttributeDict({"name": "cursor", "min_argc": 1, "max_argc": 3}), AttributeDict({"name": "debugbreak", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "deepcopy", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "delete", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "deletebufline", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "did_filetype", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "diff_filler", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "diff_hlID", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "empty", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "environ", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "escape", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "eval", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "eventhandler", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "executable", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "execute", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "exepath", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "exists", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "exp", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "expand", "min_argc": 1, "max_argc": 3}), AttributeDict({"name": "expandcmd", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "extend", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "feedkeys", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "file_readable", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "filereadable", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "filewritable", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "filter", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "finddir", "min_argc": 1, "max_argc": 3}), AttributeDict({"name": "findfile", "min_argc": 1, "max_argc": 3}), AttributeDict({"name": "float2nr", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "floor", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "fmod", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "fnameescape", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "fnamemodify", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "foldclosed", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "foldclosedend", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "foldlevel", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "foldtext", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "foldtextresult", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "foreground", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "funcref", "min_argc": 1, "max_argc": 3}), AttributeDict({"name": "function", "min_argc": 1, "max_argc": 3}), AttributeDict({"name": "garbagecollect", "min_argc": 0, "max_argc": 1}), AttributeDict({"name": "get", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "get_lazy", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "getbufinfo", "min_argc": 0, "max_argc": 1}), AttributeDict({"name": "getbufline", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "getbufvar", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "getchangelist", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "getchar", "min_argc": 0, "max_argc": 1}), AttributeDict({"name": "getcharmod", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "getcharsearch", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "getcmdline", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "getcmdpos", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "getcmdtype", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "getcmdwintype", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "getcompletion", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "getcurpos", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "getcwd", "min_argc": 0, "max_argc": 2}), AttributeDict({"name": "getenv", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "getfontname", "min_argc": 0, "max_argc": 1}), AttributeDict({"name": "getfperm", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "getfsize", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "getftime", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "getftype", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "getjumplist", "min_argc": 0, "max_argc": 2}), AttributeDict({"name": "getline", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "getloclist", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "getmatches", "min_argc": 0, "max_argc": 1}), AttributeDict({"name": "getpid", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "getpos", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "getqflist", "min_argc": 0, "max_argc": 1}), AttributeDict({"name": "getreg", "min_argc": 0, "max_argc": 3}), AttributeDict({"name": "getregtype", "min_argc": 0, "max_argc": 1}), AttributeDict({"name": "gettabinfo", "min_argc": 0, "max_argc": 1}), AttributeDict({"name": "gettabvar", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "gettabwinvar", "min_argc": 3, "max_argc": 4}), AttributeDict({"name": "gettagstack", "min_argc": 0, "max_argc": 1}), AttributeDict({"name": "getwininfo", "min_argc": 0, "max_argc": 1}), AttributeDict({"name": "getwinpos", "min_argc": 0, "max_argc": 1}), AttributeDict({"name": "getwinposx", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "getwinposy", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "getwinvar", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "glob", "min_argc": 1, "max_argc": 4}), AttributeDict({"name": "glob2regpat", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "globpath", "min_argc": 2, "max_argc": 5}), AttributeDict({"name": "has", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "has_key", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "haslocaldir", "min_argc": 0, "max_argc": 2}), AttributeDict({"name": "hasmapto", "min_argc": 1, "max_argc": 3}), AttributeDict({"name": "highlightID", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "highlight_exists", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "histadd", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "histdel", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "histget", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "histnr", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "hlID", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "hlexists", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "hostname", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "iconv", "min_argc": 3, "max_argc": 3}), AttributeDict({"name": "indent", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "index", "min_argc": 2, "max_argc": 4}), AttributeDict({"name": "input", "min_argc": 1, "max_argc": 3}), AttributeDict({"name": "inputdialog", "min_argc": 1, "max_argc": 3}), AttributeDict({"name": "inputlist", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "inputrestore", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "inputsave", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "inputsecret", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "insert", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "invert", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "isdirectory", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "isinf", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "islocked", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "isnan", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "items", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "job_getchannel", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "job_info", "min_argc": 0, "max_argc": 1}), AttributeDict({"name": "job_setoptions", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "job_start", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "job_status", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "job_stop", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "join", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "js_decode", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "js_encode", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "json_decode", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "json_encode", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "keys", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "last_buffer_nr", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "len", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "libcall", "min_argc": 3, "max_argc": 3}), AttributeDict({"name": "libcallnr", "min_argc": 3, "max_argc": 3}), AttributeDict({"name": "line", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "line2byte", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "lispindent", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "list2str", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "listener_add", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "listener_flush", "min_argc": 0, "max_argc": 1}), AttributeDict({"name": "listener_remove", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "localtime", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "log", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "log10", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "luaeval", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "map", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "maparg", "min_argc": 1, "max_argc": 4}), AttributeDict({"name": "mapcheck", "min_argc": 1, "max_argc": 3}), AttributeDict({"name": "match", "min_argc": 2, "max_argc": 4}), AttributeDict({"name": "matchadd", "min_argc": 2, "max_argc": 5}), AttributeDict({"name": "matchaddpos", "min_argc": 2, "max_argc": 5}), AttributeDict({"name": "matcharg", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "matchdelete", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "matchend", "min_argc": 2, "max_argc": 4}), AttributeDict({"name": "matchlist", "min_argc": 2, "max_argc": 4}), AttributeDict({"name": "matchstr", "min_argc": 2, "max_argc": 4}), AttributeDict({"name": "matchstrpos", "min_argc": 2, "max_argc": 4}), AttributeDict({"name": "max", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "min", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "mkdir", "min_argc": 1, "max_argc": 3}), AttributeDict({"name": "mode", "min_argc": 0, "max_argc": 1}), AttributeDict({"name": "mzeval", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "nextnonblank", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "nr2char", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "or", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "pathshorten", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "perleval", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "popup_atcursor", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "popup_beval", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "popup_clear", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "popup_close", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "popup_create", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "popup_dialog", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "popup_filter_menu", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "popup_filter_yesno", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "popup_getoptions", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "popup_getpos", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "popup_hide", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "popup_locate", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "popup_menu", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "popup_move", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "popup_notification", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "popup_setoptions", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "popup_settext", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "popup_show", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "pow", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "prevnonblank", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "printf", "min_argc": 1, "max_argc": 19}), AttributeDict({"name": "prompt_setcallback", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "prompt_setinterrupt", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "prompt_setprompt", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "prop_add", "min_argc": 3, "max_argc": 3}), AttributeDict({"name": "prop_clear", "min_argc": 1, "max_argc": 3}), AttributeDict({"name": "prop_list", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "prop_remove", "min_argc": 1, "max_argc": 3}), AttributeDict({"name": "prop_type_add", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "prop_type_change", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "prop_type_delete", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "prop_type_get", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "prop_type_list", "min_argc": 0, "max_argc": 1}), AttributeDict({"name": "pumvisible", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "py3eval", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "pyeval", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "pyxeval", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "range", "min_argc": 1, "max_argc": 3}), AttributeDict({"name": "readdir", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "readfile", "min_argc": 1, "max_argc": 3}), AttributeDict({"name": "reg_executing", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "reg_recording", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "reltime", "min_argc": 0, "max_argc": 2}), AttributeDict({"name": "reltimefloat", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "reltimestr", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "remote_expr", "min_argc": 2, "max_argc": 4}), AttributeDict({"name": "remote_foreground", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "remote_peek", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "remote_read", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "remote_send", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "remote_startserver", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "remove", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "rename", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "repeat", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "resolve", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "reverse", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "round", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "rubyeval", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "screenattr", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "screenchar", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "screenchars", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "screencol", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "screenpos", "min_argc": 3, "max_argc": 3}), AttributeDict({"name": "screenrow", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "screenstring", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "search", "min_argc": 1, "max_argc": 4}), AttributeDict({"name": "searchdecl", "min_argc": 1, "max_argc": 3}), AttributeDict({"name": "searchpair", "min_argc": 3, "max_argc": 7}), AttributeDict({"name": "searchpairpos", "min_argc": 3, "max_argc": 7}), AttributeDict({"name": "searchpos", "min_argc": 1, "max_argc": 4}), AttributeDict({"name": "server2client", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "serverlist", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "setbufline", "min_argc": 3, "max_argc": 3}), AttributeDict({"name": "setbufvar", "min_argc": 3, "max_argc": 3}), AttributeDict({"name": "setcharsearch", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "setcmdpos", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "setenv", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "setfperm", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "setline", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "setloclist", "min_argc": 2, "max_argc": 4}), AttributeDict({"name": "setmatches", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "setpos", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "setqflist", "min_argc": 1, "max_argc": 3}), AttributeDict({"name": "setreg", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "settabvar", "min_argc": 3, "max_argc": 3}), AttributeDict({"name": "settabwinvar", "min_argc": 4, "max_argc": 4}), AttributeDict({"name": "settagstack", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "setwinvar", "min_argc": 3, "max_argc": 3}), AttributeDict({"name": "sha256", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "shellescape", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "shiftwidth", "min_argc": 0, "max_argc": 1}), AttributeDict({"name": "sign_define", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "sign_getdefined", "min_argc": 0, "max_argc": 1}), AttributeDict({"name": "sign_getplaced", "min_argc": 0, "max_argc": 2}), AttributeDict({"name": "sign_jump", "min_argc": 3, "max_argc": 3}), AttributeDict({"name": "sign_place", "min_argc": 4, "max_argc": 5}), AttributeDict({"name": "sign_placelist", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "sign_undefine", "min_argc": 0, "max_argc": 1}), AttributeDict({"name": "sign_unplace", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "sign_unplacelist", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "simplify", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "sin", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "sinh", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "sort", "min_argc": 1, "max_argc": 3}), AttributeDict({"name": "sound_clear", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "sound_playevent", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "sound_playfile", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "sound_stop", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "soundfold", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "spellbadword", "min_argc": 0, "max_argc": 1}), AttributeDict({"name": "spellsuggest", "min_argc": 1, "max_argc": 3}), AttributeDict({"name": "split", "min_argc": 1, "max_argc": 3}), AttributeDict({"name": "sqrt", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "str2float", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "str2list", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "str2nr", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "strcharpart", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "strchars", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "strdisplaywidth", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "strftime", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "strgetchar", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "stridx", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "string", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "strlen", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "strpart", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "strridx", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "strtrans", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "strwidth", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "submatch", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "substitute", "min_argc": 4, "max_argc": 4}), AttributeDict({"name": "swapinfo", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "swapname", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "synID", "min_argc": 3, "max_argc": 3}), AttributeDict({"name": "synIDattr", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "synIDtrans", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "synconcealed", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "synstack", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "system", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "systemlist", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "tabpagebuflist", "min_argc": 0, "max_argc": 1}), AttributeDict({"name": "tabpagenr", "min_argc": 0, "max_argc": 1}), AttributeDict({"name": "tabpagewinnr", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "tagfiles", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "taglist", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "tan", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "tanh", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "tempname", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "term_dumpdiff", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "term_dumpload", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "term_dumpwrite", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "term_getaltscreen", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "term_getansicolors", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "term_getattr", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "term_getcursor", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "term_getjob", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "term_getline", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "term_getscrolled", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "term_getsize", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "term_getstatus", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "term_gettitle", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "term_gettty", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "term_list", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "term_scrape", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "term_sendkeys", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "term_setansicolors", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "term_setkill", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "term_setrestore", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "term_setsize", "min_argc": 3, "max_argc": 3}), AttributeDict({"name": "term_start", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "term_wait", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "test_alloc_fail", "min_argc": 3, "max_argc": 3}), AttributeDict({"name": "test_autochdir", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "test_feedinput", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "test_garbagecollect_now", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "test_garbagecollect_soon", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "test_getvalue", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "test_ignore_error", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "test_null_blob", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "test_null_channel", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "test_null_dict", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "test_null_job", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "test_null_list", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "test_null_partial", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "test_null_string", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "test_option_not_set", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "test_override", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "test_refcount", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "test_scrollbar", "min_argc": 3, "max_argc": 3}), AttributeDict({"name": "test_setmouse", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "test_settime", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "timer_info", "min_argc": 0, "max_argc": 1}), AttributeDict({"name": "timer_pause", "min_argc": 2, "max_argc": 2}), AttributeDict({"name": "timer_start", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "timer_stop", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "timer_stopall", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "tolower", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "toupper", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "tr", "min_argc": 3, "max_argc": 3}), AttributeDict({"name": "trim", "min_argc": 1, "max_argc": 2}), AttributeDict({"name": "trunc", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "type", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "undofile", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "undotree", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "uniq", "min_argc": 1, "max_argc": 3}), AttributeDict({"name": "values", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "virtcol", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "visualmode", "min_argc": 0, "max_argc": 1}), AttributeDict({"name": "wildmenumode", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "win_execute", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "win_findbuf", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "win_getid", "min_argc": 0, "max_argc": 2}), AttributeDict({"name": "win_gotoid", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "win_id2tabwin", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "win_id2win", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "win_screenpos", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "winbufnr", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "wincol", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "winheight", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "winlayout", "min_argc": 0, "max_argc": 1}), AttributeDict({"name": "winline", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "winnr", "min_argc": 0, "max_argc": 1}), AttributeDict({"name": "winrestcmd", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "winrestview", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "winsaveview", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "winwidth", "min_argc": 1, "max_argc": 1}), AttributeDict({"name": "wordcount", "min_argc": 0, "max_argc": 0}), AttributeDict({"name": "writefile", "min_argc": 2, "max_argc": 3}), AttributeDict({"name": "xor", "min_argc": 2, "max_argc": 2})]
 
-    neovim_additional_commands = [AttributeDict({"name":"rshada", "minlen":3, "flags":"BANG|FILE1|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"wshada", "minlen":3, "flags":"BANG|FILE1|TRLBAR|CMDWIN", "parser":"parse_cmd_common"})]
-    neovim_removed_commands = [AttributeDict({"name":"Print", "minlen":1, "flags":"RANGE|WHOLEFOLD|COUNT|EXFLAGS|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"fixdel", "minlen":3, "flags":"TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"helpfind", "minlen":5, "flags":"EXTRA|NOTRLCOM", "parser":"parse_cmd_common"}), AttributeDict({"name":"open", "minlen":1, "flags":"RANGE|BANG|EXTRA", "parser":"parse_cmd_common"}), AttributeDict({"name":"shell", "minlen":2, "flags":"TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"tearoff", "minlen":2, "flags":"NEEDARG|EXTRA|TRLBAR|NOTRLCOM|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"gvim", "minlen":2, "flags":"BANG|FILES|EDITCMD|ARGOPT|TRLBAR|CMDWIN", "parser":"parse_cmd_common"})]
-# To find new builtin_commands, run the below script.
-# $ scripts/update_builtin_commands.sh /path/to/vim/src/ex_cmds.h
-    builtin_commands = [AttributeDict({"name":"append", "minlen":1, "flags":"BANG|RANGE|ZEROR|TRLBAR|CMDWIN|MODIFY", "parser":"parse_cmd_append"}), AttributeDict({"name":"abbreviate", "minlen":2, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"abclear", "minlen":3, "flags":"EXTRA|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"aboveleft", "minlen":3, "flags":"NEEDARG|EXTRA|NOTRLCOM", "parser":"parse_cmd_common"}), AttributeDict({"name":"all", "minlen":2, "flags":"BANG|RANGE|NOTADR|COUNT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"amenu", "minlen":2, "flags":"RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"anoremenu", "minlen":2, "flags":"RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"args", "minlen":2, "flags":"BANG|FILES|EDITCMD|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"argadd", "minlen":4, "flags":"BANG|NEEDARG|RANGE|NOTADR|ZEROR|FILES|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"argdelete", "minlen":4, "flags":"BANG|RANGE|NOTADR|FILES|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"argedit", "minlen":4, "flags":"BANG|NEEDARG|RANGE|NOTADR|FILE1|EDITCMD|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"argdo", "minlen":5, "flags":"BANG|NEEDARG|EXTRA|NOTRLCOM", "parser":"parse_cmd_common"}), AttributeDict({"name":"argglobal", "minlen":4, "flags":"BANG|FILES|EDITCMD|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"arglocal", "minlen":4, "flags":"BANG|FILES|EDITCMD|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"argument", "minlen":4, "flags":"BANG|RANGE|NOTADR|COUNT|EXTRA|EDITCMD|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"ascii", "minlen":2, "flags":"TRLBAR|SBOXOK|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"autocmd", "minlen":2, "flags":"BANG|EXTRA|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"augroup", "minlen":3, "flags":"BANG|WORD1|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"aunmenu", "minlen":3, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"buffer", "minlen":1, "flags":"BANG|RANGE|NOTADR|BUFNAME|BUFUNL|COUNT|EXTRA|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"bNext", "minlen":2, "flags":"BANG|RANGE|NOTADR|COUNT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"ball", "minlen":2, "flags":"RANGE|NOTADR|COUNT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"badd", "minlen":3, "flags":"NEEDARG|FILE1|EDITCMD|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"bdelete", "minlen":2, "flags":"BANG|RANGE|NOTADR|BUFNAME|COUNT|EXTRA|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"behave", "minlen":2, "flags":"NEEDARG|WORD1|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"belowright", "minlen":3, "flags":"NEEDARG|EXTRA|NOTRLCOM", "parser":"parse_cmd_common"}), AttributeDict({"name":"bfirst", "minlen":2, "flags":"BANG|RANGE|NOTADR|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"blast", "minlen":2, "flags":"BANG|RANGE|NOTADR|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"bmodified", "minlen":2, "flags":"BANG|RANGE|NOTADR|COUNT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"bnext", "minlen":2, "flags":"BANG|RANGE|NOTADR|COUNT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"botright", "minlen":2, "flags":"NEEDARG|EXTRA|NOTRLCOM", "parser":"parse_cmd_common"}), AttributeDict({"name":"bprevious", "minlen":2, "flags":"BANG|RANGE|NOTADR|COUNT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"brewind", "minlen":2, "flags":"BANG|RANGE|NOTADR|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"break", "minlen":4, "flags":"TRLBAR|SBOXOK|CMDWIN", "parser":"parse_cmd_break"}), AttributeDict({"name":"breakadd", "minlen":6, "flags":"EXTRA|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"breakdel", "minlen":6, "flags":"EXTRA|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"breaklist", "minlen":6, "flags":"EXTRA|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"browse", "minlen":3, "flags":"NEEDARG|EXTRA|NOTRLCOM|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"bufdo", "minlen":5, "flags":"BANG|NEEDARG|EXTRA|NOTRLCOM", "parser":"parse_cmd_common"}), AttributeDict({"name":"buffers", "minlen":7, "flags":"BANG|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"bunload", "minlen":3, "flags":"BANG|RANGE|NOTADR|BUFNAME|COUNT|EXTRA|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"bwipeout", "minlen":2, "flags":"BANG|RANGE|NOTADR|BUFNAME|BUFUNL|COUNT|EXTRA|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"change", "minlen":1, "flags":"BANG|WHOLEFOLD|RANGE|COUNT|TRLBAR|CMDWIN|MODIFY", "parser":"parse_cmd_common"}), AttributeDict({"name":"cNext", "minlen":2, "flags":"RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser":"parse_cmd_common"}), AttributeDict({"name":"cNfile", "minlen":3, "flags":"RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser":"parse_cmd_common"}), AttributeDict({"name":"cabbrev", "minlen":2, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"cabclear", "minlen":4, "flags":"EXTRA|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"caddbuffer", "minlen":3, "flags":"RANGE|NOTADR|WORD1|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"caddexpr", "minlen":5, "flags":"NEEDARG|WORD1|NOTRLCOM|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"caddfile", "minlen":5, "flags":"TRLBAR|FILE1", "parser":"parse_cmd_common"}), AttributeDict({"name":"call", "minlen":3, "flags":"RANGE|NEEDARG|EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser":"parse_cmd_call"}), AttributeDict({"name":"catch", "minlen":3, "flags":"EXTRA|SBOXOK|CMDWIN", "parser":"parse_cmd_catch"}), AttributeDict({"name":"cbuffer", "minlen":2, "flags":"BANG|RANGE|NOTADR|WORD1|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"cc", "minlen":2, "flags":"RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser":"parse_cmd_common"}), AttributeDict({"name":"cclose", "minlen":3, "flags":"RANGE|NOTADR|COUNT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"cd", "minlen":2, "flags":"BANG|FILE1|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"center", "minlen":2, "flags":"TRLBAR|RANGE|WHOLEFOLD|EXTRA|CMDWIN|MODIFY", "parser":"parse_cmd_common"}), AttributeDict({"name":"cexpr", "minlen":3, "flags":"NEEDARG|WORD1|NOTRLCOM|TRLBAR|BANG", "parser":"parse_cmd_common"}), AttributeDict({"name":"cfile", "minlen":2, "flags":"TRLBAR|FILE1|BANG", "parser":"parse_cmd_common"}), AttributeDict({"name":"cfirst", "minlen":4, "flags":"RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser":"parse_cmd_common"}), AttributeDict({"name":"cgetbuffer", "minlen":5, "flags":"RANGE|NOTADR|WORD1|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"cgetexpr", "minlen":5, "flags":"NEEDARG|WORD1|NOTRLCOM|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"cgetfile", "minlen":2, "flags":"TRLBAR|FILE1", "parser":"parse_cmd_common"}), AttributeDict({"name":"changes", "minlen":7, "flags":"TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"chdir", "minlen":3, "flags":"BANG|FILE1|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"checkpath", "minlen":3, "flags":"TRLBAR|BANG|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"checktime", "minlen":6, "flags":"RANGE|NOTADR|BUFNAME|COUNT|EXTRA|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"clist", "minlen":2, "flags":"BANG|EXTRA|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"clast", "minlen":3, "flags":"RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser":"parse_cmd_common"}), AttributeDict({"name":"close", "minlen":3, "flags":"BANG|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"cmap", "minlen":2, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"cmapclear", "minlen":5, "flags":"EXTRA|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"cmenu", "minlen":3, "flags":"RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"cnext", "minlen":2, "flags":"RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser":"parse_cmd_common"}), AttributeDict({"name":"cnewer", "minlen":4, "flags":"RANGE|NOTADR|COUNT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"cnfile", "minlen":3, "flags":"RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser":"parse_cmd_common"}), AttributeDict({"name":"cnoremap", "minlen":3, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"cnoreabbrev", "minlen":6, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"cnoremenu", "minlen":7, "flags":"RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"copy", "minlen":2, "flags":"RANGE|WHOLEFOLD|EXTRA|TRLBAR|CMDWIN|MODIFY", "parser":"parse_cmd_common"}), AttributeDict({"name":"colder", "minlen":3, "flags":"RANGE|NOTADR|COUNT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"colorscheme", "minlen":4, "flags":"WORD1|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"command", "minlen":3, "flags":"EXTRA|BANG|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"comclear", "minlen":4, "flags":"TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"compiler", "minlen":4, "flags":"BANG|TRLBAR|WORD1|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"continue", "minlen":3, "flags":"TRLBAR|SBOXOK|CMDWIN", "parser":"parse_cmd_continue"}), AttributeDict({"name":"confirm", "minlen":4, "flags":"NEEDARG|EXTRA|NOTRLCOM|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"copen", "minlen":4, "flags":"RANGE|NOTADR|COUNT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"cprevious", "minlen":2, "flags":"RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser":"parse_cmd_common"}), AttributeDict({"name":"cpfile", "minlen":3, "flags":"RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser":"parse_cmd_common"}), AttributeDict({"name":"cquit", "minlen":2, "flags":"TRLBAR|BANG", "parser":"parse_cmd_common"}), AttributeDict({"name":"crewind", "minlen":2, "flags":"RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser":"parse_cmd_common"}), AttributeDict({"name":"cscope", "minlen":2, "flags":"EXTRA|NOTRLCOM|XFILE", "parser":"parse_cmd_common"}), AttributeDict({"name":"cstag", "minlen":3, "flags":"BANG|TRLBAR|WORD1", "parser":"parse_cmd_common"}), AttributeDict({"name":"cunmap", "minlen":2, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"cunabbrev", "minlen":4, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"cunmenu", "minlen":5, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"cwindow", "minlen":2, "flags":"RANGE|NOTADR|COUNT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"delete", "minlen":1, "flags":"RANGE|WHOLEFOLD|REGSTR|COUNT|TRLBAR|CMDWIN|MODIFY", "parser":"parse_cmd_common"}), AttributeDict({"name":"delmarks", "minlen":4, "flags":"BANG|EXTRA|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"debug", "minlen":3, "flags":"NEEDARG|EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"debuggreedy", "minlen":6, "flags":"RANGE|NOTADR|ZEROR|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"delcommand", "minlen":4, "flags":"NEEDARG|WORD1|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"delfunction", "minlen":4, "flags":"BANG|NEEDARG|WORD1|CMDWIN", "parser":"parse_cmd_delfunction"}), AttributeDict({"name":"diffupdate", "minlen":3, "flags":"BANG|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"diffget", "minlen":5, "flags":"RANGE|EXTRA|TRLBAR|MODIFY", "parser":"parse_cmd_common"}), AttributeDict({"name":"diffoff", "minlen":5, "flags":"BANG|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"diffpatch", "minlen":5, "flags":"EXTRA|FILE1|TRLBAR|MODIFY", "parser":"parse_cmd_common"}), AttributeDict({"name":"diffput", "minlen":6, "flags":"RANGE|EXTRA|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"diffsplit", "minlen":5, "flags":"EXTRA|FILE1|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"diffthis", "minlen":5, "flags":"TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"digraphs", "minlen":3, "flags":"EXTRA|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"display", "minlen":2, "flags":"EXTRA|NOTRLCOM|TRLBAR|SBOXOK|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"djump", "minlen":2, "flags":"BANG|RANGE|DFLALL|WHOLEFOLD|EXTRA", "parser":"parse_cmd_common"}), AttributeDict({"name":"dlist", "minlen":2, "flags":"BANG|RANGE|DFLALL|WHOLEFOLD|EXTRA|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"doautocmd", "minlen":2, "flags":"EXTRA|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"doautoall", "minlen":7, "flags":"EXTRA|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"drop", "minlen":2, "flags":"FILES|EDITCMD|NEEDARG|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"dsearch", "minlen":2, "flags":"BANG|RANGE|DFLALL|WHOLEFOLD|EXTRA|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"dsplit", "minlen":3, "flags":"BANG|RANGE|DFLALL|WHOLEFOLD|EXTRA", "parser":"parse_cmd_common"}), AttributeDict({"name":"edit", "minlen":1, "flags":"BANG|FILE1|EDITCMD|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"earlier", "minlen":2, "flags":"TRLBAR|EXTRA|NOSPC|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"echo", "minlen":2, "flags":"EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser":"parse_cmd_echo"}), AttributeDict({"name":"echoerr", "minlen":5, "flags":"EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser":"parse_cmd_echoerr"}), AttributeDict({"name":"echohl", "minlen":5, "flags":"EXTRA|TRLBAR|SBOXOK|CMDWIN", "parser":"parse_cmd_echohl"}), AttributeDict({"name":"echomsg", "minlen":5, "flags":"EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser":"parse_cmd_echomsg"}), AttributeDict({"name":"echon", "minlen":5, "flags":"EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser":"parse_cmd_echon"}), AttributeDict({"name":"else", "minlen":2, "flags":"TRLBAR|SBOXOK|CMDWIN", "parser":"parse_cmd_else"}), AttributeDict({"name":"elseif", "minlen":5, "flags":"EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser":"parse_cmd_elseif"}), AttributeDict({"name":"emenu", "minlen":2, "flags":"NEEDARG|EXTRA|TRLBAR|NOTRLCOM|RANGE|NOTADR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"endif", "minlen":2, "flags":"TRLBAR|SBOXOK|CMDWIN", "parser":"parse_cmd_endif"}), AttributeDict({"name":"endfor", "minlen":5, "flags":"TRLBAR|SBOXOK|CMDWIN", "parser":"parse_cmd_endfor"}), AttributeDict({"name":"endfunction", "minlen":4, "flags":"TRLBAR|CMDWIN", "parser":"parse_cmd_endfunction"}), AttributeDict({"name":"endtry", "minlen":4, "flags":"TRLBAR|SBOXOK|CMDWIN", "parser":"parse_cmd_endtry"}), AttributeDict({"name":"endwhile", "minlen":4, "flags":"TRLBAR|SBOXOK|CMDWIN", "parser":"parse_cmd_endwhile"}), AttributeDict({"name":"enew", "minlen":3, "flags":"BANG|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"ex", "minlen":2, "flags":"BANG|FILE1|EDITCMD|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"execute", "minlen":3, "flags":"EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser":"parse_cmd_execute"}), AttributeDict({"name":"exit", "minlen":3, "flags":"RANGE|WHOLEFOLD|BANG|FILE1|ARGOPT|DFLALL|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"exusage", "minlen":3, "flags":"TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"file", "minlen":1, "flags":"RANGE|NOTADR|ZEROR|BANG|FILE1|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"files", "minlen":5, "flags":"BANG|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"filetype", "minlen":5, "flags":"EXTRA|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"find", "minlen":3, "flags":"RANGE|NOTADR|BANG|FILE1|EDITCMD|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"finally", "minlen":4, "flags":"TRLBAR|SBOXOK|CMDWIN", "parser":"parse_cmd_finally"}), AttributeDict({"name":"finish", "minlen":4, "flags":"TRLBAR|SBOXOK|CMDWIN", "parser":"parse_cmd_finish"}), AttributeDict({"name":"first", "minlen":3, "flags":"EXTRA|BANG|EDITCMD|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"fixdel", "minlen":3, "flags":"TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"fold", "minlen":2, "flags":"RANGE|WHOLEFOLD|TRLBAR|SBOXOK|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"foldclose", "minlen":5, "flags":"RANGE|BANG|WHOLEFOLD|TRLBAR|SBOXOK|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"folddoopen", "minlen":5, "flags":"RANGE|DFLALL|NEEDARG|EXTRA|NOTRLCOM", "parser":"parse_cmd_common"}), AttributeDict({"name":"folddoclosed", "minlen":7, "flags":"RANGE|DFLALL|NEEDARG|EXTRA|NOTRLCOM", "parser":"parse_cmd_common"}), AttributeDict({"name":"foldopen", "minlen":5, "flags":"RANGE|BANG|WHOLEFOLD|TRLBAR|SBOXOK|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"for", "minlen":3, "flags":"EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser":"parse_cmd_for"}), AttributeDict({"name":"function", "minlen":2, "flags":"EXTRA|BANG|CMDWIN", "parser":"parse_cmd_function"}), AttributeDict({"name":"global", "minlen":1, "flags":"RANGE|WHOLEFOLD|BANG|EXTRA|DFLALL|SBOXOK|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"goto", "minlen":2, "flags":"RANGE|NOTADR|COUNT|TRLBAR|SBOXOK|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"grep", "minlen":2, "flags":"RANGE|NOTADR|BANG|NEEDARG|EXTRA|NOTRLCOM|TRLBAR|XFILE", "parser":"parse_cmd_common"}), AttributeDict({"name":"grepadd", "minlen":5, "flags":"RANGE|NOTADR|BANG|NEEDARG|EXTRA|NOTRLCOM|TRLBAR|XFILE", "parser":"parse_cmd_common"}), AttributeDict({"name":"gui", "minlen":2, "flags":"BANG|FILES|EDITCMD|ARGOPT|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"gvim", "minlen":2, "flags":"BANG|FILES|EDITCMD|ARGOPT|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"hardcopy", "minlen":2, "flags":"RANGE|COUNT|EXTRA|TRLBAR|DFLALL|BANG", "parser":"parse_cmd_common"}), AttributeDict({"name":"help", "minlen":1, "flags":"BANG|EXTRA|NOTRLCOM", "parser":"parse_cmd_common"}), AttributeDict({"name":"helpfind", "minlen":5, "flags":"EXTRA|NOTRLCOM", "parser":"parse_cmd_common"}), AttributeDict({"name":"helpgrep", "minlen":5, "flags":"EXTRA|NOTRLCOM|NEEDARG", "parser":"parse_cmd_common"}), AttributeDict({"name":"helptags", "minlen":5, "flags":"NEEDARG|FILES|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"highlight", "minlen":2, "flags":"BANG|EXTRA|TRLBAR|SBOXOK|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"hide", "minlen":3, "flags":"BANG|EXTRA|NOTRLCOM", "parser":"parse_cmd_common"}), AttributeDict({"name":"history", "minlen":3, "flags":"EXTRA|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"insert", "minlen":1, "flags":"BANG|RANGE|TRLBAR|CMDWIN|MODIFY", "parser":"parse_cmd_insert"}), AttributeDict({"name":"iabbrev", "minlen":2, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"iabclear", "minlen":4, "flags":"EXTRA|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"if", "minlen":2, "flags":"EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser":"parse_cmd_if"}), AttributeDict({"name":"ijump", "minlen":2, "flags":"BANG|RANGE|DFLALL|WHOLEFOLD|EXTRA", "parser":"parse_cmd_common"}), AttributeDict({"name":"ilist", "minlen":2, "flags":"BANG|RANGE|DFLALL|WHOLEFOLD|EXTRA|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"imap", "minlen":2, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"imapclear", "minlen":5, "flags":"EXTRA|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"imenu", "minlen":3, "flags":"RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"inoremap", "minlen":3, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"inoreabbrev", "minlen":6, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"inoremenu", "minlen":7, "flags":"RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"intro", "minlen":3, "flags":"TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"isearch", "minlen":2, "flags":"BANG|RANGE|DFLALL|WHOLEFOLD|EXTRA|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"isplit", "minlen":3, "flags":"BANG|RANGE|DFLALL|WHOLEFOLD|EXTRA", "parser":"parse_cmd_common"}), AttributeDict({"name":"iunmap", "minlen":2, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"iunabbrev", "minlen":4, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"iunmenu", "minlen":5, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"join", "minlen":1, "flags":"BANG|RANGE|WHOLEFOLD|COUNT|EXFLAGS|TRLBAR|CMDWIN|MODIFY", "parser":"parse_cmd_common"}), AttributeDict({"name":"jumps", "minlen":2, "flags":"TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"k", "minlen":1, "flags":"RANGE|WORD1|TRLBAR|SBOXOK|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"keepalt", "minlen":5, "flags":"NEEDARG|EXTRA|NOTRLCOM", "parser":"parse_cmd_common"}), AttributeDict({"name":"keepmarks", "minlen":3, "flags":"NEEDARG|EXTRA|NOTRLCOM", "parser":"parse_cmd_common"}), AttributeDict({"name":"keepjumps", "minlen":5, "flags":"NEEDARG|EXTRA|NOTRLCOM", "parser":"parse_cmd_common"}), AttributeDict({"name":"keeppatterns", "minlen":5, "flags":"NEEDARG|EXTRA|NOTRLCOM", "parser":"parse_cmd_common"}), AttributeDict({"name":"lNext", "minlen":2, "flags":"RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser":"parse_cmd_common"}), AttributeDict({"name":"lNfile", "minlen":3, "flags":"RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser":"parse_cmd_common"}), AttributeDict({"name":"list", "minlen":1, "flags":"RANGE|WHOLEFOLD|COUNT|EXFLAGS|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"laddexpr", "minlen":3, "flags":"NEEDARG|WORD1|NOTRLCOM|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"laddbuffer", "minlen":5, "flags":"RANGE|NOTADR|WORD1|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"laddfile", "minlen":5, "flags":"TRLBAR|FILE1", "parser":"parse_cmd_common"}), AttributeDict({"name":"last", "minlen":2, "flags":"EXTRA|BANG|EDITCMD|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"language", "minlen":3, "flags":"EXTRA|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"later", "minlen":3, "flags":"TRLBAR|EXTRA|NOSPC|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"lbuffer", "minlen":2, "flags":"BANG|RANGE|NOTADR|WORD1|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"lcd", "minlen":2, "flags":"BANG|FILE1|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"lchdir", "minlen":3, "flags":"BANG|FILE1|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"lclose", "minlen":3, "flags":"RANGE|NOTADR|COUNT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"lcscope", "minlen":3, "flags":"EXTRA|NOTRLCOM|XFILE", "parser":"parse_cmd_common"}), AttributeDict({"name":"left", "minlen":2, "flags":"TRLBAR|RANGE|WHOLEFOLD|EXTRA|CMDWIN|MODIFY", "parser":"parse_cmd_common"}), AttributeDict({"name":"leftabove", "minlen":5, "flags":"NEEDARG|EXTRA|NOTRLCOM", "parser":"parse_cmd_common"}), AttributeDict({"name":"let", "minlen":3, "flags":"EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser":"parse_cmd_let"}), AttributeDict({"name":"lexpr", "minlen":3, "flags":"NEEDARG|WORD1|NOTRLCOM|TRLBAR|BANG", "parser":"parse_cmd_common"}), AttributeDict({"name":"lfile", "minlen":2, "flags":"TRLBAR|FILE1|BANG", "parser":"parse_cmd_common"}), AttributeDict({"name":"lfirst", "minlen":4, "flags":"RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser":"parse_cmd_common"}), AttributeDict({"name":"lgetbuffer", "minlen":5, "flags":"RANGE|NOTADR|WORD1|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"lgetexpr", "minlen":5, "flags":"NEEDARG|WORD1|NOTRLCOM|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"lgetfile", "minlen":2, "flags":"TRLBAR|FILE1", "parser":"parse_cmd_common"}), AttributeDict({"name":"lgrep", "minlen":3, "flags":"RANGE|NOTADR|BANG|NEEDARG|EXTRA|NOTRLCOM|TRLBAR|XFILE", "parser":"parse_cmd_common"}), AttributeDict({"name":"lgrepadd", "minlen":6, "flags":"RANGE|NOTADR|BANG|NEEDARG|EXTRA|NOTRLCOM|TRLBAR|XFILE", "parser":"parse_cmd_common"}), AttributeDict({"name":"lhelpgrep", "minlen":2, "flags":"EXTRA|NOTRLCOM|NEEDARG", "parser":"parse_cmd_common"}), AttributeDict({"name":"ll", "minlen":2, "flags":"RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser":"parse_cmd_common"}), AttributeDict({"name":"llast", "minlen":3, "flags":"RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser":"parse_cmd_common"}), AttributeDict({"name":"list", "minlen":3, "flags":"BANG|EXTRA|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"lmake", "minlen":4, "flags":"BANG|EXTRA|NOTRLCOM|TRLBAR|XFILE", "parser":"parse_cmd_common"}), AttributeDict({"name":"lmap", "minlen":2, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"lmapclear", "minlen":5, "flags":"EXTRA|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"lnext", "minlen":3, "flags":"RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser":"parse_cmd_common"}), AttributeDict({"name":"lnewer", "minlen":4, "flags":"RANGE|NOTADR|COUNT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"lnfile", "minlen":3, "flags":"RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser":"parse_cmd_common"}), AttributeDict({"name":"lnoremap", "minlen":2, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"loadkeymap", "minlen":5, "flags":"CMDWIN", "parser":"parse_cmd_loadkeymap"}), AttributeDict({"name":"loadview", "minlen":2, "flags":"FILE1|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"lockmarks", "minlen":3, "flags":"NEEDARG|EXTRA|NOTRLCOM", "parser":"parse_cmd_common"}), AttributeDict({"name":"lockvar", "minlen":5, "flags":"BANG|EXTRA|NEEDARG|SBOXOK|CMDWIN", "parser":"parse_cmd_lockvar"}), AttributeDict({"name":"lolder", "minlen":3, "flags":"RANGE|NOTADR|COUNT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"lopen", "minlen":3, "flags":"RANGE|NOTADR|COUNT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"lprevious", "minlen":2, "flags":"RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser":"parse_cmd_common"}), AttributeDict({"name":"lpfile", "minlen":3, "flags":"RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser":"parse_cmd_common"}), AttributeDict({"name":"lrewind", "minlen":2, "flags":"RANGE|NOTADR|COUNT|TRLBAR|BANG", "parser":"parse_cmd_common"}), AttributeDict({"name":"ls", "minlen":2, "flags":"BANG|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"ltag", "minlen":2, "flags":"NOTADR|TRLBAR|BANG|WORD1", "parser":"parse_cmd_common"}), AttributeDict({"name":"lunmap", "minlen":2, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"lua", "minlen":3, "flags":"RANGE|EXTRA|NEEDARG|CMDWIN", "parser":"parse_cmd_lua"}), AttributeDict({"name":"luado", "minlen":4, "flags":"RANGE|DFLALL|EXTRA|NEEDARG|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"luafile", "minlen":4, "flags":"RANGE|FILE1|NEEDARG|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"lvimgrep", "minlen":2, "flags":"RANGE|NOTADR|BANG|NEEDARG|EXTRA|NOTRLCOM|TRLBAR|XFILE", "parser":"parse_cmd_common"}), AttributeDict({"name":"lvimgrepadd", "minlen":9, "flags":"RANGE|NOTADR|BANG|NEEDARG|EXTRA|NOTRLCOM|TRLBAR|XFILE", "parser":"parse_cmd_common"}), AttributeDict({"name":"lwindow", "minlen":2, "flags":"RANGE|NOTADR|COUNT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"move", "minlen":1, "flags":"RANGE|WHOLEFOLD|EXTRA|TRLBAR|CMDWIN|MODIFY", "parser":"parse_cmd_common"}), AttributeDict({"name":"mark", "minlen":2, "flags":"RANGE|WORD1|TRLBAR|SBOXOK|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"make", "minlen":3, "flags":"BANG|EXTRA|NOTRLCOM|TRLBAR|XFILE", "parser":"parse_cmd_common"}), AttributeDict({"name":"map", "minlen":3, "flags":"BANG|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"mapclear", "minlen":4, "flags":"EXTRA|BANG|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"marks", "minlen":5, "flags":"EXTRA|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"match", "minlen":3, "flags":"RANGE|NOTADR|EXTRA|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"menu", "minlen":2, "flags":"RANGE|NOTADR|ZEROR|BANG|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"menutranslate", "minlen":5, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"messages", "minlen":3, "flags":"TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"mkexrc", "minlen":2, "flags":"BANG|FILE1|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"mksession", "minlen":3, "flags":"BANG|FILE1|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"mkspell", "minlen":4, "flags":"BANG|NEEDARG|EXTRA|NOTRLCOM|TRLBAR|XFILE", "parser":"parse_cmd_common"}), AttributeDict({"name":"mkvimrc", "minlen":3, "flags":"BANG|FILE1|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"mkview", "minlen":5, "flags":"BANG|FILE1|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"mode", "minlen":3, "flags":"WORD1|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"mzscheme", "minlen":2, "flags":"RANGE|EXTRA|DFLALL|NEEDARG|CMDWIN|SBOXOK", "parser":"parse_cmd_mzscheme"}), AttributeDict({"name":"mzfile", "minlen":3, "flags":"RANGE|FILE1|NEEDARG|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"nbclose", "minlen":3, "flags":"TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"nbkey", "minlen":2, "flags":"EXTRA|NOTADR|NEEDARG", "parser":"parse_cmd_common"}), AttributeDict({"name":"nbstart", "minlen":3, "flags":"WORD1|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"next", "minlen":1, "flags":"RANGE|NOTADR|BANG|FILES|EDITCMD|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"new", "minlen":3, "flags":"BANG|FILE1|RANGE|NOTADR|EDITCMD|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"nmap", "minlen":2, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"nmapclear", "minlen":5, "flags":"EXTRA|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"nmenu", "minlen":3, "flags":"RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"nnoremap", "minlen":2, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"nnoremenu", "minlen":7, "flags":"RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"noautocmd", "minlen":3, "flags":"NEEDARG|EXTRA|NOTRLCOM", "parser":"parse_cmd_common"}), AttributeDict({"name":"noremap", "minlen":2, "flags":"BANG|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"nohlsearch", "minlen":3, "flags":"TRLBAR|SBOXOK|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"noreabbrev", "minlen":5, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"noremenu", "minlen":6, "flags":"RANGE|NOTADR|ZEROR|BANG|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"normal", "minlen":4, "flags":"RANGE|BANG|EXTRA|NEEDARG|NOTRLCOM|USECTRLV|SBOXOK|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"number", "minlen":2, "flags":"RANGE|WHOLEFOLD|COUNT|EXFLAGS|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"nunmap", "minlen":3, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"nunmenu", "minlen":5, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"oldfiles", "minlen":2, "flags":"BANG|TRLBAR|SBOXOK|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"open", "minlen":1, "flags":"RANGE|BANG|EXTRA", "parser":"parse_cmd_common"}), AttributeDict({"name":"omap", "minlen":2, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"omapclear", "minlen":5, "flags":"EXTRA|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"omenu", "minlen":3, "flags":"RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"only", "minlen":2, "flags":"BANG|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"onoremap", "minlen":3, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"onoremenu", "minlen":7, "flags":"RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"options", "minlen":3, "flags":"TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"ounmap", "minlen":2, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"ounmenu", "minlen":5, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"ownsyntax", "minlen":2, "flags":"EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"pclose", "minlen":2, "flags":"BANG|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"pedit", "minlen":3, "flags":"BANG|FILE1|EDITCMD|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"perl", "minlen":2, "flags":"RANGE|EXTRA|DFLALL|NEEDARG|SBOXOK|CMDWIN", "parser":"parse_cmd_perl"}), AttributeDict({"name":"print", "minlen":1, "flags":"RANGE|WHOLEFOLD|COUNT|EXFLAGS|TRLBAR|CMDWIN|SBOXOK", "parser":"parse_cmd_common"}), AttributeDict({"name":"profdel", "minlen":5, "flags":"EXTRA|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"profile", "minlen":4, "flags":"BANG|EXTRA|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"promptfind", "minlen":3, "flags":"EXTRA|NOTRLCOM|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"promptrepl", "minlen":7, "flags":"EXTRA|NOTRLCOM|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"perldo", "minlen":5, "flags":"RANGE|EXTRA|DFLALL|NEEDARG|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"pop", "minlen":2, "flags":"RANGE|NOTADR|BANG|COUNT|TRLBAR|ZEROR", "parser":"parse_cmd_common"}), AttributeDict({"name":"popup", "minlen":4, "flags":"NEEDARG|EXTRA|BANG|TRLBAR|NOTRLCOM|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"ppop", "minlen":2, "flags":"RANGE|NOTADR|BANG|COUNT|TRLBAR|ZEROR", "parser":"parse_cmd_common"}), AttributeDict({"name":"preserve", "minlen":3, "flags":"TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"previous", "minlen":4, "flags":"EXTRA|RANGE|NOTADR|COUNT|BANG|EDITCMD|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"psearch", "minlen":2, "flags":"BANG|RANGE|WHOLEFOLD|DFLALL|EXTRA", "parser":"parse_cmd_common"}), AttributeDict({"name":"ptag", "minlen":2, "flags":"RANGE|NOTADR|BANG|WORD1|TRLBAR|ZEROR", "parser":"parse_cmd_common"}), AttributeDict({"name":"ptNext", "minlen":3, "flags":"RANGE|NOTADR|BANG|TRLBAR|ZEROR", "parser":"parse_cmd_common"}), AttributeDict({"name":"ptfirst", "minlen":3, "flags":"RANGE|NOTADR|BANG|TRLBAR|ZEROR", "parser":"parse_cmd_common"}), AttributeDict({"name":"ptjump", "minlen":3, "flags":"BANG|TRLBAR|WORD1", "parser":"parse_cmd_common"}), AttributeDict({"name":"ptlast", "minlen":3, "flags":"BANG|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"ptnext", "minlen":3, "flags":"RANGE|NOTADR|BANG|TRLBAR|ZEROR", "parser":"parse_cmd_common"}), AttributeDict({"name":"ptprevious", "minlen":3, "flags":"RANGE|NOTADR|BANG|TRLBAR|ZEROR", "parser":"parse_cmd_common"}), AttributeDict({"name":"ptrewind", "minlen":3, "flags":"RANGE|NOTADR|BANG|TRLBAR|ZEROR", "parser":"parse_cmd_common"}), AttributeDict({"name":"ptselect", "minlen":3, "flags":"BANG|TRLBAR|WORD1", "parser":"parse_cmd_common"}), AttributeDict({"name":"put", "minlen":2, "flags":"RANGE|WHOLEFOLD|BANG|REGSTR|TRLBAR|ZEROR|CMDWIN|MODIFY", "parser":"parse_cmd_common"}), AttributeDict({"name":"pwd", "minlen":2, "flags":"TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"py3", "minlen":3, "flags":"RANGE|EXTRA|NEEDARG|CMDWIN", "parser":"parse_cmd_python3"}), AttributeDict({"name":"python3", "minlen":7, "flags":"RANGE|EXTRA|NEEDARG|CMDWIN", "parser":"parse_cmd_python3"}), AttributeDict({"name":"py3file", "minlen":4, "flags":"RANGE|FILE1|NEEDARG|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"python", "minlen":2, "flags":"RANGE|EXTRA|NEEDARG|CMDWIN", "parser":"parse_cmd_python"}), AttributeDict({"name":"pyfile", "minlen":3, "flags":"RANGE|FILE1|NEEDARG|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"pydo", "minlen":3, "flags":"RANGE|DFLALL|EXTRA|NEEDARG|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"py3do", "minlen":4, "flags":"RANGE|DFLALL|EXTRA|NEEDARG|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"quit", "minlen":1, "flags":"BANG|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"quitall", "minlen":5, "flags":"BANG|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"qall", "minlen":2, "flags":"BANG|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"read", "minlen":1, "flags":"BANG|RANGE|WHOLEFOLD|FILE1|ARGOPT|TRLBAR|ZEROR|CMDWIN|MODIFY", "parser":"parse_cmd_common"}), AttributeDict({"name":"recover", "minlen":3, "flags":"BANG|FILE1|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"redo", "minlen":3, "flags":"TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"redir", "minlen":4, "flags":"BANG|FILES|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"redraw", "minlen":4, "flags":"BANG|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"redrawstatus", "minlen":7, "flags":"BANG|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"registers", "minlen":3, "flags":"EXTRA|NOTRLCOM|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"resize", "minlen":3, "flags":"RANGE|NOTADR|TRLBAR|WORD1", "parser":"parse_cmd_common"}), AttributeDict({"name":"retab", "minlen":3, "flags":"TRLBAR|RANGE|WHOLEFOLD|DFLALL|BANG|WORD1|CMDWIN|MODIFY", "parser":"parse_cmd_common"}), AttributeDict({"name":"return", "minlen":4, "flags":"EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser":"parse_cmd_return"}), AttributeDict({"name":"rewind", "minlen":3, "flags":"EXTRA|BANG|EDITCMD|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"right", "minlen":2, "flags":"TRLBAR|RANGE|WHOLEFOLD|EXTRA|CMDWIN|MODIFY", "parser":"parse_cmd_common"}), AttributeDict({"name":"rightbelow", "minlen":6, "flags":"NEEDARG|EXTRA|NOTRLCOM", "parser":"parse_cmd_common"}), AttributeDict({"name":"ruby", "minlen":3, "flags":"RANGE|EXTRA|NEEDARG|CMDWIN", "parser":"parse_cmd_ruby"}), AttributeDict({"name":"rubydo", "minlen":5, "flags":"RANGE|DFLALL|EXTRA|NEEDARG|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"rubyfile", "minlen":5, "flags":"RANGE|FILE1|NEEDARG|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"rundo", "minlen":4, "flags":"NEEDARG|FILE1", "parser":"parse_cmd_common"}), AttributeDict({"name":"runtime", "minlen":2, "flags":"BANG|NEEDARG|FILES|TRLBAR|SBOXOK|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"rviminfo", "minlen":2, "flags":"BANG|FILE1|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"substitute", "minlen":1, "flags":"RANGE|WHOLEFOLD|EXTRA|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"sNext", "minlen":2, "flags":"EXTRA|RANGE|NOTADR|COUNT|BANG|EDITCMD|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"sandbox", "minlen":3, "flags":"NEEDARG|EXTRA|NOTRLCOM", "parser":"parse_cmd_common"}), AttributeDict({"name":"sargument", "minlen":2, "flags":"BANG|RANGE|NOTADR|COUNT|EXTRA|EDITCMD|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"sall", "minlen":3, "flags":"BANG|RANGE|NOTADR|COUNT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"saveas", "minlen":3, "flags":"BANG|DFLALL|FILE1|ARGOPT|CMDWIN|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"sbuffer", "minlen":2, "flags":"BANG|RANGE|NOTADR|BUFNAME|BUFUNL|COUNT|EXTRA|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"sbNext", "minlen":3, "flags":"RANGE|NOTADR|COUNT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"sball", "minlen":3, "flags":"RANGE|NOTADR|COUNT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"sbfirst", "minlen":3, "flags":"TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"sblast", "minlen":3, "flags":"TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"sbmodified", "minlen":3, "flags":"RANGE|NOTADR|COUNT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"sbnext", "minlen":3, "flags":"RANGE|NOTADR|COUNT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"sbprevious", "minlen":3, "flags":"RANGE|NOTADR|COUNT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"sbrewind", "minlen":3, "flags":"TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"scriptnames", "minlen":3, "flags":"TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"scriptencoding", "minlen":7, "flags":"WORD1|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"scscope", "minlen":3, "flags":"EXTRA|NOTRLCOM", "parser":"parse_cmd_common"}), AttributeDict({"name":"set", "minlen":2, "flags":"TRLBAR|EXTRA|CMDWIN|SBOXOK", "parser":"parse_cmd_common"}), AttributeDict({"name":"setfiletype", "minlen":4, "flags":"TRLBAR|EXTRA|NEEDARG|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"setglobal", "minlen":4, "flags":"TRLBAR|EXTRA|CMDWIN|SBOXOK", "parser":"parse_cmd_common"}), AttributeDict({"name":"setlocal", "minlen":4, "flags":"TRLBAR|EXTRA|CMDWIN|SBOXOK", "parser":"parse_cmd_common"}), AttributeDict({"name":"sfind", "minlen":2, "flags":"BANG|FILE1|RANGE|NOTADR|EDITCMD|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"sfirst", "minlen":4, "flags":"EXTRA|BANG|EDITCMD|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"shell", "minlen":2, "flags":"TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"simalt", "minlen":3, "flags":"NEEDARG|WORD1|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"sign", "minlen":3, "flags":"NEEDARG|RANGE|NOTADR|EXTRA|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"silent", "minlen":3, "flags":"NEEDARG|EXTRA|BANG|NOTRLCOM|SBOXOK|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"sleep", "minlen":2, "flags":"RANGE|NOTADR|COUNT|EXTRA|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"slast", "minlen":3, "flags":"EXTRA|BANG|EDITCMD|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"smagic", "minlen":2, "flags":"RANGE|WHOLEFOLD|EXTRA|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"smap", "minlen":4, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"smapclear", "minlen":5, "flags":"EXTRA|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"smenu", "minlen":3, "flags":"RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"snext", "minlen":2, "flags":"RANGE|NOTADR|BANG|FILES|EDITCMD|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"sniff", "minlen":3, "flags":"EXTRA|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"snomagic", "minlen":3, "flags":"RANGE|WHOLEFOLD|EXTRA|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"snoremap", "minlen":4, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"snoremenu", "minlen":7, "flags":"RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"sort", "minlen":3, "flags":"RANGE|DFLALL|WHOLEFOLD|BANG|EXTRA|NOTRLCOM|MODIFY", "parser":"parse_cmd_common"}), AttributeDict({"name":"source", "minlen":2, "flags":"BANG|FILE1|TRLBAR|SBOXOK|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"spelldump", "minlen":6, "flags":"BANG|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"spellgood", "minlen":3, "flags":"BANG|RANGE|NOTADR|NEEDARG|EXTRA|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"spellinfo", "minlen":6, "flags":"TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"spellrepall", "minlen":6, "flags":"TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"spellundo", "minlen":6, "flags":"BANG|RANGE|NOTADR|NEEDARG|EXTRA|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"spellwrong", "minlen":6, "flags":"BANG|RANGE|NOTADR|NEEDARG|EXTRA|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"split", "minlen":2, "flags":"BANG|FILE1|RANGE|NOTADR|EDITCMD|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"sprevious", "minlen":3, "flags":"EXTRA|RANGE|NOTADR|COUNT|BANG|EDITCMD|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"srewind", "minlen":3, "flags":"EXTRA|BANG|EDITCMD|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"stop", "minlen":2, "flags":"TRLBAR|BANG|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"stag", "minlen":3, "flags":"RANGE|NOTADR|BANG|WORD1|TRLBAR|ZEROR", "parser":"parse_cmd_common"}), AttributeDict({"name":"startinsert", "minlen":4, "flags":"BANG|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"startgreplace", "minlen":6, "flags":"BANG|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"startreplace", "minlen":6, "flags":"BANG|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"stopinsert", "minlen":5, "flags":"BANG|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"stjump", "minlen":3, "flags":"BANG|TRLBAR|WORD1", "parser":"parse_cmd_common"}), AttributeDict({"name":"stselect", "minlen":3, "flags":"BANG|TRLBAR|WORD1", "parser":"parse_cmd_common"}), AttributeDict({"name":"sunhide", "minlen":3, "flags":"RANGE|NOTADR|COUNT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"sunmap", "minlen":4, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"sunmenu", "minlen":5, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"suspend", "minlen":3, "flags":"TRLBAR|BANG|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"sview", "minlen":2, "flags":"BANG|FILE1|RANGE|NOTADR|EDITCMD|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"swapname", "minlen":2, "flags":"TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"syntax", "minlen":2, "flags":"EXTRA|NOTRLCOM|CMDWIN", "parser":"parse_cmd_syntax"}), AttributeDict({"name":"syntime", "minlen":5, "flags":"NEEDARG|WORD1|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"syncbind", "minlen":4, "flags":"TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"t", "minlen":1, "flags":"RANGE|WHOLEFOLD|EXTRA|TRLBAR|CMDWIN|MODIFY", "parser":"parse_cmd_common"}), AttributeDict({"name":"tNext", "minlen":2, "flags":"RANGE|NOTADR|BANG|TRLBAR|ZEROR", "parser":"parse_cmd_common"}), AttributeDict({"name":"tabNext", "minlen":4, "flags":"RANGE|NOTADR|COUNT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"tabclose", "minlen":4, "flags":"RANGE|NOTADR|COUNT|BANG|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"tabdo", "minlen":4, "flags":"NEEDARG|EXTRA|NOTRLCOM", "parser":"parse_cmd_common"}), AttributeDict({"name":"tabedit", "minlen":4, "flags":"BANG|FILE1|RANGE|NOTADR|ZEROR|EDITCMD|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"tabfind", "minlen":4, "flags":"BANG|FILE1|RANGE|NOTADR|ZEROR|EDITCMD|ARGOPT|NEEDARG|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"tabfirst", "minlen":6, "flags":"TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"tablast", "minlen":4, "flags":"TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"tabmove", "minlen":4, "flags":"RANGE|NOTADR|ZEROR|EXTRA|NOSPC|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"tabnew", "minlen":6, "flags":"BANG|FILE1|RANGE|NOTADR|ZEROR|EDITCMD|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"tabnext", "minlen":4, "flags":"RANGE|NOTADR|COUNT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"tabonly", "minlen":4, "flags":"BANG|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"tabprevious", "minlen":4, "flags":"RANGE|NOTADR|COUNT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"tabrewind", "minlen":4, "flags":"TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"tabs", "minlen":4, "flags":"TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"tab", "minlen":3, "flags":"NEEDARG|EXTRA|NOTRLCOM", "parser":"parse_cmd_common"}), AttributeDict({"name":"tag", "minlen":2, "flags":"RANGE|NOTADR|BANG|WORD1|TRLBAR|ZEROR", "parser":"parse_cmd_common"}), AttributeDict({"name":"tags", "minlen":4, "flags":"TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"tcl", "minlen":2, "flags":"RANGE|EXTRA|NEEDARG|CMDWIN", "parser":"parse_cmd_tcl"}), AttributeDict({"name":"tcldo", "minlen":4, "flags":"RANGE|DFLALL|EXTRA|NEEDARG|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"tclfile", "minlen":4, "flags":"RANGE|FILE1|NEEDARG|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"tearoff", "minlen":2, "flags":"NEEDARG|EXTRA|TRLBAR|NOTRLCOM|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"tfirst", "minlen":2, "flags":"RANGE|NOTADR|BANG|TRLBAR|ZEROR", "parser":"parse_cmd_common"}), AttributeDict({"name":"throw", "minlen":2, "flags":"EXTRA|NEEDARG|SBOXOK|CMDWIN", "parser":"parse_cmd_throw"}), AttributeDict({"name":"tjump", "minlen":2, "flags":"BANG|TRLBAR|WORD1", "parser":"parse_cmd_common"}), AttributeDict({"name":"tlast", "minlen":2, "flags":"BANG|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"tmenu", "minlen":2, "flags":"RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"tnext", "minlen":2, "flags":"RANGE|NOTADR|BANG|TRLBAR|ZEROR", "parser":"parse_cmd_common"}), AttributeDict({"name":"topleft", "minlen":2, "flags":"NEEDARG|EXTRA|NOTRLCOM", "parser":"parse_cmd_common"}), AttributeDict({"name":"tprevious", "minlen":2, "flags":"RANGE|NOTADR|BANG|TRLBAR|ZEROR", "parser":"parse_cmd_common"}), AttributeDict({"name":"trewind", "minlen":2, "flags":"RANGE|NOTADR|BANG|TRLBAR|ZEROR", "parser":"parse_cmd_common"}), AttributeDict({"name":"try", "minlen":3, "flags":"TRLBAR|SBOXOK|CMDWIN", "parser":"parse_cmd_try"}), AttributeDict({"name":"tselect", "minlen":2, "flags":"BANG|TRLBAR|WORD1", "parser":"parse_cmd_common"}), AttributeDict({"name":"tunmenu", "minlen":2, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"undo", "minlen":1, "flags":"RANGE|NOTADR|COUNT|ZEROR|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"undojoin", "minlen":5, "flags":"TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"undolist", "minlen":5, "flags":"TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"unabbreviate", "minlen":3, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"unhide", "minlen":3, "flags":"RANGE|NOTADR|COUNT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"unlet", "minlen":3, "flags":"BANG|EXTRA|NEEDARG|SBOXOK|CMDWIN", "parser":"parse_cmd_unlet"}), AttributeDict({"name":"unlockvar", "minlen":4, "flags":"BANG|EXTRA|NEEDARG|SBOXOK|CMDWIN", "parser":"parse_cmd_unlockvar"}), AttributeDict({"name":"unmap", "minlen":3, "flags":"BANG|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"unmenu", "minlen":4, "flags":"BANG|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"unsilent", "minlen":3, "flags":"NEEDARG|EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"update", "minlen":2, "flags":"RANGE|WHOLEFOLD|BANG|FILE1|ARGOPT|DFLALL|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"vglobal", "minlen":1, "flags":"RANGE|WHOLEFOLD|EXTRA|DFLALL|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"version", "minlen":2, "flags":"EXTRA|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"verbose", "minlen":4, "flags":"NEEDARG|RANGE|NOTADR|EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"vertical", "minlen":4, "flags":"NEEDARG|EXTRA|NOTRLCOM", "parser":"parse_cmd_common"}), AttributeDict({"name":"vimgrep", "minlen":3, "flags":"RANGE|NOTADR|BANG|NEEDARG|EXTRA|NOTRLCOM|TRLBAR|XFILE", "parser":"parse_cmd_common"}), AttributeDict({"name":"vimgrepadd", "minlen":8, "flags":"RANGE|NOTADR|BANG|NEEDARG|EXTRA|NOTRLCOM|TRLBAR|XFILE", "parser":"parse_cmd_common"}), AttributeDict({"name":"visual", "minlen":2, "flags":"BANG|FILE1|EDITCMD|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"viusage", "minlen":3, "flags":"TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"view", "minlen":3, "flags":"BANG|FILE1|EDITCMD|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"vmap", "minlen":2, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"vmapclear", "minlen":5, "flags":"EXTRA|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"vmenu", "minlen":3, "flags":"RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"vnew", "minlen":3, "flags":"BANG|FILE1|RANGE|NOTADR|EDITCMD|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"vnoremap", "minlen":2, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"vnoremenu", "minlen":7, "flags":"RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"vsplit", "minlen":2, "flags":"BANG|FILE1|RANGE|NOTADR|EDITCMD|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"vunmap", "minlen":2, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"vunmenu", "minlen":5, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"windo", "minlen":5, "flags":"BANG|NEEDARG|EXTRA|NOTRLCOM", "parser":"parse_cmd_common"}), AttributeDict({"name":"write", "minlen":1, "flags":"RANGE|WHOLEFOLD|BANG|FILE1|ARGOPT|DFLALL|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"wNext", "minlen":2, "flags":"RANGE|WHOLEFOLD|NOTADR|BANG|FILE1|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"wall", "minlen":2, "flags":"BANG|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"while", "minlen":2, "flags":"EXTRA|NOTRLCOM|SBOXOK|CMDWIN", "parser":"parse_cmd_while"}), AttributeDict({"name":"winsize", "minlen":2, "flags":"EXTRA|NEEDARG|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"wincmd", "minlen":4, "flags":"NEEDARG|WORD1|RANGE|NOTADR", "parser":"parse_wincmd"}), AttributeDict({"name":"winpos", "minlen":4, "flags":"EXTRA|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"wnext", "minlen":2, "flags":"RANGE|NOTADR|BANG|FILE1|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"wprevious", "minlen":2, "flags":"RANGE|NOTADR|BANG|FILE1|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"wq", "minlen":2, "flags":"RANGE|WHOLEFOLD|BANG|FILE1|ARGOPT|DFLALL|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"wqall", "minlen":3, "flags":"BANG|FILE1|ARGOPT|DFLALL|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"wsverb", "minlen":2, "flags":"EXTRA|NOTADR|NEEDARG", "parser":"parse_cmd_common"}), AttributeDict({"name":"wundo", "minlen":2, "flags":"BANG|NEEDARG|FILE1", "parser":"parse_cmd_common"}), AttributeDict({"name":"wviminfo", "minlen":2, "flags":"BANG|FILE1|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"xit", "minlen":1, "flags":"RANGE|WHOLEFOLD|BANG|FILE1|ARGOPT|DFLALL|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"xall", "minlen":2, "flags":"BANG|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"xmapclear", "minlen":5, "flags":"EXTRA|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"xmap", "minlen":2, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"xmenu", "minlen":3, "flags":"RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"xnoremap", "minlen":2, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"xnoremenu", "minlen":7, "flags":"RANGE|NOTADR|ZEROR|EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"xunmap", "minlen":2, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"xunmenu", "minlen":5, "flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"yank", "minlen":1, "flags":"RANGE|WHOLEFOLD|REGSTR|COUNT|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"z", "minlen":1, "flags":"RANGE|WHOLEFOLD|EXTRA|EXFLAGS|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"!", "minlen":1, "flags":"RANGE|WHOLEFOLD|BANG|FILES|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"#", "minlen":1, "flags":"RANGE|WHOLEFOLD|COUNT|EXFLAGS|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"&", "minlen":1, "flags":"RANGE|WHOLEFOLD|EXTRA|CMDWIN|MODIFY", "parser":"parse_cmd_common"}), AttributeDict({"name":"*", "minlen":1, "flags":"RANGE|WHOLEFOLD|EXTRA|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"<", "minlen":1, "flags":"RANGE|WHOLEFOLD|COUNT|EXFLAGS|TRLBAR|CMDWIN|MODIFY", "parser":"parse_cmd_common"}), AttributeDict({"name":"=", "minlen":1, "flags":"RANGE|TRLBAR|DFLALL|EXFLAGS|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":">", "minlen":1, "flags":"RANGE|WHOLEFOLD|COUNT|EXFLAGS|TRLBAR|CMDWIN|MODIFY", "parser":"parse_cmd_common"}), AttributeDict({"name":"@", "minlen":1, "flags":"RANGE|WHOLEFOLD|EXTRA|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"Next", "minlen":1, "flags":"EXTRA|RANGE|NOTADR|COUNT|BANG|EDITCMD|ARGOPT|TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"Print", "minlen":1, "flags":"RANGE|WHOLEFOLD|COUNT|EXFLAGS|TRLBAR|CMDWIN", "parser":"parse_cmd_common"}), AttributeDict({"name":"X", "minlen":1, "flags":"TRLBAR", "parser":"parse_cmd_common"}), AttributeDict({"name":"~", "minlen":1, "flags":"RANGE|WHOLEFOLD|EXTRA|CMDWIN|MODIFY", "parser":"parse_cmd_common"}), AttributeDict({"flags":"TRLBAR", "minlen":3, "name":"cbottom", "parser":"parse_cmd_common"}), AttributeDict({"flags":"BANG|NEEDARG|EXTRA|NOTRLCOM|RANGE|NOTADR|DFLALL", "minlen":3, "name":"cdo", "parser":"parse_cmd_common"}), AttributeDict({"flags":"BANG|NEEDARG|EXTRA|NOTRLCOM|RANGE|NOTADR|DFLALL", "minlen":3, "name":"cfdo", "parser":"parse_cmd_common"}), AttributeDict({"flags":"TRLBAR", "minlen":3, "name":"chistory", "parser":"parse_cmd_common"}), AttributeDict({"flags":"TRLBAR|CMDWIN", "minlen":3, "name":"clearjumps", "parser":"parse_cmd_common"}), AttributeDict({"flags":"BANG|NEEDARG|EXTRA|NOTRLCOM", "minlen":4, "name":"filter", "parser":"parse_cmd_common"}), AttributeDict({"flags":"RANGE|NOTADR|COUNT|TRLBAR", "minlen":5, "name":"helpclose", "parser":"parse_cmd_common"}), AttributeDict({"flags":"TRLBAR", "minlen":3, "name":"lbottom", "parser":"parse_cmd_common"}), AttributeDict({"flags":"BANG|NEEDARG|EXTRA|NOTRLCOM|RANGE|NOTADR|DFLALL", "minlen":2, "name":"ldo", "parser":"parse_cmd_common"}), AttributeDict({"flags":"BANG|NEEDARG|EXTRA|NOTRLCOM|RANGE|NOTADR|DFLALL", "minlen":3, "name":"lfdo", "parser":"parse_cmd_common"}), AttributeDict({"flags":"TRLBAR", "minlen":3, "name":"lhistory", "parser":"parse_cmd_common"}), AttributeDict({"flags":"BANG|EXTRA|TRLBAR|CMDWIN", "minlen":3, "name":"llist", "parser":"parse_cmd_common"}), AttributeDict({"flags":"NEEDARG|EXTRA|NOTRLCOM", "minlen":3, "name":"noswapfile", "parser":"parse_cmd_common"}), AttributeDict({"flags":"BANG|FILE1|NEEDARG|TRLBAR|SBOXOK|CMDWIN", "minlen":2, "name":"packadd", "parser":"parse_cmd_common"}), AttributeDict({"flags":"BANG|TRLBAR|SBOXOK|CMDWIN", "minlen":5, "name":"packloadall", "parser":"parse_cmd_common"}), AttributeDict({"flags":"TRLBAR|CMDWIN|SBOXOK", "minlen":3, "name":"smile", "parser":"parse_cmd_common"}), AttributeDict({"flags":"RANGE|EXTRA|NEEDARG|CMDWIN", "minlen":3, "name":"pyx", "parser":"parse_cmd_common"}), AttributeDict({"flags":"RANGE|DFLALL|EXTRA|NEEDARG|CMDWIN", "minlen":4, "name":"pyxdo", "parser":"parse_cmd_common"}), AttributeDict({"flags":"RANGE|EXTRA|NEEDARG|CMDWIN", "minlen":7, "name":"pythonx", "parser":"parse_cmd_common"}), AttributeDict({"flags":"RANGE|FILE1|NEEDARG|CMDWIN", "minlen":4, "name":"pyxfile", "parser":"parse_cmd_common"}), AttributeDict({"flags":"RANGE|BANG|FILES|CMDWIN", "minlen":3, "name":"terminal", "parser":"parse_cmd_common"}), AttributeDict({"flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "minlen":3, "name":"tmap", "parser":"parse_cmd_common"}), AttributeDict({"flags":"EXTRA|TRLBAR|CMDWIN", "minlen":5, "name":"tmapclear", "parser":"parse_cmd_common"}), AttributeDict({"flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "minlen":3, "name":"tnoremap", "parser":"parse_cmd_common"}), AttributeDict({"flags":"EXTRA|TRLBAR|NOTRLCOM|USECTRLV|CMDWIN", "minlen":5, "name":"tunmap", "parser":"parse_cmd_common"}), AttributeDict({"flags":"EX_RANGE|EX_COUNT|EX_TRLBAR", "minlen":4, "name":"cabove", "parser":"parse_cmd_common"}), AttributeDict({"flags":"EX_RANGE|EX_COUNT|EX_TRLBAR", "minlen":3, "name":"cafter", "parser":"parse_cmd_common"}), AttributeDict({"flags":"EX_RANGE|EX_COUNT|EX_TRLBAR", "minlen":3, "name":"cbefore", "parser":"parse_cmd_common"}), AttributeDict({"flags":"EX_RANGE|EX_COUNT|EX_TRLBAR", "minlen":4, "name":"cbelow", "parser":"parse_cmd_common"}), AttributeDict({"flags":"EX_EXTRA|EX_NOTRLCOM|EX_SBOXOK|EX_CMDWIN", "minlen":4, "name":"const", "parser":"parse_cmd_common"}), AttributeDict({"flags":"EX_RANGE|EX_COUNT|EX_TRLBAR", "minlen":3, "name":"labove", "parser":"parse_cmd_common"}), AttributeDict({"flags":"EX_RANGE|EX_COUNT|EX_TRLBAR", "minlen":3, "name":"lafter", "parser":"parse_cmd_common"}), AttributeDict({"flags":"EX_RANGE|EX_COUNT|EX_TRLBAR", "minlen":3, "name":"lbefore", "parser":"parse_cmd_common"}), AttributeDict({"flags":"EX_RANGE|EX_COUNT|EX_TRLBAR", "minlen":4, "name":"lbelow", "parser":"parse_cmd_common"}), AttributeDict({"flags":"EX_TRLBAR|EX_CMDWIN", "minlen":7, "name":"redrawtabline", "parser":"parse_cmd_common"}), AttributeDict({"flags":"EX_WORD1|EX_TRLBAR|EX_CMDWIN", "minlen":7, "name":"scriptversion", "parser":"parse_cmd_common"}), AttributeDict({"flags":"EX_BANG|EX_FILE1|EX_TRLBAR|EX_CMDWIN", "minlen":2, "name":"tcd", "parser":"parse_cmd_common"}), AttributeDict({"flags":"EX_BANG|EX_FILE1|EX_TRLBAR|EX_CMDWIN", "minlen":3, "name":"tchdir", "parser":"parse_cmd_common"}), AttributeDict({"flags":"EX_RANGE|EX_ZEROR|EX_EXTRA|EX_TRLBAR|EX_NOTRLCOM|EX_CTRLV|EX_CMDWIN", "minlen":3, "name":"tlmenu", "parser":"parse_cmd_common"}), AttributeDict({"flags":"EX_RANGE|EX_ZEROR|EX_EXTRA|EX_TRLBAR|EX_NOTRLCOM|EX_CTRLV|EX_CMDWIN", "minlen":3, "name":"tlnoremenu", "parser":"parse_cmd_common"}), AttributeDict({"flags":"EX_RANGE|EX_ZEROR|EX_EXTRA|EX_TRLBAR|EX_NOTRLCOM|EX_CTRLV|EX_CMDWIN", "minlen":3, "name":"tlunmenu", "parser":"parse_cmd_common"}), AttributeDict({"flags":"EX_EXTRA|EX_TRLBAR|EX_CMDWIN", "minlen":2, "name":"xrestore", "parser":"parse_cmd_common"})]
+
 class ExprTokenizer:
+
     def __init__(self, reader):
         self.reader = reader
         self.cache = AttributeDict({})
 
     def token(self, type, value, pos):
-        return AttributeDict({"type":type, "value":value, "pos":pos})
+        return AttributeDict({"type": type, "value": value, "pos": pos})
 
     def peek(self):
         pos = self.reader.tell()
@@ -2148,7 +2288,9 @@ class ExprTokenizer:
             s += c
         return s
 
+
 class ExprParser:
+
     def __init__(self, reader):
         self.reader = reader
         self.tokenizer = ExprTokenizer(reader)
@@ -2156,7 +2298,7 @@ class ExprParser:
     def parse(self):
         return self.parse_expr1()
 
-# expr1: expr2 ? expr1 : expr1
+    # expr1: expr2 ? expr1 : expr1
     def parse_expr1(self):
         left = self.parse_expr2()
         pos = self.reader.tell()
@@ -2175,7 +2317,7 @@ class ExprParser:
             self.reader.seek_set(pos)
         return left
 
-# expr2: expr3 || expr3 ..
+    # expr2: expr3 || expr3 ..
     def parse_expr2(self):
         left = self.parse_expr3()
         while TRUE:
@@ -2192,7 +2334,7 @@ class ExprParser:
                 break
         return left
 
-# expr3: expr4 && expr4
+    # expr3: expr4 && expr4
     def parse_expr3(self):
         left = self.parse_expr4()
         while TRUE:
@@ -2209,21 +2351,21 @@ class ExprParser:
                 break
         return left
 
-# expr4: expr5 == expr5
-#        expr5 != expr5
-#        expr5 >  expr5
-#        expr5 >= expr5
-#        expr5 <  expr5
-#        expr5 <= expr5
-#        expr5 =~ expr5
-#        expr5 !~ expr5
-#
-#        expr5 ==? expr5
-#        expr5 ==# expr5
-#        etc.
-#
-#        expr5 is expr5
-#        expr5 isnot expr5
+    # expr4: expr5 == expr5
+    #        expr5 != expr5
+    #        expr5 >  expr5
+    #        expr5 >= expr5
+    #        expr5 <  expr5
+    #        expr5 <= expr5
+    #        expr5 =~ expr5
+    #        expr5 !~ expr5
+    #
+    #        expr5 ==? expr5
+    #        expr5 ==# expr5
+    #        etc.
+    #
+    #        expr5 is expr5
+    #        expr5 isnot expr5
     def parse_expr4(self):
         left = self.parse_expr5()
         pos = self.reader.tell()
@@ -2412,10 +2554,10 @@ class ExprParser:
             self.reader.seek_set(pos)
         return left
 
-# expr5: expr6 + expr6 ..
-#        expr6 - expr6 ..
-#        expr6 . expr6 ..
-#        expr6 .. expr6 ..
+    # expr5: expr6 + expr6 ..
+    #        expr6 - expr6 ..
+    #        expr6 . expr6 ..
+    #        expr6 .. expr6 ..
     def parse_expr5(self):
         left = self.parse_expr6()
         while TRUE:
@@ -2452,9 +2594,9 @@ class ExprParser:
                 break
         return left
 
-# expr6: expr7 * expr7 ..
-#        expr7 / expr7 ..
-#        expr7 % expr7 ..
+    # expr6: expr7 * expr7 ..
+    #        expr7 / expr7 ..
+    #        expr7 % expr7 ..
     def parse_expr6(self):
         left = self.parse_expr7()
         while TRUE:
@@ -2483,9 +2625,9 @@ class ExprParser:
                 break
         return left
 
-# expr7: ! expr7
-#        - expr7
-#        + expr7
+    # expr7: ! expr7
+    #        - expr7
+    #        + expr7
     def parse_expr7(self):
         pos = self.reader.tell()
         token = self.tokenizer.get()
@@ -2509,10 +2651,10 @@ class ExprParser:
             node = self.parse_expr8()
             return node
 
-# expr8: expr8[expr1]
-#        expr8[expr1 : expr1]
-#        expr8.name
-#        expr8(expr1, ...)
+    # expr8: expr8[expr1]
+    #        expr8[expr1 : expr1]
+    #        expr8.name
+    #        expr8(expr1, ...)
     def parse_expr8(self):
         left = self.parse_expr9()
         while TRUE:
@@ -2597,21 +2739,21 @@ class ExprParser:
                 break
         return left
 
-# expr9: number
-#        "string"
-#        'string'
-#        [expr1, ...]
-#        {expr1: expr1, ...}
-#        #{literal_key1: expr1, ...}
-#        {args -> expr1}
-#        &option
-#        (expr1)
-#        variable
-#        var{ria}ble
-#        $VAR
-#        @r
-#        function(expr1, ...)
-#        func{ti}on(expr1, ...)
+    # expr9: number
+    #        "string"
+    #        'string'
+    #        [expr1, ...]
+    #        {expr1: expr1, ...}
+    #        #{literal_key1: expr1, ...}
+    #        {args -> expr1}
+    #        &option
+    #        (expr1)
+    #        variable
+    #        var{ria}ble
+    #        $VAR
+    #        @r
+    #        function(expr1, ...)
+    #        func{ti}on(expr1, ...)
     def parse_expr9(self):
         pos = self.reader.tell()
         token = self.tokenizer.get()
@@ -2794,9 +2936,9 @@ class ExprParser:
         node.value = "'" + self.tokenizer.get_dict_literal_key() + "'"
         return node
 
-# SUBSCRIPT or CONCAT
-#   dict "." [0-9A-Za-z_]+ => (subscript dict key)
-#   str  "." expr6         => (concat str expr6)
+    # SUBSCRIPT or CONCAT
+    #   dict "." [0-9A-Za-z_]+ => (subscript dict key)
+    #   str  "." expr6         => (concat str expr6)
     def parse_dot(self, token, left):
         if left.type != NODE_IDENTIFIER and left.type != NODE_CURLYNAME and left.type != NODE_DICT and left.type != NODE_SUBSCRIPT and left.type != NODE_CALL and left.type != NODE_DOT:
             return NIL
@@ -2816,8 +2958,8 @@ class ExprParser:
         node.right.value = name
         return node
 
-# CONCAT
-#   str  ".." expr6         => (concat str expr6)
+    # CONCAT
+    #   str  ".." expr6         => (concat str expr6)
     def parse_concat(self, token, left):
         if left.type != NODE_IDENTIFIER and left.type != NODE_CURLYNAME and left.type != NODE_DICT and left.type != NODE_SUBSCRIPT and left.type != NODE_CALL and left.type != NODE_DOT:
             return NIL
@@ -2893,13 +3035,15 @@ class ExprParser:
                 break
         return curly_parts
 
+
 class LvalueParser(ExprParser):
+
     def parse(self):
         return self.parse_lv8()
 
-# expr8: expr8[expr1]
-#        expr8[expr1 : expr1]
-#        expr8.name
+    # expr8: expr8[expr1]
+    #        expr8[expr1 : expr1]
+    #        expr8.name
     def parse_lv8(self):
         left = self.parse_lv9()
         while TRUE:
@@ -2957,11 +3101,11 @@ class LvalueParser(ExprParser):
                 break
         return left
 
-# expr9: &option
-#        variable
-#        var{ria}ble
-#        $VAR
-#        @r
+    # expr9: &option
+    #        variable
+    #        var{ria}ble
+    #        $VAR
+    #        @r
     def parse_lv9(self):
         pos = self.reader.tell()
         token = self.tokenizer.get()
@@ -2992,7 +3136,9 @@ class LvalueParser(ExprParser):
             raise VimLParserException(Err(viml_printf("unexpected token: %s", token.value), token.pos))
         return node
 
+
 class StringReader:
+
     def __init__(self, lines):
         self.buf = []
         self.pos = []
@@ -3097,7 +3243,7 @@ class StringReader:
 
     def getpos(self):
         lnum, col, offset = self.pos[self.i]
-        return AttributeDict({"i":self.i, "lnum":lnum, "col":col, "offset":offset})
+        return AttributeDict({"i": self.i, "lnum": lnum, "col": col, "offset": offset})
 
     def setpos(self, pos):
         self.i = pos.i
@@ -3173,8 +3319,10 @@ class StringReader:
 
     def read_nonwhite(self):
         r = ""
-        while not iswhite(self.peekn(1)):
+        ch = self.peekn(1)
+        while not iswhite(ch) and ch != "":
             r += self.getn(1)
+            ch = self.peekn(1)
         return r
 
     def read_name(self):
@@ -3194,7 +3342,9 @@ class StringReader:
                 break
             self.seek_cur(1)
 
+
 class Compiler:
+
     def __init__(self):
         self.indent = [""]
         self.lines = []
@@ -3237,6 +3387,9 @@ class Compiler:
             return NIL
         elif node.type == NODE_LET:
             self.compile_let(node)
+            return NIL
+        elif node.type == NODE_CONST:
+            self.compile_const(node)
             return NIL
         elif node.type == NODE_UNLET:
             self.compile_unlet(node)
@@ -3459,6 +3612,19 @@ class Compiler:
             left = "(" + left + ")"
         right = self.compile(node.right)
         self.out("(let %s %s %s)", node.op, left, right)
+
+    # TODO: merge with s:Compiler.compile_let() ?
+    def compile_const(self, node):
+        left = ""
+        if node.left is not NIL:
+            left = self.compile(node.left)
+        else:
+            left = viml_join([self.compile(vval) for vval in node.list], " ")
+            if node.rest is not NIL:
+                left += " . " + self.compile(node.rest)
+            left = "(" + left + ")"
+        right = self.compile(node.right)
+        self.out("(const %s %s %s)", node.op, left, right)
 
     def compile_unlet(self, node):
         list = [self.compile(vval) for vval in node.list]
@@ -3767,12 +3933,14 @@ class Compiler:
         rlist = [self.compile(vval) for vval in node.rlist]
         return viml_printf("(lambda (%s) %s)", viml_join(rlist, " "), self.compile(node.left))
 
+
 # TODO: under construction
 class RegexpParser:
     RE_VERY_NOMAGIC = 1
     RE_NOMAGIC = 2
     RE_MAGIC = 3
     RE_VERY_MAGIC = 4
+
     def __init__(self, reader, cmd, delim):
         self.reader = reader
         self.cmd = cmd
@@ -3831,7 +3999,7 @@ class RegexpParser:
             viml_add(ret, ntoken)
         return ret
 
-# @return [actual_token, normalized_token]
+    # @return [actual_token, normalized_token]
     def get_token(self):
         if self.reg_magic == self.RE_VERY_MAGIC:
             return self.get_token_very_magic()
@@ -4090,7 +4258,7 @@ class RegexpParser:
             raise VimLParserException(Err("E678: Invalid character after \\%[dxouU]", epos))
         return ["\\" + c, c]
 
-# \{}
+    # \{}
     def get_token_brace(self, pre):
         r = ""
         minus = ""
@@ -4116,7 +4284,7 @@ class RegexpParser:
         self.reader.get()
         return [pre + r, "\\{" + minus + n + comma + m + "}"]
 
-# \[]
+    # \[]
     def get_token_sq(self, pre):
         start = self.reader.tell()
         r = ""
@@ -4165,7 +4333,7 @@ class RegexpParser:
                 if startc > endc or endc > startc + 256:
                     raise VimLParserException(Err("E16: Invalid range", self.reader.getpos()))
 
-# [c]
+    # [c]
     def get_token_sq_c(self):
         c = self.reader.p(0)
         if c == "\\":
@@ -4201,7 +4369,7 @@ class RegexpParser:
             self.reader.seek_cur(1)
             return [c, viml_char2nr(c)]
 
-# [\d123]
+    # [\d123]
     def get_token_sq_coll_char(self):
         pos = self.reader.tell()
         c = self.reader.get()
@@ -4227,19 +4395,19 @@ class RegexpParser:
             return "\\"
         return ["\\" + c + r, n]
 
-# [[.a.]]
+    # [[.a.]]
     def get_token_sq_coll_element(self):
         if self.reader.p(0) == "[" and self.reader.p(1) == "." and not self.isend(self.reader.p(2)) and self.reader.p(3) == "." and self.reader.p(4) == "]":
             return self.reader.getn(5)
         return ""
 
-# [[=a=]]
+    # [[=a=]]
     def get_token_sq_equi_class(self):
         if self.reader.p(0) == "[" and self.reader.p(1) == "=" and not self.isend(self.reader.p(2)) and self.reader.p(3) == "=" and self.reader.p(4) == "]":
             return self.reader.getn(5)
         return ""
 
-# [[:alpha:]]
+    # [[:alpha:]]
     def get_token_sq_char_class(self):
         class_names = ["alnum", "alpha", "blank", "cntrl", "digit", "graph", "lower", "print", "punct", "space", "upper", "xdigit", "tab", "return", "backspace", "escape"]
         pos = self.reader.tell()
@@ -4254,7 +4422,7 @@ class RegexpParser:
         self.reader.seek_set(pos)
         return ""
 
-# \@...
+    # \@...
     def get_token_at(self, pre):
         epos = self.reader.getpos()
         c = self.reader.get()
@@ -4272,7 +4440,7 @@ class RegexpParser:
                 return [pre + "<!", "\\@<!"]
         raise VimLParserException(Err("E64: @ follows nothing", epos))
 
-# \%...
+    # \%...
     def get_token_percent(self, pre):
         c = self.reader.get()
         if c == "^":
@@ -4290,7 +4458,7 @@ class RegexpParser:
         else:
             return self.get_token_mlcv(pre)
 
-# \%[]
+    # \%[]
     def get_token_percent_sq(self, pre):
         r = ""
         while TRUE:
@@ -4306,7 +4474,7 @@ class RegexpParser:
             r += c
         return [pre + r + "]", "\\%[" + r + "]"]
 
-# \%'m \%l \%c \%v
+    # \%'m \%l \%c \%v
     def get_token_mlvc(self, pre):
         r = ""
         cmp = ""
@@ -4351,6 +4519,7 @@ class RegexpParser:
                 break
             r += self.reader.get()
         return r
+
 
 if __name__ == '__main__':
     main()
