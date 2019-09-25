@@ -69,13 +69,18 @@ class ProhibitEqualTildeOperator(AbstractPolicy):
         """
         node_type = NodeType(node['type'])
 
-        left_type = NodeType(node['left']['type'])
+        left_node = node['left']
+        right_node = node['right']
+        left_type = NodeType(left_node['type'])
         right_type = NodeType(node['right']['type'])
 
-        is_like_string_comparison = left_type is NodeType.STRING \
-            or right_type is NodeType.STRING
-
-        is_valid = not is_like_string_comparison
+        is_valid = True
+        if left_type is NodeType.STRING:
+            if any(c.isalpha() for c in left_node.value):
+                is_valid = False
+        if is_valid and right_type is NodeType.STRING:
+            if any(c.isalpha() for c in right_node.value):
+                is_valid = False
 
         if not is_valid:
             self._make_description(node_type)
