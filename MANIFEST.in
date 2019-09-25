@@ -1,6 +1,9 @@
 include README.markdown
 include LICENSE.txt
 include MANIFEST.in
+include tox.ini
+include .gitmodules
 recursive-include vint/asset *
+recursive-include test *.py *.vim *rc *.yaml *.yml fixture_config_file not_vim_script
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]
