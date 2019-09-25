@@ -32,3 +32,10 @@ echo i < 1
 echo i <= 1
 echo i is 1
 echo i isnot 1
+
+" Case-sensitive operators are allowed with only non-alpha characters.
+echo '!' == '='
+echo i == '0'
+echo '0' == i
+echo i == ''
+echo "" == ''

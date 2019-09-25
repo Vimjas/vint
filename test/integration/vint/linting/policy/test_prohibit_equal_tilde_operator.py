@@ -196,11 +196,30 @@ class TestProhibitEqualTildeOperator(PolicyAssertion, unittest.TestCase):
                     'path': PATH_INVALID_VIM_SCRIPT
                 },
             },
+            {
+                'name': 'ProhibitEqualTildeOperator',
+                'level': Level.WARNING,
+                'position': {
+                    'column': 12,
+                    'line': 27,
+                    'path': PATH_INVALID_VIM_SCRIPT
+                },
+            },
+            {
+                'name': 'ProhibitEqualTildeOperator',
+                'level': Level.WARNING,
+                'position': {
+                    'column': 12,
+                    'line': 28,
+                    'path': PATH_INVALID_VIM_SCRIPT
+                },
+            },
         ]
 
         self.assertFoundViolationsEqual(PATH_INVALID_VIM_SCRIPT,
                                         ProhibitEqualTildeOperator,
                                         expected_violations)
+
 
 if __name__ == '__main__':
     unittest.main()
