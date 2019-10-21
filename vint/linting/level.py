@@ -8,5 +8,5 @@ class Level(enum.Enum):
     STYLE_PROBLEM = 2
 
 
-def is_level_enabled(level, base_lebel):
-    return level.value <= base_lebel.value
+def is_level_enabled(level, base_level):
+    return level.value <= base_level.value
