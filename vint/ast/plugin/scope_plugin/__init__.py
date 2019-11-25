@@ -9,7 +9,6 @@ from vint.ast.plugin.scope_plugin.reference_reachability_tester import (
 from vint.ast.plugin.scope_plugin.scope_detector import (
     ScopeVisibility as _ScopeVisibility,
     ExplicityOfScopeVisibility as _ExplicityOfScopeVisibility,
-    detect_possible_scope_visibility as _detect_possible_scope_visibility,
 )
 from vint.ast.plugin.scope_plugin.identifier_attribute import (
     is_autoload_identifier as _is_autoload_identifier,

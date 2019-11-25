@@ -3,4 +3,4 @@ try:
     import unittest.mock as mock
 except ImportError:
     # You need to install 'mock' package before running
-    import mock
+    import mock  # noqa: F401

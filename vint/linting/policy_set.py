@@ -1,6 +1,5 @@
 import logging
 from vint.linting.level import is_level_enabled
-import vint.linting.policy_registry as policy_registry
 
 
 class PolicySet(object):
