@@ -406,14 +406,17 @@ class ScopeLinker(object):
         # We can access "a:firstline" and "a:lastline" if the function is
         # declared with an attribute "range". See :func-range
         attr = func_node['attr']
-        is_declared_with_range = attr['range'] is not 0
+        is_declared_with_range = attr['range'] != 0
         if is_declared_with_range:
             self._scope_tree_builder.handle_new_range_parameters_found()
 
         # We can access "l:self" is declared with an attribute "dict" or
         # the function is a member of a dict. See :help self
-        is_declared_with_dict = attr['dict'] is not 0 \
-            or NodeType(func_name_node['type']) in FunctionNameNodesDeclaringVariableSelf
+        is_declared_with_dict = (
+            attr["dict"] != 0
+            or NodeType(func_name_node["type"])
+            in FunctionNameNodesDeclaringVariableSelf
+        )
         if is_declared_with_dict:
             self._scope_tree_builder.handle_new_dict_parameter_found()
 
