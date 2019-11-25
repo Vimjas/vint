@@ -36,9 +36,14 @@ script:
   - tox
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash) -f coverage.xml -X fix
-  # coveralls only support one env.
-  - if [ "$TOXENV" = py37-cov ]; then pip install coveralls; coveralls; fi
+  - |
+    if [[ "${TOXENV%-cov}" != $TOXENV ]]; then
+      bash <(curl -s https://codecov.io/bash) -f coverage.xml -X fix
+
+      pip install coveralls
+      COVERALLS_PARALLEL=true coveralls
+    fi
 
 notifications:
   email: false
+  webhooks: https://coveralls.io/webhook
