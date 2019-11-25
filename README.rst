@@ -24,6 +24,12 @@ You can install with `pip <https://pip.pypa.io/en/latest/>`__.
 
     $ pip install vim-vint
 
+If you want to install development version
+
+::
+
+    $ pip install git+https://github.com/Kuniwak/vint
+
 You can use Vint with
 `scrooloose/syntastic <https://github.com/scrooloose/syntastic>`__::
 
