@@ -6,15 +6,6 @@ import sys
 
 
 class TestCLI(unittest.TestCase):
-    def assertRegex(self, string, pattern):
-        assertRegexpMatches = getattr(self, 'assertRegexpMatches', None)
-        if assertRegexpMatches:
-            assertRegexpMatches(string, pattern)
-            return
-
-        super(TestCLI, self).assertRegex(string, pattern)
-
-
     def assertReturnedStdoutEqual(self, expected_stdout, args):
         got_stdout = '(no stdout)'
         cmd = [sys.executable, '-m', 'vint'] + args
@@ -139,7 +130,7 @@ class TestCLI(unittest.TestCase):
 
         got_output = context_manager.exception.output
 
-        expected_output_pattern = '\\033\['
+        expected_output_pattern = r'\\033\['
         self.assertRegex(got_output, expected_output_pattern)
 
 

@@ -12,22 +12,13 @@ jobs:
   include:
     - name: Python 3.7 (integration)
       python: "3.7"
-      env: TOXENV=py37-cov
+      env:
+        - TOXENV=py37-cov
+        # Fail on (internal) deprecation warnings.
+        - PYTEST_ADDOPTS="$PYTEST_ADDOPTS -Werror::DeprecationWarning -Wonce::DeprecationWarning:.*[/\\](_bundles|site-packages)[/\\]"
       git:
         # Check out vital.vim for test_cli_vital.
         submodules: true
-    - name: Python 2.7
-      python: "2.7"
-      env: TOXENV=py27-cov
-    - name: Python 3.6
-      python: "3.6"
-      env: TOXENV=py36-cov
-    - name: Python 3.5
-      python: "3.5"
-      env: TOXENV=py35-cov
-    - name: Python 3.4
-      python: "3.4"
-      env: TOXENV=py34-cov
 
 install:
   - pip install tox
