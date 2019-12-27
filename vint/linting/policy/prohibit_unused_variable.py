@@ -55,5 +55,9 @@ class ProhibitUnusedVariable(AbstractPolicy):
                 ))
                 return True
 
-        self.description = 'Unused variable: {var_name}'.format(var_name=identifier_value)
+        if scope_plugin.is_function_identifier(identifier):
+            node_type = 'function'
+        else:
+            node_type = 'variable'
+        self.description = 'Unused {node_type}: {var_name}'.format(node_type = node_type, var_name=identifier_value)
         return False
