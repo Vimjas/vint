@@ -11,7 +11,6 @@ from vint.linting.policy_registry import register_policy
 # see `:help expr-string`
 _special_char_matcher = re.compile(
     r'(\'|'  # allow single quote
-    r'\$|'  # allow dollar
     r'\\('  # prefix back slash
     r'(?P<octal>[0-7]{1,3})'
     r'|(?P<hexadecimal>[xX][0-9a-fA-F]{1,2})'
