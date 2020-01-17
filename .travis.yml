@@ -59,7 +59,7 @@ deploy:
       password: $DPASS1$DPASS2
       on:
         tags: true
-        repo: Vimjas/pytest
+        repo: Vimjas/vint
 
 notifications:
   email: false
