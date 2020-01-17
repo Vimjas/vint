@@ -8,6 +8,12 @@ env:
   global:
     PYTEST_ADDOPTS="--cov-report=xml"
 
+stages:
+  - name: test
+    if: tag IS NOT present
+  - name: release
+    if: tag IS present
+
 jobs:
   include:
     - name: Python 3.7 (integration)
@@ -29,6 +35,23 @@ jobs:
       python: "3.4"
       env: TOXENV=py34-cov
 
+    - stage: release
+      script: skip
+      install: skip
+      after_success: true
+      env:
+        # PyPI token split into $DPASS1/$DPASS2 (https://github.com/travis-ci/travis.rb/issues/687).
+        secure: "Gvw1PYyfiXR5ZViMwBG9dDqymsVLRJCRjZHxnNGl94H1l+FTvQcMBlwy3aJZvU+hJqkacOEmPB/47hL06pupjvKeUyBDQYX8XW/SZQeblM8/oe4S7ZI1WlH0w0M6XChzmVDaAIuwbS+gd2swU7lV49Vo3iG14ZQVlKG5Z1oEteQ="
+        secure: "OHZdXuOxcEwLM+KWFpYrH54cw/+99EklFXoZ1gOyuJGuMAs2kUfjcmx3mXndKD/UKzZxP6GICHD1YDJok7zUGUcUvT277O6L8aLEbz6sl0PDIRGgG8xHrFbGZNxmTg0nx+qXWXIKmhWRxFT7VItJyocOGCgdfXnHYsiMm+Zqqdw="
+      deploy:
+        provider: pypi
+        distributions: sdist bdist_wheel
+        user: __token__
+        password: $DPASS1$DPASS2
+        on:
+          tags: true
+          repo: Vimjas/vint
+
 install:
   - pip install tox
 
@@ -43,23 +66,6 @@ after_success:
       pip install coveralls
       COVERALLS_PARALLEL=true coveralls
     fi
-
-deploy:
-  python: '3.8'
-  install: pip install -U setuptools setuptools_scm
-  script: skip
-  env:
-    # PyPI token split into $DPASS1/$DPASS2 (https://github.com/travis-ci/travis.rb/issues/687).
-    secure: "Gvw1PYyfiXR5ZViMwBG9dDqymsVLRJCRjZHxnNGl94H1l+FTvQcMBlwy3aJZvU+hJqkacOEmPB/47hL06pupjvKeUyBDQYX8XW/SZQeblM8/oe4S7ZI1WlH0w0M6XChzmVDaAIuwbS+gd2swU7lV49Vo3iG14ZQVlKG5Z1oEteQ="
-    secure: "OHZdXuOxcEwLM+KWFpYrH54cw/+99EklFXoZ1gOyuJGuMAs2kUfjcmx3mXndKD/UKzZxP6GICHD1YDJok7zUGUcUvT277O6L8aLEbz6sl0PDIRGgG8xHrFbGZNxmTg0nx+qXWXIKmhWRxFT7VItJyocOGCgdfXnHYsiMm+Zqqdw="
-    deploy:
-      provider: pypi
-      distributions: sdist bdist_wheel
-      user: __token__
-      password: $DPASS1$DPASS2
-      on:
-        tags: true
-        repo: Vimjas/pytest
 
 notifications:
   email: false
