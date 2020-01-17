@@ -44,22 +44,22 @@ after_success:
       COVERALLS_PARALLEL=true coveralls
     fi
 
-    - stage: deploy
-      python: '3.8'
-      install: pip install -U setuptools setuptools_scm
-      script: skip
-      env:
-        # PyPI token split into $DPASS1/$DPASS2 (https://github.com/travis-ci/travis.rb/issues/687).
-        secure: "Gvw1PYyfiXR5ZViMwBG9dDqymsVLRJCRjZHxnNGl94H1l+FTvQcMBlwy3aJZvU+hJqkacOEmPB/47hL06pupjvKeUyBDQYX8XW/SZQeblM8/oe4S7ZI1WlH0w0M6XChzmVDaAIuwbS+gd2swU7lV49Vo3iG14ZQVlKG5Z1oEteQ="
-        secure: "OHZdXuOxcEwLM+KWFpYrH54cw/+99EklFXoZ1gOyuJGuMAs2kUfjcmx3mXndKD/UKzZxP6GICHD1YDJok7zUGUcUvT277O6L8aLEbz6sl0PDIRGgG8xHrFbGZNxmTg0nx+qXWXIKmhWRxFT7VItJyocOGCgdfXnHYsiMm+Zqqdw="
-      deploy:
-        provider: pypi
-        distributions: sdist bdist_wheel
-        user: __token__
-        password: $DPASS1$DPASS2
-        on:
-          tags: true
-          repo: Vimjas/pytest
+deploy:
+  python: '3.8'
+  install: pip install -U setuptools setuptools_scm
+  script: skip
+  env:
+    # PyPI token split into $DPASS1/$DPASS2 (https://github.com/travis-ci/travis.rb/issues/687).
+    secure: "Gvw1PYyfiXR5ZViMwBG9dDqymsVLRJCRjZHxnNGl94H1l+FTvQcMBlwy3aJZvU+hJqkacOEmPB/47hL06pupjvKeUyBDQYX8XW/SZQeblM8/oe4S7ZI1WlH0w0M6XChzmVDaAIuwbS+gd2swU7lV49Vo3iG14ZQVlKG5Z1oEteQ="
+    secure: "OHZdXuOxcEwLM+KWFpYrH54cw/+99EklFXoZ1gOyuJGuMAs2kUfjcmx3mXndKD/UKzZxP6GICHD1YDJok7zUGUcUvT277O6L8aLEbz6sl0PDIRGgG8xHrFbGZNxmTg0nx+qXWXIKmhWRxFT7VItJyocOGCgdfXnHYsiMm+Zqqdw="
+    deploy:
+      provider: pypi
+      distributions: sdist bdist_wheel
+      user: __token__
+      password: $DPASS1$DPASS2
+      on:
+        tags: true
+        repo: Vimjas/pytest
 
 notifications:
   email: false
