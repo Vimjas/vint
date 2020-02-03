@@ -18,11 +18,11 @@ help us.**
 Quick start
 -----------
 
-You can install with `pip <https://pip.pypa.io/en/latest/>`__.
+You need to install the latest vint from GitHub as
 
 ::
 
-    $ pip install vim-vint
+    $ pip install git+https://github.com/vimjas/vint
 
 You can use Vint with
 `scrooloose/syntastic <https://github.com/scrooloose/syntastic>`__::
