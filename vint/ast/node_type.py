@@ -95,3 +95,8 @@ class NodeType(Enum):
     CURLYNAMEPART = 90
     CURLYNAMEEXPR = 91
     LAMBDA = 92
+    BLOB = 93
+    CONST = 94
+    EVAL = 95
+    HEREDOC = 96
+    METHOD = 97
