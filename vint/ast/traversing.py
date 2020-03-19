@@ -202,6 +202,11 @@ ChildNodeAccessorMap = {
     NodeType.CURLYNAMEPART: [],
     NodeType.CURLYNAMEEXPR: [ChildType['CURLYNAMEEXPR_VALUES']],
     NodeType.LAMBDA: [ChildType['RLIST'], ChildType['LEFT']],
+    NodeType.BLOB: [],
+    NodeType.CONST: [ChildType['LEFT'], ChildType['LIST'], ChildType['REST'], ChildType['RIGHT']],
+    NodeType.EVAL: [ChildType['LEFT']],
+    NodeType.HEREDOC: [ChildType['RLIST'], ChildType['BODY']],
+    NodeType.METHOD: [ChildType['LEFT'], ChildType['RIGHT']],
 }
 
 
