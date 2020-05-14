@@ -25,7 +25,7 @@ You can install with `pip <https://pip.pypa.io/en/latest/>`__.
     $ pip install vim-vint
 
 You can use Vint with
-`scrooloose/syntastic <https://github.com/scrooloose/syntastic>`__::
+`vim-syntastic/syntastic <https://github.com/vim-syntastic/syntastic>`__::
 
     let g:syntastic_vim_checkers = ['vint']
 
@@ -216,8 +216,8 @@ Acknowledgement
    :target: https://pypi.python.org/pypi/vim-vint/
 .. |Supported Python implementations| image:: https://img.shields.io/pypi/implementation/vim-vint.svg
    :target: https://pypi.python.org/pypi/vim-vint/
-.. |Build Status| image:: https://travis-ci.org/Kuniwak/vint.svg?branch=master
-   :target: https://travis-ci.org/Kuniwak/vint
+.. |Build Status| image:: https://travis-ci.org/Vimjas/vint.svg?branch=master
+   :target: https://travis-ci.org/Vimjas/vint
 .. |Coverage Status| image:: https://img.shields.io/coveralls/Kuniwak/vint.svg
    :target: https://coveralls.io/r/Kuniwak/vint
 .. |Code Health| image:: https://landscape.io/github/Kuniwak/vint/master/landscape.png
