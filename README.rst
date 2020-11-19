@@ -28,6 +28,43 @@ You can use Vint with
 `vim-syntastic/syntastic <https://github.com/vim-syntastic/syntastic>`__::
 
     let g:syntastic_vim_checkers = ['vint']
+    
+Or with `coc.nvim <https://github.com/neoclide/coc.nvim>`__ and
+`iamcco/diagnostic-languageserver <https://github.com/iamcco/diagnostic-languageserver>`__::
+    {
+      "languageserver": {
+        "dls": {
+          "command": "diagnostic-languageserver",
+          "args": ["--stdio"],
+          "filetypes": ["vim"],
+          "initializationOptions": {
+            "linters": {
+              "vint": {
+                "command": "vint",
+                "debounce": 100,
+                "args": ["--enable-neovim", "-"],
+                "offsetLine": 0,
+                "offsetColumn": 0,
+                "sourceName": "vint",
+                "formatLines": 1,
+                "formatPattern": [
+                  "[^:]+:(\\d+):(\\d+):\\s*(.*)(\\r|\\n)*$",
+                  {
+                    "line": 1,
+                    "column": 2,
+                    "message": 3
+                  }
+                ]
+              }
+            },
+            "filetypes": {
+              "vim": "vint"
+            }
+          }
+        }
+      }
+    }
+
 
 Configure
 ---------
