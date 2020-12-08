@@ -16,6 +16,9 @@ stages:
 
 jobs:
   include:
+    - name: Python 3.9
+      python: "3.9"
+      env: TOXENV=py39-cov
     - name: Python 3.8
       python: "3.8"
       env: TOXENV=py38-cov
