@@ -6,6 +6,9 @@ env:
   PYTEST_ADDOPTS: "--cov-report=xml --color=yes"
   TOX_TESTENV_PASSENV: 'GITHUB_ACTIONS'
 
+permissions:
+  contents: read
+
 jobs:
   test:
     strategy:
