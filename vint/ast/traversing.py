@@ -207,6 +207,7 @@ ChildNodeAccessorMap = {
     NodeType.EVAL: [ChildType['LEFT']],
     NodeType.HEREDOC: [ChildType['RLIST'], ChildType['BODY']],
     NodeType.METHOD: [ChildType['LEFT'], ChildType['RIGHT']],
+    NodeType.ECHOCONSOLE: [ChildType['LIST']],
 }
 
 

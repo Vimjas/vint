@@ -100,3 +100,4 @@ class NodeType(Enum):
     EVAL = 95
     HEREDOC = 96
     METHOD = 97
+    ECHOCONSOLE = 98
