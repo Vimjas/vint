@@ -4,6 +4,7 @@ on: [push, pull_request]
 
 env:
   PYTEST_ADDOPTS: "--cov-report=xml --color=yes"
+  TOX_TESTENV_PASSENV: 'GITHUB_ACTIONS'
 
 jobs:
   test:
