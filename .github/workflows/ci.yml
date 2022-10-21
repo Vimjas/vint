@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 env:
   PYTEST_ADDOPTS: "--cov-report=xml --color=yes"
-  TOX_TESTENV_PASSENV: 'GITHUB_ACTIONS'
+  TOX_TESTENV_PASSENV: 'TERM'
 
 permissions:
   contents: read
@@ -31,6 +31,7 @@ jobs:
       - run: tox
         env:
           TOXENV: '${{ matrix.toxenv }}'
+          TERM: xterm
       - uses: codecov/codecov-action@v3
         with:
           files: coverage.xml
