@@ -216,10 +216,10 @@ Acknowledgement
    :target: https://pypi.python.org/pypi/vim-vint/
 .. |Supported Python implementations| image:: https://img.shields.io/pypi/implementation/vim-vint.svg
    :target: https://pypi.python.org/pypi/vim-vint/
-.. |Build Status| image:: https://travis-ci.org/Vimjas/vint.svg?branch=master
-   :target: https://travis-ci.org/Vimjas/vint
-.. |Coverage Status| image:: https://img.shields.io/coveralls/Kuniwak/vint.svg
-   :target: https://coveralls.io/r/Kuniwak/vint
+.. |Build Status| image:: https://github.com/Vimjas/vint/actions/workflows/ci.yml/badge.svg
+   :target: https://github.com/Vimjas/vint/actions/workflows/ci.yml
+.. |Coverage Status| image:: https://codecov.io/gh/Vimjas/vint/branch/master/graph/badge.svg
+   :target: https://app.codecov.io/gh/Vimjas/vint
 .. |Code Health| image:: https://landscape.io/github/Kuniwak/vint/master/landscape.png
    :target: https://landscape.io/github/Kuniwak/vint/master
 .. |Dependency Status| image:: https://gemnasium.com/Kuniwak/vint.svg

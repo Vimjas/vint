@@ -1,0 +1,37 @@
+name: CI
+
+on: [push, pull_request]
+
+env:
+  PYTEST_ADDOPTS: "--cov-report=xml --color=yes"
+  TOX_TESTENV_PASSENV: 'TERM'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        python: ['3.10', '3.9', '3.8']
+        include:
+          - python: '3.10'
+            toxenv: py310-cov
+          - python: '3.9'
+            toxenv: py39-cov
+          - python: '3.8'
+            toxenv: py38-cov
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '${{ matrix.python }}'
+      - run: pip install tox
+      - run: tox
+        env:
+          TOXENV: '${{ matrix.toxenv }}'
+          TERM: xterm
+      - uses: codecov/codecov-action@v3
+        with:
+          files: coverage.xml
