@@ -29,6 +29,10 @@ You can use Vint with
 
     let g:syntastic_vim_checkers = ['vint']
 
+You can install with `vim-plug <https://github.com/junegunn/vim-plug>`__::
+
+    plug Vimjas/vint
+
 Configure
 ---------
 
