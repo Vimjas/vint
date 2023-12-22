@@ -12,20 +12,27 @@ class ProhibitEncodingOptionAfterScriptEncoding(AbstractPolicy):
     level = Level.WARNING
 
     was_scriptencoding_found = False
-    has_encoding_opt_after_scriptencoding = False
 
 
     def listen_node_types(self):
-        return [NodeType.EXCMD]
+        return [NodeType.EXCMD, NodeType.TOPLEVEL]
 
 
-    def is_valid(self, excmd_node, lint_context):
+    def is_valid(self, node, lint_context):
         """ Whether the specified node is valid.
 
         This policy prohibits encoding option after scriptencoding.
         """
 
-        cmd_str = excmd_node['str']
+        node_type = NodeType(node['type'])
+
+        if node_type is NodeType.TOPLEVEL:
+          self.was_scriptencoding_found = False
+          return True
+
+        assert node_type is NodeType.EXCMD
+
+        cmd_str = node['str']
 
         if re.match(r':*scripte', cmd_str):
             self.was_scriptencoding_found = True

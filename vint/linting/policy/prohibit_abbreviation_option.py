@@ -22,9 +22,6 @@ class ProhibitAbbreviationOption(AbstractPolicy):
     reference = ':help option-summary'
     level = Level.STYLE_PROBLEM
 
-    was_scriptencoding_found = False
-    has_encoding_opt_after_scriptencoding = False
-
 
     def listen_node_types(self):
         return [NodeType.EXCMD, NodeType.OPTION]
