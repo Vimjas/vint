@@ -3,21 +3,37 @@ from functools import reduce
 from vint.linting.config.config_source import ConfigSource
 
 
-def merge_dict_deeply(posterior, prior):
+class ConfigEmptyEntryException(BaseException):
+    def __init__(self, path):
+        self.path = path
+
+    def __str__(self):
+        return 'empty entry in config: `{path}`'.format(path=self.path)
+
+
+def merge_dict_deeply(posterior, prior, path=[]):
+    def try_get(obj, path):
+        if obj is None:
+            raise ConfigEmptyEntryException(".".join(path))
+        return obj
+
     # type: (Dict[str, Any], Dict[str, Any]) -> Dict[str, Any]
     tmp = {}
 
     for key in set(posterior.keys()) | set(prior.keys()):
+        child_path = path + [key]
         if key in prior:
             if isinstance(prior[key], dict):
-                tmp[key] = merge_dict_deeply(posterior.get(key, {}), prior[key])
+                child_posterior = try_get(posterior.get(key, {}), child_path)
+                tmp[key] = merge_dict_deeply(child_posterior, prior[key],
+                                             child_path)
             else:
-                tmp[key] = prior[key]
+                tmp[key] = try_get(prior[key], child_path)
         else:
             if isinstance(posterior[key], dict):
-                tmp[key] = posterior[key].copy()
+                tmp[key] = try_get(posterior[key], child_path).copy()
             else:
-                tmp[key] = posterior[key]
+                tmp[key] = try_get(posterior[key], child_path)
 
     return tmp
 

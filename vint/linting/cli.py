@@ -6,7 +6,7 @@ import logging
 
 from vint.linting.linter import Linter
 from vint.linting.env import build_environment
-from vint.linting.config.config_container import ConfigContainer
+from vint.linting.config.config_container import ConfigContainer, ConfigEmptyEntryException
 from vint.linting.config.config_cmdargs_source import ConfigCmdargsSource
 from vint.linting.config.config_default_source import ConfigDefaultSource
 from vint.linting.config.config_global_source import ConfigGlobalSource
@@ -34,7 +34,11 @@ def start_cli():
 
     _adjust_log_level(env)
 
-    config_dict = _build_config_dict(env)
+    try:
+        config_dict = _build_config_dict(env)
+    except ConfigEmptyEntryException as e:
+        sys.stderr.write("[error] " + str(e) + "\n")
+        sys.exit(1)
     violations = _lint_all(env, config_dict)
 
     parser = _build_arg_parser()
